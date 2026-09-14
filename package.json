@@ -1,0 +1,28 @@
+{
+  "name": "kotiva-website",
+  "version": "1.0.0",
+  "description": "Premium skincare website for KOTIVA™ — doctor-approved formulations for the MENA market.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node scripts/test-routine-engine.mjs && node scripts/check-consistency.js && node scripts/check-global-consistency.js && node scripts/generate-routine-model.js --check",
+    "test:routine": "node scripts/test-routine-engine.mjs",
+    "gen:routine-model": "node scripts/generate-routine-model.js",
+    "check": "node scripts/check-consistency.js",
+    "check:global": "node scripts/check-global-consistency.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AshaterEzz/kotiva-website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/AshaterEzz/kotiva-website/issues"
+  },
+  "homepage": "https://github.com/AshaterEzz/kotiva-website#readme",
+  "devDependencies": {
+    "playwright": "^1.61.0"
+  }
+}

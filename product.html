@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ritual">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pdp-title">Product — kotiva™</title>
+<meta id="pdp-meta-desc" name="description" content="Doctor-approved skincare. Perfected by science.">
+<meta name="robots" content="noindex, follow">
+<link id="pdp-canonical" rel="canonical" href="https://kotiva.co/product.html">
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="KOTIVA">
+<meta property="og:locale" content="en_US">
+<meta id="pdp-og-title" property="og:title" content="Product — kotiva™">
+<meta id="pdp-og-desc" property="og:description" content="Doctor-approved skincare. Perfected by science.">
+<meta id="pdp-og-url" property="og:url" content="https://kotiva.co/product.html">
+<meta id="pdp-og-image" property="og:image" content="https://kotiva.co/assets/hero-warm-skincare.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta id="pdp-tw-title" name="twitter:title" content="Product — kotiva™">
+<meta id="pdp-tw-desc" name="twitter:description" content="Doctor-approved skincare. Perfected by science.">
+<meta id="pdp-tw-image" name="twitter:image" content="https://kotiva.co/assets/hero-warm-skincare.webp">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=20260720">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png?v=20260720">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260720">
+  <link rel="preload" href="fonts/FuturaNowVar-Roman.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/Montserrat-VariableFont_wght_25.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/kotiva.css?v=v4m">
+<style>
+.pdp-hero {
+  padding-top: var(--nav-h);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 88vh;
+}
+.pdp-gallery {
+  position: sticky;
+  top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+  overflow: hidden;
+  background: #0e0c0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdp-gallery-img {
+  width: 70%;
+  max-width: 420px;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+}
+.pdp-gallery-badge {
+  position: absolute;
+  top: 32px; left: 32px;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  background: var(--bronze);
+  color: var(--black);
+  padding: 6px 14px;
+}
+.pdp-gallery-num {
+  position: absolute;
+  bottom: 32px; right: 32px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  /* K12: 0.2 alpha measured 1.72:1 on the near-black gallery — the worst ratio on the site, and
+     effectively invisible text rather than merely low-contrast. 0.48 gives 4.52:1. */
+  color: rgba(245,240,232,0.48);
+}
+.pdp-content {
+  padding: clamp(48px, 6vw, 80px) clamp(36px, 5vw, 72px);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.pdp-breadcrumb {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 28px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.pdp-breadcrumb a { color: inherit; transition: color 0.2s; }
+.pdp-breadcrumb a:hover { color: var(--bronze); }
+.pdp-breadcrumb-sep { color: var(--border); }
+.pdp-skin-type {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  margin-bottom: 16px;
+}
+.pdp-name {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 48px);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.0;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+.pdp-category {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 16px;
+}
+.pdp-price {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.pdp-price-vat {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+.pdp-claim {
+  font-family: var(--font-script);
+  font-size: clamp(18px, 1.8vw, 28px);
+  color: var(--script);
+  margin-bottom: 28px;
+}
+.pdp-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 28px 0;
+}
+.pdp-description {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--fg-mid);
+  font-family: var(--font-body);
+  margin-bottom: 32px;
+}
+.pdp-benefits-list {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.pdp-benefits-list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fg-mid);
+  font-family: var(--font-body);
+}
+.pdp-benefits-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  background: var(--bronze);
+  border-radius: 50%;
+}
+.pdp-ingredients-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.pdp-ingredient-pill {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  color: var(--accent-deep);
+}
+.pdp-free-from {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.pdp-free-pill {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border: 1px solid rgba(100,180,100,0.2);
+  color: rgba(100,200,140,0.6);
+}
+.pdp-how-to {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 24px 28px;
+  margin-bottom: 32px;
+}
+.pdp-how-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  margin-bottom: 12px;
+}
+.pdp-how-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--fg-mid);
+  font-family: var(--font-body);
+}
+.pdp-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pdp-doctor-badge {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--border);
+  padding: 16px 20px;
+}
+.pdp-doctor-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.pdp-doctor-text {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--fg-mid);
+  line-height: 1.7;
+}
+/* RELATED */
+.related-section {
+  padding: var(--gap-section) 0;
+  border-top: 1px solid var(--border);
+}
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-top: clamp(36px, 4vw, 56px);
+}
+@media (max-width: 1000px) {
+  .pdp-hero { grid-template-columns: 1fr; }
+  .pdp-gallery { position: relative; height: 60vw; min-height: 300px; top: 0; }
+  .pdp-content { border-left: none; border-top: 1px solid var(--border); }
+  .related-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════ -->
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="nav transparent" id="main-nav" role="navigation">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html" aria-label="KOTIVA Home">
+      <img class="logo-dark" src="assets/kotiva-logo.svg?v=lg1" alt="KOTIVA" height="28" />
+      <img class="logo-light" src="assets/kotiva-logo-white.svg?v=lg1" alt="KOTIVA" height="28" style="display:none;" />
+    </a>
+    <div class="nav-links" role="list">
+      <a class="nav-link" href="index.html" role="listitem">Home</a>
+      <a class="nav-link" href="shop.html" role="listitem">Shop</a>
+      <a class="nav-link" href="science.html" role="listitem">Science</a>
+      <a class="nav-link" href="journal.html" role="listitem">Journal</a>
+      <a class="nav-link" href="about.html" role="listitem">About</a>
+      <a class="nav-link" href="contact.html" role="listitem">Where to Buy</a>
+    </div>
+    <div class="nav-right">
+      <a class="btn btn-gold btn-sm" href="routine-finder.html">Find My Routine</a>
+      <button class="nav-theme-btn" id="theme-toggle" aria-label="Switch to dark mode" title="Toggle light/dark">
+        <span class="icon-moon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
+        <span class="icon-sun" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></span>
+      </button>
+      <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Overlay -->
+<div class="nav-overlay" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <a class="nav-link" href="index.html">Home</a>
+  <a class="nav-link" href="shop.html">Shop</a>
+  <a class="nav-link" href="science.html">Science</a>
+  <a class="nav-link" href="journal.html">Journal</a>
+  <a class="nav-link" href="about.html">About</a>
+  <a class="nav-link" href="contact.html">Where to Buy</a>
+  <a class="btn btn-gold" href="routine-finder.html">Find My Routine</a>
+</div>
+
+<main id="main-content">
+  <!-- rendered by JS -->
+  <div style="padding: 200px 0; text-align:center;" id="pdp-loading">
+    <p class="t-eyebrow" style="text-align:center;">Loading product…</p>
+  </div>
+</main>
+
+<!-- FOOTER via layout.js -->
+
+<script src="js/data-lite.js?v=v8"></script>
+<script src="js/data-full.js?v=v1"></script>
+<footer class="footer" data-theme="ritual" role="contentinfo">
+  <div class="container">
+    <div class="footer-main">
+      <div>
+        <a class="footer-brand-link" href="index.html" aria-label="KOTIVA — home"><img class="footer-brand-logo logo-dark" src="assets/kotiva-logo.svg?v=lg1" alt="" /></a>
+        <p class="footer-tagline mt-16">Doctor-approved skincare. Perfected by science. Tailored for you.</p>
+        <!-- SOCIAL: accounts not created yet. Rendered as non-interactive marks on purpose -->
+        <!-- (no href = no dead click). To activate: swap each span for -->
+        <!-- <a href="URL" target="_blank" rel="noopener noreferrer" aria-label="X"> and drop the caption. -->
+        <div class="footer-social" aria-label="Social media — accounts coming soon">
+          <span class="footer-social-icon" role="img" aria-label="Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg></span>
+          <span class="footer-social-icon" role="img" aria-label="TikTok"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg></span>
+          <span class="footer-social-icon" role="img" aria-label="Facebook"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></span>
+        </div>
+        <span class="footer-social-soon">Coming soon</span>
+      </div>
+      <div><div class="footer-col-title">Shop</div>
+        <nav class="footer-links" aria-label="Shop links">
+          <a href="shop.html">All Products</a><a href="shop.html?filter=face">Face Care</a>
+          <a href="shop.html?filter=body">Body Care</a><a href="shop.html?filter=serums">Serums</a>
+          <a href="shop.html?filter=sunscreen">SPF</a><a href="shop.html?filter=hair">Hair</a>
+        </nav>
+      </div>
+      <div><div class="footer-col-title">Company</div>
+        <nav class="footer-links" aria-label="Company links">
+          <a href="about.html">About Kotiva</a><a href="science.html">Our Science</a><a href="ingredients.html">Ingredient Glossary</a>
+          <a href="routine-finder.html">Routine Finder</a><a href="journal.html">Journal</a><a href="index.html#newsletter">Newsletter</a>
+          <a href="contact.html">Contact Us</a><a href="assets/kotiva-company-profile.pdf" target="_blank" rel="noopener">Company Profile (PDF)</a>
+        </nav>
+      </div>
+      <div><div class="footer-col-title">Support</div>
+        <nav class="footer-links" aria-label="Support links">
+          <a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="contact.html#faq">FAQ</a>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 KOTIVA&trade;, a brand of Vitakode LLC. All rights reserved.</span>
+      <span>Doctor-approved skincare tailored for you.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/layout.js?v=v3s"></script>
+<script src="js/animations.js?v=v3m"></script>
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const product = KOTIVA.products.find(p => p.id === parseInt(id, 10));
+  const main = document.getElementById('main-content');
+  if (!main) return;
+
+  if (!product) {
+    main.innerHTML = `<div style="padding:200px 0;text-align:center;">
+      <p class="t-eyebrow" style="text-align:center;margin-bottom:24px;">Product not found</p>
+      <a href="shop.html" class="btn btn-outline" style="display:inline-flex;">← Back to Products</a>
+    </div>`;
+    return;
+  }
+
+  // Update page title + per-product metadata (title/description only used to update the DOM
+  // after JS runs — see product.html's <head> comment / SEO audit 2026-07-04: this is a partial
+  // mitigation only, since none of this exists in the static HTML a non-JS crawler would fetch.
+  // Proper fix is server/build-time pre-rendering of each product's page — tracked separately.)
+  const pageUrl = `${window.location.origin}/product.html?id=${product.id}`;
+  const img = KOTIVA.productImage(product);
+  const absImg = img ? `${window.location.origin}/${img.replace(/^\//, '')}` : `${window.location.origin}/assets/hero-warm-skincare.webp`;
+  const shortDesc = product.description.length > 160 ? product.description.slice(0, 157) + '…' : product.description;
+
+  document.title = `${product.name} — kotiva™`;
+  const setMeta = (id, attr, value) => { const el = document.getElementById(id); if (el) el[attr] = value; };
+  setMeta('pdp-meta-desc', 'content', shortDesc);
+  setMeta('pdp-canonical', 'href', pageUrl);
+  setMeta('pdp-og-title', 'content', `${product.name} — kotiva™`);
+  setMeta('pdp-og-desc', 'content', shortDesc);
+  setMeta('pdp-og-url', 'content', pageUrl);
+  setMeta('pdp-og-image', 'content', absImg);
+  setMeta('pdp-tw-title', 'content', `${product.name} — kotiva™`);
+  setMeta('pdp-tw-desc', 'content', shortDesc);
+  setMeta('pdp-tw-image', 'content', absImg);
+
+  // Product structured data (JSON-LD) — built from the product record
+  (function() {
+    var ld = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": product.name,
+      "description": product.description,
+      "image": absImg,
+      "url": pageUrl,
+      "sku": product.kot,
+      "brand": { "@type": "Brand", "name": "KOTIVA" },
+      "category": product.category,
+      "offers": {
+        "@type": "Offer",
+        "url": pageUrl,
+        "availability": "https://schema.org/PreOrder",
+        "itemCondition": "https://schema.org/NewCondition"
+      }
+    };
+    var s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.textContent = JSON.stringify(ld);
+    document.head.appendChild(s);
+
+    var breadcrumbLd = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Products", "item": `${window.location.origin}/shop.html` },
+        { "@type": "ListItem", "position": 2, "name": product.category, "item": `${window.location.origin}/shop.html?filter=${encodeURIComponent(product.filterTags && product.filterTags[0] || '')}` },
+        { "@type": "ListItem", "position": 3, "name": product.name, "item": pageUrl }
+      ]
+    };
+    var s2 = document.createElement('script');
+    s2.type = 'application/ld+json';
+    s2.textContent = JSON.stringify(breadcrumbLd);
+    document.head.appendChild(s2);
+  })();
+
+  const thumb = img;
+  const ingPills = product.ingredients.map(i => `<span class="pdp-ingredient-pill">${i}</span>`).join('');
+  const freePills = product.freeFrom.map(f => `<span class="pdp-free-pill">${f} Free</span>`).join('');
+  const benefitsHtml = (product.benefits || []).map(b => `<li>${b}</li>`).join('');
+  // Verbatim clinical/actives content -> escaped, with references collapsed to tidy links
+  const sciHtml = (product.science || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">source &#8599;<\/a>')
+    .replace(/\n{2,}/g,'<br><br>').replace(/\n/g,'<br>');
+
+  // Related products (same category, different id)
+  const related = KOTIVA.products.filter(p => p.category === product.category && p.id !== product.id).slice(0,4);
+  const relatedCards = related.map(p => {
+    const t = KOTIVA.productImage(p);
+    const nm = p.name.replace(/^Kotiva\s+/i, '');
+    return `<a class="product-card" href="product.html?id=${p.id}" style="border:none;">
+      <div class="product-card-img"><img src="${t}" alt="${nm}" loading="lazy"></div>
+      <div class="product-card-body">
+        <div class="product-card-name">${nm}</div>
+        <div class="product-card-desc">${p.category} · ${p.skinType}</div>
+        <div class="product-card-footer"><span class="badge-concern">${p.concern}</span><span class="product-card-cta">Discover</span></div>
+      </div>
+    </a>`;
+  }).join('');
+
+  main.innerHTML = `
+  <!-- PDP HERO -->
+  <div class="pdp-hero">
+    <!-- GALLERY -->
+    <div class="pdp-gallery">
+      <div class="grain-overlay"></div>
+      ${product.badge ? `<div class="pdp-gallery-badge">${product.badge}</div>` : ''}
+      <img src="${thumb}" alt="${product.name}" class="pdp-gallery-img">
+      <div class="pdp-gallery-num">${String(KOTIVA.products.findIndex(p => p.id === product.id) + 1).padStart(2,'0')} / ${String(KOTIVA.products.length).padStart(2,'0')}</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="pdp-content">
+      <div class="pdp-breadcrumb">
+        <a href="shop.html">Products</a>
+        <span class="pdp-breadcrumb-sep">→</span>
+        <span>${product.category}</span>
+      </div>
+
+      <div class="pdp-skin-type">${product.skinType}</div>
+      <h1 class="pdp-name">${product.name}</h1>
+      <div class="pdp-category">${product.category}${product.volume ? ` · ${product.volume}` : ''}</div>
+      ${product.price ? `<div class="pdp-price"><span>${product.currency} ${product.price.toFixed(2)}</span><span class="pdp-price-vat">VAT included</span></div>` : ''}
+      <div class="pdp-claim">${product.action}</div>
+
+      <div class="pdp-divider"></div>
+
+      <p class="pdp-description">${product.description}</p>
+
+      ${benefitsHtml ? `
+      <div class="pdp-benefits" style="margin-bottom:8px;">
+        <p class="t-eyebrow" style="margin-bottom:12px; color:var(--fg-dim);">Key Benefits</p>
+        <ul class="pdp-benefits-list">${benefitsHtml}</ul>
+      </div>` : ''}
+
+      ${ingPills ? `
+      <div style="margin-bottom:8px;">
+        <p class="t-eyebrow" style="margin-bottom:12px; color:var(--fg-dim);">Key Ingredients</p>
+        <div class="pdp-ingredients-list">${ingPills}</div>
+      </div>` : ''}
+
+      ${freePills ? `<div class="pdp-free-from">${freePills}</div>` : ''}
+
+      <div class="pdp-how-to">
+        <div class="pdp-how-label">How to Use</div>
+        <p class="pdp-how-text">${product.howToUse || 'Apply as directed. Part of The Kotiva Standard routine.'}</p>
+      </div>
+
+      ${sciHtml ? `
+      <details class="pdp-science">
+        <summary><span>The Science</span><span class="pdp-science-hint">Actives &amp; clinical references</span></summary>
+        <div class="pdp-science-body">${sciHtml}</div>
+      </details>` : ''}
+
+      <div class="pdp-actions">
+        <a href="contact.html" class="btn btn-primary">Where to Buy</a>
+        <a href="routine-finder.html" class="btn btn-outline">Build Your Routine</a>
+      </div>
+
+      <div class="pdp-doctor-badge">
+        <div class="pdp-doctor-icon">⚕</div>
+        <div class="pdp-doctor-text">
+          Doctor Approved · Kotiva Standard<br>
+          Formulated with clinically proven active ingredients
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RELATED PRODUCTS -->
+  ${related.length ? `
+  <section class="related-section">
+    <div class="container">
+      <div class="section-header-row">
+        <div>
+          <p class="t-eyebrow" style="margin-bottom:12px;">You May Also Need</p>
+          <h2 class="t-title">COMPLETE YOUR<br>ROUTINE</h2>
+        </div>
+        <a href="shop.html" class="btn-text-light">View All →</a>
+      </div>
+      <div class="related-grid">${relatedCards}</div>
+    </div>
+  </section>` : ''}
+  `;
+})();
+</script>
+</body>
+</html>

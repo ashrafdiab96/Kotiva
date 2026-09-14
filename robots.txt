@@ -1,0 +1,4 @@
+# kotiva.co — STAGING (pre-launch, go-live gated on client approval, DEC-176)
+# Update at go-live domain flip: replace Disallow: / with Allow: / + restore the Sitemap line
+User-agent: *
+Disallow: /

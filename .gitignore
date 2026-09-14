@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.tar.gz
+*.zip
+
+# Logs
+*.log
+
+# Dependencies / editor / agent
+node_modules/
+.claude/
+
+# Local scratch / design-review previews — never part of the deployable site
+scratch/

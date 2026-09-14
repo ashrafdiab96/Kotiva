@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ritual">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Science — kotiva™</title>
+<meta name="description" content="The clinical science behind kotiva™. Ingredient selection, formulation philosophy, and the clinical rationale behind every active.">
+<link rel="canonical" href="https://kotiva.co/science.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KOTIVA">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Our Science — kotiva™">
+<meta property="og:description" content="The clinical science behind kotiva™. Ingredient selection, formulation philosophy, and the clinical rationale behind every active.">
+<meta property="og:url" content="https://kotiva.co/science.html">
+<meta property="og:image" content="https://kotiva.co/assets/hero-warm-skincare.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Our Science — kotiva™">
+<meta name="twitter:description" content="The clinical science behind kotiva™. Ingredient selection, formulation philosophy, and the rationale behind every active.">
+<meta name="twitter:image" content="https://kotiva.co/assets/hero-warm-skincare.webp">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=20260720">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png?v=20260720">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260720">
+  <link rel="preload" href="fonts/FuturaNowVar-Roman.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/Montserrat-VariableFont_wght_25.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/kotiva.css?v=v4m">
+<style>
+.science-hero {
+  padding-top: calc(var(--nav-h) + 80px);
+  padding-bottom: 80px;
+  border-bottom: 1px solid var(--border);
+}
+/* INGREDIENT LIBRARY */
+.ingredient-library {
+  padding: var(--gap-section) 0;
+}
+.ingredients-filter {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  width: fit-content;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+.ing-filter-btn {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 11px 22px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--fg-mid);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.ing-filter-btn:last-child { border-right: none; }
+.ing-filter-btn.active, .ing-filter-btn:hover {
+  background: var(--bronze);
+  color: var(--black);
+}
+.ingredients-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.actives-card {
+  background: var(--black);
+  padding: clamp(28px, 3.5vw, 48px);
+  transition: background 0.3s;
+  cursor: pointer;
+}
+.actives-card:hover { background: var(--bg-alt); }
+.actives-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.actives-card-name {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.5vw, 20px);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg);
+  line-height: 1.1;
+}
+.actives-card-claim {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.actives-card-desc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-mid);
+  margin-bottom: 20px;
+  font-family: var(--font-body);
+}
+.actives-card-products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.actives-card-product {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+}
+/* PHILOSOPHY */
+.philosophy-section {
+  background: var(--bg);
+  padding: var(--gap-section) 0;
+}
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.philosophy-card {
+  background: var(--bg);
+  padding: clamp(32px, 4vw, 56px) clamp(24px, 3vw, 40px);
+}
+.philo-num {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--accent-deep);
+  margin-bottom: 20px;
+}
+.philo-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin-bottom: 14px;
+  line-height: 1.2;
+}
+.philo-desc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-mid);
+  font-family: var(--font-body);
+}
+/* CATEGORIES OF ACTIVES */
+.actives-section {
+  padding: var(--gap-section) 0;
+  border-top: 1px solid var(--border);
+}
+.actives-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.active-block {
+  background: var(--black);
+  padding: 32px 28px;
+}
+.active-category {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  margin-bottom: 16px;
+}
+.active-ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.active-ing-row {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.active-ing-row:last-child { border-bottom: none; padding-bottom: 0; }
+/* HERO INGREDIENT FEATURE */
+.hero-ing-feature {
+  background: #0D0C0A;
+  padding: var(--gap-section) 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 100px);
+  align-items: center;
+}
+.feature-ing-display {
+  text-align: center;
+  padding: 60px 40px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+.feature-ing-name {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 60px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.feature-ing-claim {
+  font-family: var(--font-script);
+  font-size: clamp(18px, 1.8vw, 28px);
+  color: var(--script);
+}
+@media (max-width: 900px) {
+  .ingredients-grid { grid-template-columns: repeat(2, 1fr); }
+  .philosophy-grid { grid-template-columns: repeat(2, 1fr); }
+  .actives-grid { grid-template-columns: repeat(2, 1fr); }
+  .feature-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .ingredients-grid { grid-template-columns: 1fr; }
+  .philosophy-grid { grid-template-columns: 1fr; }
+  .actives-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════ -->
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="nav transparent" id="main-nav" role="navigation">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html" aria-label="KOTIVA Home">
+      <img class="logo-dark" src="assets/kotiva-logo.svg?v=lg1" alt="KOTIVA" height="28" />
+      <img class="logo-light" src="assets/kotiva-logo-white.svg?v=lg1" alt="KOTIVA" height="28" style="display:none;" />
+    </a>
+    <div class="nav-links" role="list">
+      <a class="nav-link" href="index.html" role="listitem">Home</a>
+      <a class="nav-link" href="shop.html" role="listitem">Shop</a>
+      <a class="nav-link" href="science.html" role="listitem">Science</a>
+      <a class="nav-link" href="journal.html" role="listitem">Journal</a>
+      <a class="nav-link" href="about.html" role="listitem">About</a>
+      <a class="nav-link" href="contact.html" role="listitem">Where to Buy</a>
+    </div>
+    <div class="nav-right">
+      <a class="btn btn-gold btn-sm" href="routine-finder.html">Find My Routine</a>
+      <button class="nav-theme-btn" id="theme-toggle" aria-label="Switch to dark mode" title="Toggle light/dark">
+        <span class="icon-moon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
+        <span class="icon-sun" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></span>
+      </button>
+      <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Overlay -->
+<div class="nav-overlay" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <a class="nav-link" href="index.html">Home</a>
+  <a class="nav-link" href="shop.html">Shop</a>
+  <a class="nav-link" href="science.html">Science</a>
+  <a class="nav-link" href="journal.html">Journal</a>
+  <a class="nav-link" href="about.html">About</a>
+  <a class="nav-link" href="contact.html">Where to Buy</a>
+  <a class="btn btn-gold" href="routine-finder.html">Find My Routine</a>
+</div>
+
+<main id="main-content">
+  <!-- HERO -->
+  <header class="science-hero">
+    <div class="container">
+      <div style="max-width:800px;">
+        <p class="t-eyebrow reveal" style="margin-bottom:20px;">Clinical Formulation</p>
+        <h1 class="t-display reveal reveal-delay-1" style="margin-bottom:28px;">OUR<br>SCIENCE</h1>
+        <span class="t-script reveal reveal-delay-2" style="display:block; margin-bottom:28px;">Perfected by science.</span>
+        <p class="t-body reveal reveal-delay-3" style="max-width:580px; font-size:16px;">We don't select ingredients because they trend. We select them because clinical evidence demonstrates measurable performance on real skin. Every active in the Kotiva range has a reason to be there.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO INGREDIENT FEATURE -->
+  <section class="hero-ing-feature" data-theme="editorial">
+    <div class="container">
+      <div class="feature-grid">
+        <div class="feature-ing-display reveal">
+          <div class="grain-overlay"></div>
+          <p class="t-eyebrow" style="margin-bottom:16px; text-align:center;">Hero Active</p>
+          <div class="feature-ing-name">Niacinamide</div>
+          <div class="feature-ing-claim">Pore Minimizing &amp; Tone Evening</div>
+        </div>
+        <div class="reveal reveal-delay-2">
+          <p class="t-eyebrow" style="margin-bottom:20px;">Why We Use It</p>
+          <h2 class="t-title" style="margin-bottom:20px;">THE MOST<br>VERSATILE<br>ACTIVE IN<br>SKINCARE</h2>
+          <p class="t-body" style="margin-bottom:20px;">Niacinamide (Vitamin B3) is clinically proven to reduce pore appearance, even skin tone, calm inflammation, and regulate sebum — making it our most widely deployed active ingredient across the Kotiva range.</p>
+          <p class="t-body" style="margin-bottom:32px;">At 1%, we achieve measurable efficacy without the irritation risk that comes with higher concentrations in compromised skin barriers. Precision concentration. Proven results.</p>
+          <a href="shop.html" class="btn btn-outline">Shop Products With Niacinamide</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INGREDIENT LIBRARY -->
+  <section class="ingredient-library">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="t-eyebrow" style="margin-bottom:16px;">Ingredient Library</p>
+        <div class="section-header-row">
+          <h2 class="t-headline">THE ACTIVES<br>WE TRUST</h2>
+        </div>
+        <p class="t-body" style="max-width:500px; margin-top:16px;">Every ingredient in the Kotiva range is selected based on clinical evidence, safety profile, and compatibility with the specific skin types it targets.</p>
+      </div>
+      <div class="ingredients-grid" id="ing-library-grid"></div>
+      <!-- K38: the full Ingredient Glossary (22 actives, its own page) was reachable ONLY
+           from the footer, and the section that exists to talk about actives did not link
+           to it. The 2026-07 decision packet says the glossary "stays, presented under
+           Science" — this is that presentation. -->
+      <p class="t-body" style="margin-top:32px;"><a href="ingredients.html" class="ritual-foot-link" style="color:var(--accent-text);border-bottom:1px solid currentColor;padding-bottom:2px;text-decoration:none;">Browse the full ingredient glossary &rarr;</a></p>
+    </div>
+  </section>
+
+  <!-- PHILOSOPHY -->
+  <section class="philosophy-section" style="position:relative;overflow:hidden;">
+    <!-- K30-C: the Science page carried zero content imagery. This band sits behind the
+         heading at low opacity, same treatment as the homepage bestsellers backdrop —
+         atmosphere, never a focal point. Unbranded glassware, no graduations, no text. -->
+    <img src="assets/science-philosophy.webp" alt="" role="presentation" loading="lazy"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.14;z-index:0;pointer-events:none;" />
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="reveal">
+        <p class="t-eyebrow" style="margin-bottom:16px; color:var(--fg-dim);">Formulation Philosophy</p>
+        <h2 class="t-headline" style="color:var(--fg);">HOW WE BUILD<br>A PRODUCT</h2>
+      </div>
+      <div class="philosophy-grid">
+        <div class="philosophy-card reveal">
+          <div class="philo-num">Step 01</div>
+          <div class="philo-title">Identify the Skin Reality</div>
+          <div class="philo-desc">We start with a real skin concern, not a market gap. Oily and acne-prone skin needs oil regulation and pore clearing — not a generic cleanser. We define the biological target first.</div>
+        </div>
+        <div class="philosophy-card reveal reveal-delay-1">
+          <div class="philo-num">Step 02</div>
+          <div class="philo-title">Select the Active</div>
+          <div class="philo-desc">We shortlist only ingredients with published clinical evidence for the identified concern. We review concentration data, compatibility matrices, and contraindication profiles before selection.</div>
+        </div>
+        <div class="philosophy-card reveal reveal-delay-2">
+          <div class="philo-num">Step 03</div>
+          <div class="philo-title">Optimise the Concentration</div>
+          <div class="philo-desc">More is rarely better in cosmeceuticals. We formulate at clinically effective concentrations — not maximum doses — to maximise efficacy while preserving skin barrier integrity.</div>
+        </div>
+        <div class="philosophy-card reveal">
+          <div class="philo-num">Step 04</div>
+          <div class="philo-title">Doctor Review</div>
+          <div class="philo-desc">Every formula is guided by expert insight and selected according to dermatological research, in compliance with stringent European Union manufacturing standards.</div>
+        </div>
+        <div class="philosophy-card reveal reveal-delay-1">
+          <div class="philo-num">Step 05</div>
+          <div class="philo-title">Verify Free-From Status</div>
+          <div class="philo-desc">Where safety data supports it, we formulate free from parabens, sulphates, and alcohol. We declare this clearly and honestly on packaging and product pages — no ambiguity.</div>
+        </div>
+        <div class="philosophy-card reveal reveal-delay-2">
+          <div class="philo-num">Step 06</div>
+          <div class="philo-title">Set the Standard</div>
+          <div class="philo-desc">The final product only carries the kotiva™ mark when it meets every benchmark in our formulation and validation process. The Kotiva Standard is a real standard — not a slogan.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTIVES BY CATEGORY -->
+  <section class="actives-section">
+    <div class="container">
+      <div class="reveal">
+        <p class="t-eyebrow" style="margin-bottom:16px;">Active Ingredients by Function</p>
+        <h2 class="t-headline">EVERY ACTIVE.<br>A PURPOSE.</h2>
+      </div>
+      <figure class="reveal" style="margin:0 0 clamp(32px,4vw,56px);">
+        <img src="assets/science-actives.webp" alt="A ribbon of amber serum folding onto pale stone, lit from behind" loading="lazy" width="1536" height="1024" style="display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:var(--radius-md,8px);" />
+      </figure>
+      <div class="actives-grid reveal reveal-delay-1">
+        <div class="active-block" data-theme="editorial">
+          <div class="active-category">Hydration</div>
+          <div class="active-ingredients">
+            <div class="active-ing-row">Hyaluronic Acid</div>
+            <div class="active-ing-row">Sorbitol</div>
+            <div class="active-ing-row">Urea 3%</div>
+            <div class="active-ing-row">Panthenol (B5)</div>
+            <div class="active-ing-row">Vitamin B5</div>
+          </div>
+        </div>
+        <div class="active-block" data-theme="editorial">
+          <div class="active-category">Brightening</div>
+          <div class="active-ingredients">
+            <div class="active-ing-row">Tranexamic Acid</div>
+            <div class="active-ing-row">Niacinamide</div>
+            <div class="active-ing-row">Glutathione</div>
+            <div class="active-ing-row">Pyruvic Acid</div>
+            <div class="active-ing-row">Troxerutin</div>
+          </div>
+        </div>
+        <div class="active-block" data-theme="editorial">
+          <div class="active-category">Anti-Aging</div>
+          <div class="active-ingredients">
+            <div class="active-ing-row">Retinyl Palmitate</div>
+            <div class="active-ing-row">Coenzyme Q10</div>
+            <div class="active-ing-row">Vegetal Proteins</div>
+            <div class="active-ing-row">Ceramide Precursors</div>
+            <div class="active-ing-row">Caffeine</div>
+          </div>
+        </div>
+        <div class="active-block" data-theme="editorial">
+          <div class="active-category">Clarifying</div>
+          <div class="active-ingredients">
+            <div class="active-ing-row">Salicylic Acid 2%</div>
+            <div class="active-ing-row">Azelaic Acid</div>
+            <div class="active-ing-row">Malic Acid</div>
+            <div class="active-ing-row">Zinc PCA</div>
+            <div class="active-ing-row">Zinc Oxide</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANUFACTURING STANDARDS -->
+  <section class="actives-section" aria-label="Manufacturing standards">
+    <div class="container">
+      <div class="reveal" style="max-width:760px;">
+        <p class="t-eyebrow" style="margin-bottom:16px;">Manufacturing Standards</p>
+        <h2 class="t-headline" style="margin-bottom:20px;">MANUFACTURED<br>IN POLAND. EU GMP<br>CERTIFIED.</h2>
+        <p class="t-body">Every kotiva™ product is manufactured in Poland using high-quality European raw materials, in full compliance with stringent European Union manufacturing standards and Good Manufacturing Practices (GMP). Poland's advanced research institutions, skilled scientists, and state-of-the-art production facilities follow strict EU regulations to ensure quality, safety, and consistency — making it a trusted hub for the development of high-quality skincare. This same scientific rigor is why our formulations meet the standard healthcare professionals and consumers can rely on.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="padding: var(--gap-section) 0; border-top: 1px solid var(--border);">
+    <div class="container" style="text-align:center;">
+      <div class="reveal">
+        <p class="t-eyebrow" style="text-align:center; margin-bottom:20px;">Ready to Apply the Science</p>
+        <h2 class="t-headline" style="text-align:center; margin-bottom:28px;">SHOP THE<br>RANGE</h2>
+        <p class="t-body" style="text-align:center; max-width:440px; margin:0 auto 36px;">25 doctor-approved formulations. Every ingredient selected for measurable, clinical performance.</p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+          <a href="shop.html" class="btn btn-primary">Explore Products</a>
+          <a href="routine-finder.html" class="btn btn-outline">Find My Routine</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER via layout.js -->
+
+<script src="js/data-lite.js?v=v8"></script>
+<footer class="footer" data-theme="ritual" role="contentinfo">
+  <div class="container">
+    <div class="footer-main">
+      <div>
+        <a class="footer-brand-link" href="index.html" aria-label="KOTIVA — home"><img class="footer-brand-logo logo-dark" src="assets/kotiva-logo.svg?v=lg1" alt="" /></a>
+        <p class="footer-tagline mt-16">Doctor-approved skincare. Perfected by science. Tailored for you.</p>
+        <!-- SOCIAL: accounts not created yet. Rendered as non-interactive marks on purpose -->
+        <!-- (no href = no dead click). To activate: swap each span for -->
+        <!-- <a href="URL" target="_blank" rel="noopener noreferrer" aria-label="X"> and drop the caption. -->
+        <div class="footer-social" aria-label="Social media — accounts coming soon">
+          <span class="footer-social-icon" role="img" aria-label="Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg></span>
+          <span class="footer-social-icon" role="img" aria-label="TikTok"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg></span>
+          <span class="footer-social-icon" role="img" aria-label="Facebook"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></span>
+        </div>
+        <span class="footer-social-soon">Coming soon</span>
+      </div>
+      <div><div class="footer-col-title">Shop</div>
+        <nav class="footer-links" aria-label="Shop links">
+          <a href="shop.html">All Products</a><a href="shop.html?filter=face">Face Care</a>
+          <a href="shop.html?filter=body">Body Care</a><a href="shop.html?filter=serums">Serums</a>
+          <a href="shop.html?filter=sunscreen">SPF</a><a href="shop.html?filter=hair">Hair</a>
+        </nav>
+      </div>
+      <div><div class="footer-col-title">Company</div>
+        <nav class="footer-links" aria-label="Company links">
+          <a href="about.html">About Kotiva</a><a href="science.html">Our Science</a><a href="ingredients.html">Ingredient Glossary</a>
+          <a href="routine-finder.html">Routine Finder</a><a href="journal.html">Journal</a><a href="index.html#newsletter">Newsletter</a>
+          <a href="contact.html">Contact Us</a><a href="assets/kotiva-company-profile.pdf" target="_blank" rel="noopener">Company Profile (PDF)</a>
+        </nav>
+      </div>
+      <div><div class="footer-col-title">Support</div>
+        <nav class="footer-links" aria-label="Support links">
+          <a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="contact.html#faq">FAQ</a>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 KOTIVA&trade;, a brand of Vitakode LLC. All rights reserved.</span>
+      <span>Doctor-approved skincare tailored for you.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/layout.js?v=v3s"></script>
+<script src="js/animations.js?v=v3m"></script>
+<script>
+/* ── BUILD INGREDIENT LIBRARY ─────────────────────────── */
+(function() {
+  const grid = document.getElementById('ing-library-grid');
+  if (!grid) return;
+  /* HERO_INGREDIENTS schema is {name, benefit, description, products:[id]} —
+     this builder previously read a stale {claim, desc, found} shape and threw on
+     the first entry, leaving the whole grid empty (caught by the 2026-07-16
+     release-gate run, DEC-245). Product IDs resolve to names via the lite set. */
+  const nameById = {};
+  (KOTIVA.products || []).forEach(p => { nameById[p.id] = p.name; });
+  grid.innerHTML = KOTIVA.ingredients.filter(i => i.products.some(id => nameById[id])).map(i => `
+    <div class="actives-card" data-theme="editorial">
+      <div class="actives-card-header">
+        <div class="actives-card-name">${i.name}</div>
+        <div class="actives-card-claim">${i.benefit.split(' & ')[0]}</div>
+      </div>
+      <p class="actives-card-desc">${i.description}</p>
+      <div class="actives-card-products">
+        ${i.products.map(id => nameById[id] ? `<span class="actives-card-product">${nameById[id]}</span>` : '').join('')}
+      </div>
+    </div>`).join('');
+})();
+</script>
+</body>
+</html>

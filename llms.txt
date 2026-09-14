@@ -1,0 +1,55 @@
+# KOTIVA
+
+> Doctor-approved skincare, perfected by science and tailored for every skin type. KOTIVA is a
+> clinical skincare range of ~25 products formulated around real dermatological concerns, with each
+> active chosen for evidence of efficacy (cleansers, serums, treatments, SPF, body and hair care).
+
+## Brand facts
+- KOTIVA is a doctor-approved dermo-cosmetics brand, **manufactured in Poland under EU GMP**. The
+  name derives from *quotidian* (daily) — the brand's central idea is consistent daily skincare over
+  quick fixes.
+- KOTIVA is a brand of **Vitakode LLC** (parent company; Muscat, Oman). Vitakode's sibling brand is
+  **Formul8** ("Beauty At Every Stage", Made in Italy) — a separate aesthetics/injectables line.
+- Go-to-market: launched in Poland, with a **Saudi Arabia launch** as the first GCC market (certified/
+  licensed), expanding across the GCC, then Egypt and the wider Middle East.
+- Positioning: doctor-approved and evidence-based · European manufacturing · trusted by healthcare
+  professionals · daily-routine consistency.
+
+## Pages
+- [Home](https://kotiva.co/): brand overview, bestsellers, the KOTIVA standard.
+- [Shop](https://kotiva.co/shop.html): the full product collection, filterable by concern, skin type and category.
+- [Our Science](https://kotiva.co/science.html): formulation philosophy, ingredient selection, and the clinical rationale behind each active.
+- [Ingredient Glossary](https://kotiva.co/ingredients.html): a canonical reference of the key active ingredients — what each active is and what it does for skin — cross-linked to the products that use it.
+- [Routine Finder](https://kotiva.co/routine-finder.html): a short quiz that builds a morning and evening routine from the KOTIVA range by skin type and concern.
+- [Journal](https://kotiva.co/journal.html): educational articles on ingredients, routines and dermatology.
+- [About](https://kotiva.co/about.html): the story and standards behind the brand.
+- [Contact & Where to Buy](https://kotiva.co/contact.html): stockists and how to get in touch.
+
+## Notes
+- 25 product detail pages, statically rendered with full ingredient/mechanism-of-action/reference content (no JS required to read):
+  - [Kotiva Micellar Water](https://kotiva.co/product/micellar-water.html) — Cleanser, Makeup Removal
+  - [Kotiva Acne Cleansing Gel](https://kotiva.co/product/acne-cleansing-gel.html) — Cleanser, Acne & Breakouts
+  - [Kotiva Hyaluronic Facial Cleanser](https://kotiva.co/product/hyaluronic-facial-cleanser.html) — Cleanser, Hydration
+  - [Kotiva Facial Foam for Sensitive Skin](https://kotiva.co/product/facial-foam-sensitive.html) — Cleanser, Soothing & Calming
+  - [Kotiva Glow Up Water Essence Toner](https://kotiva.co/product/glow-up-water-essence-toner.html) — Toner, Glow & Radiance
+  - [Kotiva Oil Control Foam](https://kotiva.co/product/oil-control-foam.html) — Cleanser, Oil Control
+  - [Kotiva Face & Body Cleansing Foam](https://kotiva.co/product/face-body-cleansing-foam.html) — Cleanser, Daily Cleansing
+  - [Kotiva Post Fillers Lip Balm](https://kotiva.co/product/post-fillers-lip-balm.html) — Lip Care, Lip Care
+  - [Kotiva Sun Protection SPF 50+](https://kotiva.co/product/sun-protection-spf50.html) — SPF, Sun Protection
+  - [Kotiva After Sun Cream](https://kotiva.co/product/after-sun-cream.html) — Body, After-Sun Soothing
+  - [Kotiva Younger Hand Cream](https://kotiva.co/product/younger-hand-cream.html) — Hand Care, Anti-Aging
+  - [Kotiva Whitening Hand Cream](https://kotiva.co/product/whitening-hand-cream.html) — Hand Care, Brightening
+  - [Kotiva Anti-Perspirant Roll On](https://kotiva.co/product/anti-perspirant-roll-on.html) — Body, Anti-Perspirant
+  - [Kotiva Whitening Anti-Perspirant](https://kotiva.co/product/whitening-anti-perspirant.html) — Body, Brightening
+  - [Kotiva Hydroshield Post-Laser Cream](https://kotiva.co/product/hydroshield-post-laser-cream.html) — Treatment, Barrier Repair
+  - [Kotiva Triple Action Whitening Day Cream](https://kotiva.co/product/whitening-day-cream-spf50.html) — Treatment, Brightening
+  - [Kotiva Triple Action Whitening Night Cream](https://kotiva.co/product/whitening-night-cream.html) — Treatment, Brightening
+  - [Kotiva Triple Action Bikini Area Whitening Cream](https://kotiva.co/product/bikini-area-whitening-cream.html) — Treatment, Brightening
+  - [Kotiva Triple Action Whitening Wash Gel for Sensitive Area](https://kotiva.co/product/whitening-wash-gel-sensitive.html) — Cleanser, Brightening
+  - [Kotiva Acne Control](https://kotiva.co/product/acne-control.html) — Treatment, Acne & Breakouts
+  - [Kotiva Pores Off Serum](https://kotiva.co/product/pores-off-serum.html) — Serums, Pores & Texture
+  - [Kotiva UV Balance SPF 50+](https://kotiva.co/product/uv-balance-spf50.html) — SPF, Sun Protection
+  - [Kotiva Anti-Hair Loss Ampoules](https://kotiva.co/product/anti-hair-loss-ampoules.html) — Hair, Hair Loss
+  - [Kotiva Anti-Hair Loss Shampoo](https://kotiva.co/product/anti-hair-loss-shampoo.html) — Hair, Hair Loss
+  - [Kotiva Siliscar Gel](https://kotiva.co/product/siliscar-gel.html) — Treatment, Scars & Barrier
+- Staging host: `kotiva.co` (production domain pending go-live).
