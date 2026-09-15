@@ -319,23 +319,23 @@ function pageHtml(product, index) {
 <meta name="twitter:image" content="${absImg}">
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=20260720">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48.png?v=20260720">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png?v=20260720">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png?v=20260915">
 <link rel="preload" href="/fonts/FuturaNowVar-Roman.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Montserrat-VariableFont_wght_25.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/kotiva.css?v=v4m">
+<link rel="stylesheet" href="/css/kotiva.css?v=kc1">
 <script type="application/ld+json">${JSON.stringify(productLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>
 <style>
 .pdp-hero { padding-top: var(--nav-h); display: grid; grid-template-columns: 1fr 1fr; min-height: 88vh; }
-.pdp-gallery { position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow: hidden; background: #0e0c0a; display: flex; align-items: center; justify-content: center; }
+.pdp-gallery { position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow: hidden; background: #231F20; display: flex; align-items: center; justify-content: center; }
 .pdp-gallery-img { width: 70%; max-width: 420px; aspect-ratio: 3/4; object-fit: cover; }
 .pdp-gallery-badge { position: absolute; top: 32px; left: 32px; font-family: var(--font-display); font-size: 8px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; background: var(--bronze); color: var(--black); padding: 6px 14px; }
-/* K12: 0.2 alpha measured 1.72:1 on the #0e0c0a gallery — invisible, not merely low. 0.48 = 4.52:1. */
-.pdp-gallery-num { position: absolute; bottom: 32px; right: 32px; font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: rgba(245,240,232,0.48); }
+/* K12: dim gallery number on the #231F20 gallery — alpha from the approved palette (docs/COLOUR-MIGRATION.md). */
+.pdp-gallery-num { position: absolute; bottom: 32px; right: 32px; font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: rgba(255,255,255,0.64); }
 .pdp-content { padding: clamp(48px, 6vw, 80px) clamp(36px, 5vw, 72px); border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 0; }
 .pdp-breadcrumb { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 28px; display: flex; gap: 12px; align-items: center; }
 .pdp-breadcrumb a { color: inherit; transition: color 0.2s; }
-.pdp-breadcrumb a:hover { color: var(--bronze); }
+.pdp-breadcrumb a:hover { color: var(--accent-text); }
 .pdp-breadcrumb-sep { color: var(--border); }
 .pdp-skin-type { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 16px; }
 .pdp-name { font-family: var(--font-display); font-size: clamp(28px, 3vw, 48px); font-weight: 900; letter-spacing: 0.03em; text-transform: uppercase; line-height: 1.0; color: var(--fg); margin-bottom: 8px; }
@@ -351,7 +351,7 @@ function pageHtml(product, index) {
 .pdp-ingredients-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
 .pdp-ingredient-pill { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; padding: 6px 14px; border: 1px solid var(--border); color: var(--accent-deep); }
 .pdp-free-from { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
-.pdp-free-pill { font-family: var(--font-display); font-size: 8px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 12px; border: 1px solid rgba(100,180,100,0.2); color: rgba(100,200,140,0.6); }
+.pdp-free-pill { font-family: var(--font-display); font-size: 8px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 12px; border: 1px solid rgba(0,69,57,0.2); color: rgba(0,69,57,0.6); }
 .pdp-how-to { background: var(--bg-card); border: 1px solid var(--border); padding: 24px 28px; margin-bottom: 32px; }
 .pdp-how-label { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 12px; }
 .pdp-how-text { font-size: 14px; line-height: 1.7; color: var(--fg-mid); font-family: var(--font-body); }
@@ -376,7 +376,7 @@ function pageHtml(product, index) {
   <div class="nav-inner">
     <a class="nav-logo" href="/index.html" aria-label="KOTIVA Home">
       <img class="logo-dark" src="/assets/kotiva-logo.svg?v=lg1" alt="KOTIVA" height="28" />
-      <img class="logo-light" src="/assets/kotiva-logo-white.svg?v=lg1" alt="KOTIVA" height="28" style="display:none;" />
+      <img class="logo-light" src="/assets/kotiva-logo-white.svg?v=lg2" alt="KOTIVA" height="28" style="display:none;" />
     </a>
     <div class="nav-links" role="list">
       <a class="nav-link" href="/index.html" role="listitem">Home</a>

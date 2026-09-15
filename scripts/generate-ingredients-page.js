@@ -112,10 +112,10 @@ const html = `<!DOCTYPE html>
 <meta name="twitter:image" content="${SITE_ORIGIN}/assets/hero-warm-skincare.webp">
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=20260720">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48.png?v=20260720">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png?v=20260720">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png?v=20260915">
 <link rel="preload" href="/fonts/FuturaNowVar-Roman.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Montserrat-VariableFont_wght_25.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/kotiva.css?v=v4m">
+<link rel="stylesheet" href="/css/kotiva.css?v=kc1">
 <script type="application/ld+json">${JSON.stringify(definedTermSet)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>
 <style>
@@ -131,7 +131,7 @@ const html = `<!DOCTYPE html>
 .ig-found-label { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-dim); display: block; margin-bottom: 10px; }
 .ig-found-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .ig-prod { font-family: var(--font-display); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; padding: 5px 12px; border: 1px solid var(--border); color: var(--accent-deep); transition: color 0.2s, border-color 0.2s; }
-.ig-prod:hover { color: var(--bronze); border-color: var(--bronze); }
+.ig-prod:hover { color: var(--accent-text); border-color: var(--bronze); }
 .ig-disclaimer { padding: clamp(32px, 4vw, 56px) 0; border-top: 1px solid var(--border); }
 .ig-disclaimer p { font-size: 12px; line-height: 1.8; color: var(--fg-dim); font-family: var(--font-body); max-width: 720px; }
 @media (max-width: 780px) { .ig-grid { grid-template-columns: 1fr; } }
@@ -144,7 +144,7 @@ const html = `<!DOCTYPE html>
   <div class="nav-inner">
     <a class="nav-logo" href="/index.html" aria-label="KOTIVA Home">
       <img class="logo-dark" src="/assets/kotiva-logo.svg?v=lg1" alt="KOTIVA" height="28" />
-      <img class="logo-light" src="/assets/kotiva-logo-white.svg?v=lg1" alt="KOTIVA" height="28" style="display:none;" />
+      <img class="logo-light" src="/assets/kotiva-logo-white.svg?v=lg2" alt="KOTIVA" height="28" style="display:none;" />
     </a>
     <div class="nav-links" role="list">
       <a class="nav-link" href="/index.html" role="listitem">Home</a>
