@@ -19,10 +19,10 @@
 <meta name="twitter:image" content="https://kotiva.co/assets/hero-warm-skincare.webp">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=20260720">
 <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png?v=20260720">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260720">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260915">
   <link rel="preload" href="fonts/FuturaNowVar-Roman.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/Montserrat-VariableFont_wght_25.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/kotiva.css?v=v4m">
+<link rel="stylesheet" href="css/kotiva.css?v=kc1">
 <style>
 .rf-hero {
   padding-top: calc(var(--nav-h) + 72px);
@@ -70,7 +70,7 @@
 }
 .quiz-sub {
   font-size: 14px;
-  color: rgba(245,240,232,0.4);
+  color: rgba(255,255,255,0.64);
   margin-bottom: 44px;
   font-family: var(--font-body);
 }
@@ -93,11 +93,11 @@
 }
 .quiz-option:hover {
   border-color: var(--bronze);
-  background: rgba(196,149,106,0.05);
+  background: rgba(138,183,233,0.25);
 }
 .quiz-option.selected {
   border-color: var(--bronze);
-  background: rgba(196,149,106,0.1);
+  background: rgba(138,183,233,0.25);
 }
 .quiz-option-title {
   font-family: var(--font-display);
@@ -109,11 +109,11 @@
 }
 .quiz-option-desc {
   font-size: 12px;
-  color: rgba(245,240,232,0.4);
+  color: rgba(255,255,255,0.64);
   line-height: 1.5;
   font-family: var(--font-body);
 }
-.quiz-option.selected .quiz-option-title { color: var(--bronze); }
+.quiz-option.selected .quiz-option-title { color: var(--accent-text); }
 .quiz-nav {
   display: flex;
   align-items: center;
@@ -128,7 +128,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(245,240,232,0.35);
+  color: rgba(255,255,255,0.64);
   cursor: pointer;
   background: none;
   border: none;
@@ -181,7 +181,7 @@
   cursor: pointer;
 }
 .result-step:last-child { border-bottom: none; }
-.result-step:hover { background: #111; }
+.result-step:hover { background: var(--bg-alt); }
 .result-step-num {
   font-family: var(--font-display);
   font-size: 9px;
@@ -198,7 +198,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(245,240,232,0.3);
+  color: rgba(255,255,255,0.64);
   margin-bottom: 4px;
 }
 .result-step-product {
@@ -222,8 +222,8 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(245,240,232,0.3);
-  border-bottom: 1px solid rgba(245,240,232,0.15);
+  color: rgba(255,255,255,0.64);
+  border-bottom: 1px solid rgba(255,255,255,0.18);
   padding-bottom: 3px;
   cursor: pointer;
   background: none;
@@ -243,11 +243,11 @@
 .quiz-option{background:var(--bg-card);color:var(--fg);}
 .quiz-option-title{color:var(--fg);}
 .quiz-option-desc{color:var(--fg-mid);}
-.quiz-option.selected .quiz-option-title{color:var(--bronze);}
+.quiz-option.selected .quiz-option-title{color:var(--accent-text);}
 .quiz-progress-dot.active{background:var(--fg);}
 .quiz-back{color:var(--fg-mid);}
 .quiz-back:hover{color:var(--fg);}
-.result-time-block{background:var(--bg-card);}
+.result-time-block{background:linear-gradient(var(--bg-card),var(--bg-card)),var(--bg);}
 .result-time-label{color:var(--accent-text);}
 .result-step{border-bottom:1px solid var(--border);}
 .result-step:hover{background:var(--bg-alt);}
@@ -263,7 +263,7 @@
 .quiz-rank{
   display:inline-flex;align-items:center;justify-content:center;
   width:20px;height:20px;flex-shrink:0;
-  border:1px solid var(--bronze);color:var(--bronze);
+  border:1px solid var(--bronze);color:var(--accent-text);
   font-family:var(--font-display);font-size:9px;font-weight:700;
   opacity:0;transition:opacity .2s;
 }
@@ -345,7 +345,7 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
   <div class="nav-inner">
     <a class="nav-logo" href="index.html" aria-label="KOTIVA Home">
       <img class="logo-dark" src="assets/kotiva-logo.svg?v=lg1" alt="KOTIVA" height="28" />
-      <img class="logo-light" src="assets/kotiva-logo-white.svg?v=lg1" alt="KOTIVA" height="28" style="display:none;" />
+      <img class="logo-light" src="assets/kotiva-logo-white.svg?v=lg2" alt="KOTIVA" height="28" style="display:none;" />
     </a>
     <div class="nav-links" role="list">
       <a class="nav-link" href="index.html" role="listitem">Home</a>
