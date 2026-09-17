@@ -14,9 +14,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const root = path.join(__dirname, '..');
-const srcPath = path.join(root, 'data/routine-model.json');
-const outPath = path.join(root, 'js/routine-model.js');
+const root = path.join(__dirname, '..', '..');
+const srcPath = path.join(root, 'resources/routine/routine-model.json');
+const outPath = path.join(root, 'public/js/routine-model.js');
 
 /* Fields the runtime engine + result UI genuinely need. Everything else
    (evidence quotes, provenance tags, ratification notes) stays in the JSON. */
@@ -64,4 +64,4 @@ if (process.argv.includes('--check')) {
 }
 
 fs.writeFileSync(outPath, next, 'utf8');
-console.log(`✓ wrote js/routine-model.js (${Object.keys(JSON.parse(fs.readFileSync(srcPath, 'utf8')).products).length} products)`);
+console.log(`✓ wrote public/js/routine-model.js (${Object.keys(JSON.parse(fs.readFileSync(srcPath, 'utf8')).products).length} products)`);

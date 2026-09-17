@@ -1,0 +1,638 @@
+@extends('layouts.app')
+
+@section('meta')
+  <title>kotiva™ — Doctor-Approved Skincare</title>
+  <meta name="description" content="Doctor-approved skincare, perfected by science and tailored for you. Explore 25 products formulated with clinically proven ingredients across cleansers, serums, SPF, body and hair care." />
+  <link rel="preload" as="image" href="{{ asset('assets/hero-campaign-v3.webp') }}" fetchpriority="high" />
+  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/" />
+  <meta property="og:title" content="kotiva™ — Doctor-Approved Skincare" />
+  <meta property="og:description" content="Doctor-approved skincare, perfected by science and tailored for you. Explore 25 products formulated with clinically proven ingredients for every skin type." />
+  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="KOTIVA" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/hero-campaign-v3.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="kotiva™ — Doctor-Approved Skincare" />
+  <meta name="twitter:description" content="Doctor-approved skincare, perfected by science and tailored for you. 25 products formulated with clinically proven ingredients, for every skin type." />
+  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/hero-campaign-v3.webp" />
+@endsection
+
+@section('main_attrs')aria-label="Main content"@endsection
+
+@push('styles')
+@verbatim
+<style>
+@media (max-width:640px){
+  /* K30-C (2026-08-19) — retuned for the new campaign hero. At 375px this 1.78 AR source is
+     cropped to a ~26% sliver of its width, so a landscape frame with the subject on the RIGHT
+     and the copy area on the LEFT cannot deliver both: measured across six crop positions,
+     any position showing her face put the H1 at 2.3–2.7:1 (12–21% of the block under 3:1),
+     and any position holding contrast cut her face off entirely. Structural, not a crop-tuning
+     problem — so the crop keeps the FACE (78%) and a vertical text-panel scrim carries the type.
+     Measured at this setting: H1 p5 7.9:1 (0% under 3:1), 15px sub p5 5.5:1, face still reading
+     at L*29. The previous value (50% 30%) was tuned for the OLD hero's centred subject and now
+     lands on hair and shoulder with the face outside the frame. */
+  .hero-bg img{ object-position:78% 26% !important; }
+  .hero-scrim-bottom{ background:linear-gradient(to top,rgba(106,50,119,0.25) 0%,rgba(106,50,119,0.10) 55%,transparent 100%) !important; }
+  .hero-overlay{
+    background:linear-gradient(to bottom,
+      rgba(106,50,119,0.10) 0%,
+      rgba(106,50,119,0.40) 22%,
+      rgba(106,50,119,0.70) 34%,
+      rgba(106,50,119,0.70) 72%,
+      rgba(106,50,119,0.62) 92%,
+      rgba(106,50,119,0.62) 100%) !important;
+  }
+}
+</style>
+@endverbatim
+@endpush
+
+@section('content')
+
+<!-- ═══════════════════════════════════════
+     HERO — editorial
+═══════════════════════════════════════ -->
+<!-- R-143a hero tonal retune (2026-08-18) — the client's "feels dark", answered without a redesign.
+     Before: four stacked darkening layers (img dimmed to 0.82 + kotiva.css's full-frame .hero-overlay
+     wash + two frame-wide scrims) left the hero at mean luminance 58/255, 74% of pixels below 25%
+     brightness — measured. After: darkness is SHAPED instead of poured — a left text-panel gradient
+     plus a soft radial under the title, photo at full opacity. Measured: 67/255 desktop, 70 mobile;
+     every reading-text element >=4.5:1 worst-case behind actual glyphs. Values, method and variant
+     history: 40_projects/kotiva/r143-k30-asset-plan-2026-08-18.md. The mobile block exists because
+     the desktop-shaped radial misbehaves at 390px — measured, not assumed. -->
+<style>
+@media (max-width:640px){
+  /* K30-C (2026-08-19) — retuned for the new campaign hero. At 375px this 1.78 AR source is
+     cropped to a ~26% sliver of its width, so a landscape frame with the subject on the RIGHT
+     and the copy area on the LEFT cannot deliver both: measured across six crop positions,
+     any position showing her face put the H1 at 2.3–2.7:1 (12–21% of the block under 3:1),
+     and any position holding contrast cut her face off entirely. Structural, not a crop-tuning
+     problem — so the crop keeps the FACE (78%) and a vertical text-panel scrim carries the type.
+     Measured at this setting: H1 p5 7.9:1 (0% under 3:1), 15px sub p5 5.5:1, face still reading
+     at L*29. The previous value (50% 30%) was tuned for the OLD hero's centred subject and now
+     lands on hair and shoulder with the face outside the frame. */
+  .hero-bg img{ object-position:78% 26% !important; }
+  .hero-scrim-bottom{ background:linear-gradient(to top,rgba(106,50,119,0.25) 0%,rgba(106,50,119,0.10) 55%,transparent 100%) !important; }
+  .hero-overlay{
+    background:linear-gradient(to bottom,
+      rgba(106,50,119,0.10) 0%,
+      rgba(106,50,119,0.40) 22%,
+      rgba(106,50,119,0.70) 34%,
+      rgba(106,50,119,0.70) 72%,
+      rgba(106,50,119,0.62) 92%,
+      rgba(106,50,119,0.62) 100%) !important;
+  }
+}
+</style>
+<section class="hero" data-theme="editorial" aria-label="Hero">
+  <div class="hero-bg" style="background:#6A3277;">
+    <img src="{{ asset('assets/hero-campaign-v3.webp') }}" alt="A woman resting her fingertips against her cheek in soft, warm daylight" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:40% 28%;opacity:1;" />
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 65% 40%, rgba(106,50,119,0.14) 0%, transparent 55%);"></div>
+    <div class="hero-scrim-bottom" style="position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(to top,rgba(106,50,119,0.46) 0%,rgba(106,50,119,0.18) 48%,transparent 100%);"></div>
+    <div class="hero-scrim-top" style="position:absolute;top:0;left:0;right:0;height:30%;background:linear-gradient(to bottom,rgba(106,50,119,0.46),transparent);"></div>
+  </div>
+  <div class="hero-overlay" style="background:linear-gradient(to right,rgba(106,50,119,0.34) 0%,rgba(106,50,119,0.16) 42%,rgba(106,50,119,0.03) 66%,transparent 80%);"></div>
+  <div class="hero-content">
+    <p class="hero-tagline">Doctor-Approved Skincare</p>
+    <p class="hero-script-accent">for every skin. every ritual.</p>
+    <h1 class="hero-title">Skin That<br/>Performs.</h1>
+    <p class="hero-sub">Doctor-approved. Science-backed. Made for you.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="{{ route('routine-finder') }}">Find My Routine</a>
+      <a class="btn btn-outline-light" href="{{ route('shop.index') }}">Discover the Range</a>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     MARQUEE STRIP
+═══════════════════════════════════════ -->
+<div class="marquee-strip" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item">Doctor Approved<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Science-Backed Formulas<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">25 Clinical Products<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Every Skin Type<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Paraben-Free<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Sulphate-Free<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">MENA-First Skincare<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Daily Ritual<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <!-- Duplicate for seamless loop -->
+    <span class="marquee-item">Doctor Approved<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Science-Backed Formulas<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">25 Clinical Products<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Every Skin Type<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Paraben-Free<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Sulphate-Free<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">MENA-First Skincare<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+    <span class="marquee-item">Daily Ritual<span class="marquee-dot" aria-hidden="true">&#10022;</span></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TRUST BAR — ritual
+═══════════════════════════════════════ -->
+<section data-theme="ritual" aria-label="Brand credentials">
+  <div class="trust-bar">
+    <div class="container">
+      <div class="trust-bar-grid">
+        <div class="trust-item reveal">
+          <div class="trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div>
+            <div class="trust-label">Doctor Approved</div>
+            <div class="trust-sub">Clinically supported formulas</div>
+          </div>
+        </div>
+        <div class="trust-item reveal reveal-delay-1">
+          <div class="trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="trust-stat-num"><span data-count="25" data-suffix="">25</span></div>
+          <div class="trust-label">Products</div>
+            <div class="trust-sub">Full clinical skincare range</div>
+          </div>
+        </div>
+        <div class="trust-item reveal reveal-delay-2">
+          <div class="trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          </div>
+          <div>
+            <div class="trust-stat-num"><span data-count="4" data-suffix="">4</span></div>
+          <div class="trust-label">Skin Types</div>
+            <div class="trust-sub">Normal, dry, oily, sensitive</div>
+          </div>
+        </div>
+        <div class="trust-item reveal reveal-delay-3">
+          <div class="trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          </div>
+          <div>
+            <div class="trust-label">Science-Backed</div>
+            <div class="trust-sub">Active ingredient formulas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     BRAND PHILOSOPHY — ritual
+═══════════════════════════════════════ -->
+<section data-theme="ritual" class="section-pad" aria-label="Brand philosophy">
+  <div class="container">
+    <div class="philosophy-grid">
+      <div class="philosophy-left reveal-left">
+        <!-- K33: was "The Kotiva Standard", which named three different sections. Renamed from
+             this section's own opening sentence ("a single conviction") rather than inventing a
+             phrase, so no new brand language and no new claim enters the page. -->
+        <p class="t-eyebrow mb-16">Our Conviction</p>
+        <h2 class="philosophy-headline">Daily ritual.<br/>Visible results.</h2>
+        <p class="t-body mt-24" style="max-width:400px;">We built Kotiva on a single conviction: that everyone deserves skincare that actually works. Not marketing promises. Real, doctor-validated products with active ingredients that target real skin concerns. Skincare as daily self-governance — the Ripple Effect of consistent care.</p>
+      </div>
+      <div class="philosophy-right">
+        <div class="philosophy-value reveal reveal-delay-1">
+          <h3>Scientific Integrity</h3>
+          <p>Every product is doctor-approved and ingredient-driven. We don't formulate without clinical validation.</p>
+        </div>
+        <div class="philosophy-value reveal reveal-delay-2">
+          <h3>Tailored for You</h3>
+          <p>Products segmented by skin type, concern, and zone. Because one formula was never enough.</p>
+        </div>
+        <div class="philosophy-value reveal reveal-delay-3">
+          <h3>Ritual Over Routine</h3>
+          <p>Daily consistency produces visible results. The Kotiva ritual is an act of daily self-governance — not obligation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CATEGORY GRID — ritual
+═══════════════════════════════════════ -->
+<section data-theme="ritual" aria-label="Product categories">
+  <!-- K36: this was the ONLY major section on the page with no heading of any kind — six
+       full-bleed image tiles arrived unannounced, so the block's job had to be inferred from
+       the tiles themselves. The vault's own page-section guide (40_projects/kotiva/
+       page-section-guide-2026-06-14.md) already assigns it one: "lets visitors self-segment by
+       need and enter the catalogue", answering the visitor question "Where do I start for my
+       concern?". The heading states that role instead of leaving it implicit. Kept to three
+       words and given no eyebrow — the page already carries five, and adding a sixth to fix a
+       missing heading would trade one scaffold problem for another. -->
+  <div class="container">
+    <h2 class="t-display t-display-md category-grid-heading">Where to Start</h2>
+  </div>
+  <div class="category-grid" data-stagger="60">
+
+    <a class="category-card" href="{{ route('shop.index', ['filter' => 'face']) }}" aria-label="Shop Face Care">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ asset('assets/categories/cat-face-v3.webp') }}" alt="A woman with olive skin resting in warm sunlight, her skin clear and glowing." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Face</div>
+        <div class="category-card-count">16 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ route('shop.index', ['filter' => 'body']) }}" aria-label="Shop Body Care">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ asset('assets/categories/cat-body-v3.webp') }}" alt="A woman smoothing body cream along her arm in soft morning light." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Body</div>
+        <div class="category-card-count">8 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ route('shop.index', ['filter' => 'serums']) }}" aria-label="Shop Serums">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ asset('assets/categories/cat-serums-v3.webp') }}" alt="A golden droplet of serum falling from a glass dropper." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Serums</div>
+        <div class="category-card-count">1 product</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ route('shop.index', ['filter' => 'treatments']) }}" aria-label="Shop Treatments">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ asset('assets/categories/cat-treatments-v4.webp') }}" alt="A woman pressing treatment cream into her cheek with her fingertips." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Treatments</div>
+        <div class="category-card-count">7 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ route('shop.index', ['filter' => 'sunscreen']) }}" aria-label="Shop Sunscreen">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ asset('assets/categories/cat-spf-v3.webp') }}" alt="A woman turning her face toward warm sunlight, skin protected and even." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">SPF</div>
+        <div class="category-card-count">3 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+    <a class="category-card" href="{{ route('shop.index', ['filter' => 'hair']) }}" aria-label="Shop Hair Care">
+      <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
+        <img src="{{ asset('assets/categories/cat-hair-v3.webp') }}" alt="Long healthy hair backlit by sunlight, seen from behind." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="category-card-overlay"></div>
+      <div class="category-card-info">
+        <div class="category-card-name">Hair</div>
+        <div class="category-card-count">2 products</div>
+      </div>
+      <div class="category-card-arrow" aria-hidden="true">→</div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     DOCTOR APPROVED — editorial
+═══════════════════════════════════════ -->
+<section data-theme="editorial" class="doctor-section" aria-label="Doctor approved">
+  <div class="doctor-content reveal-left">
+    <!-- K33: the "The Kotiva Standard" eyebrow was deleted rather than reworded. It duplicated
+         the Brand-philosophy eyebrow above and collided with the heading of the section 5,400px
+         below, and this section needs no label: an 83px "Doctor Approved" stamp already says what
+         it is. Also thins the eyebrow-on-every-section cadence. -->
+    <h2 class="doctor-approved-stamp">Doctor<br/>Approved</h2>
+    <p class="t-body" style="color:var(--fg-mid);font-size:clamp(15px,1.5vw,18px);margin-bottom:0;">Every formula. Clinically supported.</p>
+    <p class="t-body" style="max-width:440px;">Every Kotiva formula is developed with evidence-based medicine and powered by scientifically proven active ingredients, carefully selected to deliver safe, effective and clinically supported results.</p>
+    <div class="credential-badges">
+      <span class="credential-badge">Paraben-Free</span>
+      <span class="credential-badge">Sulphate-Free</span>
+      <span class="credential-badge">Dermatologist-Approved</span>
+      <span class="credential-badge">Doctor-Approved</span>
+    </div>
+    <a class="btn btn-gold" href="{{ route('science') }}">Our Science →</a>
+  </div>
+  <div class="doctor-image" style="position:relative;overflow:hidden;">
+    <img src="{{ asset('assets/home-doctor-approved-v5.webp') }}" alt="A dermatologist in a white coat holding the real KOTIVA Micellar Water bottle, label clearly visible" loading="lazy" data-parallax="0.10" style="position:absolute;top:-7%;left:0;width:100%;height:114%;object-fit:cover;object-position:center 22%;" />
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     ROUTINE FINDER CTA — editorial
+═══════════════════════════════════════ -->
+<section data-theme="editorial" class="routine-cta" aria-label="Find your routine">
+  <div class="routine-cta-image">
+    <img src="{{ asset('assets/home-routine-ritual-v2.webp') }}" alt="A woman applies face cream during her morning ritual in warm natural light" data-parallax="0.10" style="position:absolute;top:-7%;left:0;width:100%;height:114%;object-fit:cover;object-position:center 20%;transform:scaleX(-1);" />
+    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(106,50,119,0.55) 0%,rgba(106,50,119,0.15) 60%,transparent 100%);"></div>
+  </div>
+  <div class="routine-cta-content reveal-right">
+    <p class="t-eyebrow">Personalised For You</p>
+    <h2 class="t-display t-display-md" style="color:var(--fg);">Your skin.<br/>Your ritual.</h2>
+    <p class="t-body" style="max-width:380px;">Answer 7 questions about your skin type and concerns. We'll build your morning and evening routine from the Kotiva range — precisely matched to you.</p>
+    <a class="btn btn-gold" href="{{ route('routine-finder') }}">Start the Quiz</a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     BEST SELLERS — editorial showcase
+═══════════════════════════════════════ -->
+<section data-theme="editorial" class="bestsellers-section" aria-label="Best sellers">
+  <div class="bestsellers-bg" aria-hidden="true">
+    <img src="{{ asset('assets/home-bestsellers-bg-v2.webp') }}" alt="" role="presentation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;opacity:0.28;" />
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 50%,rgba(106,50,119,0.18) 0%,transparent 60%),linear-gradient(to right,rgba(106,50,119,0.98) 0%,rgba(106,50,119,0.70) 50%,rgba(106,50,119,0.85) 100%);"></div>
+  </div>
+  <!-- Horizontal scroll showcase — premium feel on mobile, grid on desktop -->
+  <!-- Pin-scrub rail (2026-08-18 round 4). Default state: .pin-rail-wrapper has no height
+       rule and .pin-rail-sticky has no position rule, so with no JS or with JS that decides
+       not to engage, this renders EXACTLY as the plain drag/scroll-snap rail below it always
+       has -- there is no tall empty scroll region unless the enhancement class is actually
+       applied. initPinRail() in js/animations.js adds .pin-active only when: motion is not
+       reduced, viewport is >=900px, and the pointer is fine (mouse/trackpad) -- touch/mobile
+       keeps the native swipeable rail, which is already the natural touch-equivalent gesture,
+       not a fallback. The "View All 25" link above is reachable independently of this rail's
+       focus behaviour, so keyboard users always have a guaranteed, ordinary path to the full
+       catalogue regardless of how the pin's scroll-linked transform behaves in any browser. -->
+  <div class="pin-rail-wrapper">
+   <div class="pin-rail-sticky">
+    <!-- K31 (2026-08-19): the header lives INSIDE the sticky frame now. Previously it sat
+         above the pin wrapper and scrolled away the moment the rail engaged, so for the whole
+         ~2.3k px of the pinned journey the visitor had no section title, no context and no
+         exit — just cards moving sideways. Keeping it pinned means the "View All 25" escape is
+         on screen for the entire interaction, not only before it starts. When .pin-active is
+         absent (touch, reduced motion, <900px) the sticky is a no-op and this simply renders
+         as an ordinary header above the swipeable rail, exactly as before. -->
+    <div class="container">
+      <div class="bestsellers-header">
+        <div>
+          <p class="t-eyebrow mb-16">Most Loved</p>
+          <h2 class="t-display t-display-md" style="color:var(--fg);">The Essentials</h2>
+        </div>
+        <a class="btn btn-outline-light" href="{{ route('shop.index') }}" style="color:rgba(255,255,255,0.78);border-color:rgba(255,255,255,0.40);">View All {{ $catalogCount }} →</a>
+      </div>
+    </div>
+    <div class="bestsellers-scroll" role="region" aria-label="Best sellers">
+    <div class="bestsellers-track" data-stagger="70">
+      @foreach ($bestSellers as $p)
+      <a class="bs-card" href="{{ route('product.show', ['slug' => $p->slug]) }}" aria-label="{{ $p->displayName() }}, {{ config('kotiva.currency.code') }} {{ number_format((float) $p->price, 2) }}">
+        <div class="bs-card-img"><img src="{{ $p->heroImageUrl() }}" alt="{{ $p->displayName() }}" width="200" height="200" style="--s:1.0" loading="lazy" /></div>
+        <div class="bs-card-body">
+          <div class="bs-card-name">{{ $p->displayName() }}</div>
+          <div class="bs-card-meta"><span class="bs-card-price">{{ config('kotiva.currency.code') }} {{ number_format((float) $p->price, 2) }}</span><span class="bs-card-vol">{{ $p->volume }}</span></div>
+          <div class="bs-card-foot"><span class="badge-concern">{{ $p->concern }}</span><span class="bs-card-cta">Discover</span></div>
+        </div>
+      </a>
+@endforeach
+      <!-- K31 (2026-08-19): the rail's terminus. The centre-anchored geometry (round 5, fe0599e —
+           deliberately chosen over edge-flush after edge-flush was reported wrong) parks the LAST
+           track item at centre, which structurally leaves the trailing half of the frame empty.
+           Before this panel that emptiness was the ending: the journey simply ran out. Now the
+           closing hero moment is an invitation, and the geometry is untouched. It leads with the
+           count the visitor has NOT seen, because the header's "View All" total is on screen at
+           the same time and restating it would spend the most valuable frame in the section on an
+           echo. That count was hardcoded to 18 and held true by scripts/check-consistency.js.
+           With the catalog in the database and that gate retired, a literal here could go stale
+           the first time a product is deactivated — so it is derived: active products minus the
+           ones the rail just showed. -->
+      <a class="bs-end" href="{{ route('shop.index') }}" aria-label="Explore the full KOTIVA range, {{ $catalogCount - $bestSellers->count() }} more products">
+        <span class="bs-end-count">{{ $catalogCount - $bestSellers->count() }}</span>
+        <span class="bs-end-label">more products<br/>in the full range</span>
+        <span class="bs-end-cta">Explore the range →</span>
+      </a>
+    </div>
+    </div>
+    <div class="pin-rail-progress" aria-hidden="true"></div>
+   </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     INGREDIENT SPOTLIGHT — clinical
+═══════════════════════════════════════ -->
+<section data-theme="ritual" class="section-pad" aria-label="Hero ingredients">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header-left">
+        <p class="t-eyebrow mb-16">Active Intelligence</p>
+        <h2 class="t-display t-display-md">The Ingredients</h2>
+      </div>
+      <a class="btn btn-text" href="{{ route('science') }}">Full Science →</a>
+    </div>
+    <div class="ingredient-grid">
+      <div class="ingredient-card reveal-scale">
+        <div class="ingredient-name">Niacinamide</div>
+        <div class="ingredient-benefit">Pore Refinement & Even Tone</div>
+        <p class="ingredient-desc">A validated form of Vitamin B3 that minimises pore appearance, controls sebum production, and visibly evens skin tone through consistent daily use.</p>
+        <a class="btn btn-text mt-16" href="{{ route('science') }}">Learn More →</a>
+      </div>
+      <div class="ingredient-card reveal-scale reveal-delay-2">
+        <div class="ingredient-name">Hyaluronic Acid</div>
+        <div class="ingredient-benefit">Deep Molecular Hydration</div>
+        <p class="ingredient-desc">Holds up to 1000× its weight in water. Our multi-weight complex hydrates at every level of the skin — surface, mid, and deep dermal layers.</p>
+        <a class="btn btn-text mt-16" href="{{ route('science') }}">Learn More →</a>
+      </div>
+      <div class="ingredient-card reveal-scale reveal-delay-4">
+        <div class="ingredient-name">Retinyl Palmitate</div>
+        <div class="ingredient-benefit">Supports Skin Renewal</div>
+        <p class="ingredient-desc">A vitamin A derivative that supports skin renewal and improves the appearance of texture and fine lines, working with the skin’s overnight regeneration cycle.</p>
+        <a class="btn btn-text mt-16" href="{{ route('science') }}">Learn More →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     TESTIMONIALS — ritual
+═══════════════════════════════════════ -->
+<!-- THE KOTIVA STANDARD
+     Replaced the three homepage testimonials 2026-08-11 (K27). The previous
+     quotes were attributed to named individuals, carried 5-star ratings, and
+     cited three products that do not exist in the 25-SKU catalogue, alongside
+     an unsupported efficacy claim with a timeframe. (The removed names are
+     recorded in the vault, deliberately not repeated here: leaving them in
+     served markup would keep feeding nonexistent products to crawlers and AI
+     retrieval, which is most of the harm.) Every statement below is drawn from the
+     client's own Company Profile and carries no customer-review signalling —
+     no names, no star ratings, no first-person voice, no time-to-result claim.
+     Genuine customer testimonials remain an open request to KOTIVA; nothing
+     here may be relabelled as one until they supply them. -->
+<section data-theme="ritual" class="section-pad" aria-label="The Kotiva Standard">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-header-left">
+        <!-- K33: eyebrow "Doctor Approved Skincare" deleted. It was the mirror image of the
+             Doctor Approved section above (which carried "The Kotiva Standard" as ITS eyebrow) —
+             the two sections had each other's names. "The Kotiva Standard" now names exactly one
+             section: this one, which is the only place that actually enumerates the standard. -->
+        <h2 class="t-display t-display-md">The Kotiva Standard</h2>
+      </div>
+    </div>
+    <!-- K33 (2026-08-19): these were .testimonial-card, and the CONTENT is correct — K27
+         (038b822) replaced three fabricated testimonials (named people, 5-star ratings, three
+         products that do not exist in the 25-SKU catalogue) with statements sourced from the
+         client's own Company Profile, and the "Kotiva Company Profile" line is deliberate
+         honesty: it tells the reader KOTIVA is the source, so this cannot be mistaken for
+         third-party endorsement. K27 also suppressed the decorative quote glyph and the italic
+         voice for exactly that reason.
+
+         What it could not fix from a modifier class was the LAYOUT. The card kept testimonial
+         anatomy — body copy first, then a rule, then a bottom-pinned attribution block — which
+         is the visual grammar of a quotation regardless of which glyphs are hidden. So the
+         section still read as "three people vouching for us," which is the precise impression
+         K27 existed to prevent.
+
+         Rebuilt label-first: the scannable fact leads, the body explains, the source stays but
+         is demoted to provenance rather than a signature. Not a new invention — it is the
+         pattern this same page already uses twice (Brand philosophy's value blocks and The
+         Ingredients), so the two sections after Best Sellers now share one grammar instead of
+         opposite ones. Copy is unchanged, verbatim, including the attribution.
+
+         .testimonial-* is left intact and unused: genuine testimonials are still an open client
+         request, and the component should be waiting when they arrive. -->
+    <div class="fact-grid">
+      <article class="fact-card reveal-left">
+        <h3 class="fact-card-title">Doctor Approved</h3>
+        <p class="fact-card-body">Every formula is developed with evidence-based medicine and powered by scientifically proven active ingredients, selected to deliver safe, effective and clinically supported results.</p>
+        <p class="fact-card-source">Kotiva Company Profile</p>
+      </article>
+      <article class="fact-card reveal reveal-delay-2">
+        <h3 class="fact-card-title">Made in Europe</h3>
+        <p class="fact-card-body">Manufactured in Poland using high-quality European raw materials, in compliance with stringent European Union manufacturing standards.</p>
+        <p class="fact-card-source">Kotiva Company Profile</p>
+      </article>
+      <article class="fact-card reveal-right reveal-delay-2">
+        <h3 class="fact-card-title">Built on Consistency</h3>
+        <p class="fact-card-body">The name Kotiva comes from quotidian, meaning daily. Healthy skin is built through consistent everyday care rather than occasional treatments.</p>
+        <p class="fact-card-source">Kotiva Company Profile</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     RITUAL STRIP — editorial
+═══════════════════════════════════════ -->
+<section data-theme="editorial" class="section-pad-sm" aria-label="The Kotiva ritual">
+  <div class="container text-center reveal">
+    <span class="t-script" style="display:block; margin-bottom:12px;">The ritual, daily.</span>
+    <h2 class="t-display t-display-md mb-16" style="color:var(--fg);">The Kotiva Ritual</h2>
+    <!-- K33: this line used to sit BELOW the six images, so the sequence was seen before it was
+         explained — six large unlabelled frames, then the reason for them. Moved above the grid.
+         The words are unchanged and no order is implied, which matters: the absence of a numbered
+         sequence here is a deliberate, evidenced decision (routine-model.json records stepOrder as
+         "dem-inferred" with "ratify": true, so publishing a morning-to-night order would assert
+         something the client has never ratified). Framing the set is not the same as sequencing
+         it — this states WHY the frames are there without claiming what order anything goes in. -->
+    <p class="ritual-lede">Consistency over complexity.</p>
+  </div>
+  <!-- Imagery restored 2026-08-18 (minimal polish pass) using the ONLY provenance-safe
+       imagery this brand owns: the authentic manufacturer product renders. Deliberately NOT
+       a numbered sequence — data/routine-model.json records stepOrder as "dem-inferred" with
+       "ratify": true, so publishing a canonical morning-to-night order would assert something
+       the client has never ratified. That is the same error class as the invented labels this
+       section is recovering from, in a different costume. The three concern labels below are
+       the ones already published on the bestseller cards; nothing new is claimed. -->
+  <!-- K30-C (2026-08-19): the six-image ritual gallery is RESTORED, with newly commissioned
+       imagery instead of the fabricated set K30-B removed. Every frame was generated against
+       40_projects/kotiva/KOTIVA-IMAGE-GENERATION-MASTER-2026-08-18.md and passed that package's
+       acceptance checks AT FULL RESOLUTION — the step K30-A skipped. Specifically: the five
+       unbranded frames were swept at 100% and carry no readable text, no invented label, no
+       certification mark and no numeric claim; ritual-01 is the real KOT005 toner, compared
+       side-by-side against its master (silhouette, cap, arc-cut label panel, wordmark, every
+       label block). Still deliberately NOT a numbered sequence — data/routine-model.json records
+       stepOrder as "dem-inferred" with "ratify": true, so no order is implied. The interim
+       3-product shelf (the K30-B fallback) is retired; its routine-finder CTA is kept. -->
+  <div class="container">
+    <div class="ritual-grid reveal" role="list" data-stagger="70">
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-01-v2.webp') }}" alt="A Kotiva Glow Up Water Essence Toner bottle on warm stone in late-afternoon light" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-02-v2.webp') }}" alt="Two unmarked skincare vessels beside a glass prism casting a band of refracted light" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-03-v2.webp') }}" alt="A group of unmarked skincare vessels resting on rumpled linen" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-04-v2.webp') }}" alt="Water droplets beaded on warm stone, backlit to a golden glow" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-05-v2.webp') }}" alt="An unmarked skincare bottle beside plain glass labware on pale stone" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-06-v2.webp') }}" alt="A single dried rosehip and its leaves on sunlit stone" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+    </div>
+    <p class="ritual-foot"><a href="{{ route('routine-finder') }}">Build your routine →</a></p>
+  </div>
+  <!-- K30-B (2026-08-18, SAME DAY as K30-A, and this correction matters more than the fix it
+       replaces). K30-A swapped this strip to img/journal/*.webp on the finding that those six
+       images were referenced by nothing. That was true and it was not sufficient: NOBODY OPENED
+       THEM AT FULL RESOLUTION. Four of the six carry invented product text — journal-01 renders a
+       bottle labelled "NIACINAMIDE 15% BRIGHTENING SERUM" with a "CLINICALLY TESTED / DOCTOR
+       APPROVED" badge and capsules misspelt "NIACIIAMIDE"; journal-02 an SPF regulatory-style
+       UVA/UVB mark; journal-03 a burned-in caption band with a MOON over "DAYTIME SPF",
+       contradicting KOTIVA's own SPF-morning rule that the routine engine enforces; journal-05 a
+       notebook of formulation percentages and pH. KOTIVA HAS NO 15% NIACINAMIDE PRODUCT — "15%"
+       appears zero times in data-lite.js and data-full.js. That is a fabricated product making a
+       fabricated certification claim on a doctor-positioned brand in a regulated category: the
+       same class as K27 (fabricated testimonials) and K34 (fabricated FAQ products), and a direct
+       breach of DEM's own house rule for this brand's imagery — image-prompts-cycle3-2026-07-20.md
+       line 79: "HARD RULE - no invented text or branding. Never render any readable text, logo,
+       brand name, product label, certification badge or packaging copy anywhere in the frame."
+       The grid is REMOVED rather than re-sourced. K30-B was already the sanctioned fallback, it
+       needs no new photography, and it fixes the original duplication defect as well. The section
+       keeps its copy and its CTA. -->
+
+</section>
+
+<!-- ═══════════════════════════════════════
+     NEWSLETTER — ritual
+═══════════════════════════════════════ -->
+<section data-theme="ritual" class="section-pad" id="newsletter" aria-label="Newsletter">
+  <div class="container text-center">
+    <div class="reveal" style="max-width:560px;margin:0 auto;">
+      <p class="t-eyebrow mb-16">Stay Informed</p>
+      <h2 class="t-display t-display-md mb-24">Skin insights,<br/>delivered.</h2>
+      <p class="t-body" style="text-align:center;margin-bottom:0;">Ingredient breakdowns, routine guides, and clinical updates — no filler. Unsubscribe anytime.</p>
+      <form class="newsletter-form" id="home-nl-form" onsubmit="handleHomeNL(event)" role="form" aria-label="Newsletter signup">
+        <input class="newsletter-input" id="home-nl-email" type="email" placeholder="Your email address" aria-label="Email address" required />
+        <button class="btn btn-gold" type="submit">Subscribe</button>
+      </form>
+      <p id="home-nl-status" role="status" aria-live="polite" style="margin-top:12px; font-size:13px; color:var(--fg-mid); display:none;"></p>
+    </div>
+  </div>
+</section>
+
+@endsection
+
+@push('scripts')
+@verbatim
+<script>
+function handleHomeNL(e) {
+  e.preventDefault();
+  const input = document.getElementById('home-nl-email');
+  const btn = e.target.querySelector('button[type="submit"]');
+  const status = document.getElementById('home-nl-status');
+  if (!input.value || !input.value.includes('@')) return;
+  const originalText = btn.textContent;
+  btn.textContent = 'Subscribing…';
+  btn.disabled = true;
+  kotivaSubmitToInbox({ type: 'newsletter', email: input.value }).then(() => {
+    status.textContent = "You're subscribed. Welcome to the standard.";
+    status.style.display = 'block';
+    input.disabled = true;
+    btn.textContent = 'Subscribed ✓';
+  }).catch(() => {
+    status.textContent = 'Something went wrong — please try again or email info@vitakode.com.';
+    status.style.display = 'block';
+    btn.textContent = originalText;
+    btn.disabled = false;
+  });
+}
+</script>
+@endverbatim
+@endpush

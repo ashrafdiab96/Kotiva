@@ -20,18 +20,55 @@
   })();
 
   /* ── FORM SUBMISSION (contact + newsletter) ──
-     Temporary until a CRM is connected: routes to an n8n webhook that
-     emails the submission to info@vitakode.com. Shared by contact.html's
-     contact form, and the newsletter sign-up on index.html/journal.html.
+     Posts to this application's own endpoints. This used to call an n8n
+     webhook operated by the previous development partner — the handover
+     README flagged it as outside the codebase and not guaranteed to keep
+     running, so a submission could be lost with nothing to show for it.
+     Both endpoints now store the submission before attempting to email it.
+
+     The signature is unchanged on purpose: contact.html's form and the
+     newsletter sign-ups on index.html and journal.html all call this one
+     function, and none of them needed editing.
   ── */
   window.kotivaSubmitToInbox = function(payload) {
-    return fetch('https://n8n.ashater.com/webhook/kotiva-contact', {
+    var isNewsletter = payload && payload.type === 'newsletter';
+    var url = isNewsletter ? '/newsletter' : '/contact';
+
+    var body = isNewsletter
+      ? { email: payload.email, source: payload.source || 'website' }
+      : {
+          name: payload.name,
+          email: payload.email,
+          enquiry_type: payload.enquiryType || null,
+          message: payload.message
+        };
+
+    var meta = document.querySelector('meta[name="csrf-token"]');
+
+    return fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': meta ? meta.getAttribute('content') : ''
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify(body)
     }).then(function(res) {
-      if (!res.ok) throw new Error('Submission failed (' + res.status + ')');
-      return res.json();
+      return res.json().catch(function() { return {}; }).then(function(data) {
+        if (!res.ok) {
+          /* 422 carries per-field messages; surface the first one so the
+             visitor is told what to fix rather than that "something" failed. */
+          var first = data.errors && Object.keys(data.errors)[0];
+          throw new Error(
+            (first && data.errors[first][0]) ||
+            data.message ||
+            'Submission failed (' + res.status + ')'
+          );
+        }
+        return data;
+      });
     });
   };
 
@@ -362,8 +399,16 @@
 
     var shown = 0;
     grid.querySelectorAll('.product-card').forEach(function (card) {
-      var href = card.getAttribute('href') || '';
-      var m = href.match(/\/product\/([^/.]+)\.html/);
+      /* The card is a cell now, wrapping the product link next to an add-to-cart
+         form, so the href sits on a child anchor rather than on the card itself.
+         Reading the card's own href first keeps this working either way. */
+      var link = card.getAttribute('href') ? card : card.querySelector('a[href]');
+      var href = link ? (link.getAttribute('href') || '') : '';
+      /* Product routes are extensionless now (/product/<slug>, not /product/<slug>.html),
+         so the trailing \.html this used to require would never match and every card would
+         hide — the handoff failing closed on the one page it exists to serve. Excluding
+         ?# rather than . keeps a slug containing a dot from being truncated. */
+      var m = href.match(/\/product\/([^/?#]+)/);
       var i = m ? slugs.indexOf(m[1]) : -1;
       if (i === -1) { card.style.display = 'none'; return; }
       card.style.display = '';

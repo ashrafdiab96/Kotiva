@@ -17,11 +17,11 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
-const root = join(__dir, '..');
+const root = join(__dir, '..', '..');
 const require = createRequire(import.meta.url);
 
-const model = JSON.parse(readFileSync(join(root, 'data/routine-model.json'), 'utf8'));
-const engine = require(join(root, 'js/routine-engine.js'));
+const model = JSON.parse(readFileSync(join(root, 'resources/routine/routine-model.json'), 'utf8'));
+const engine = require(join(root, 'public/js/routine-engine.js'));
 
 let failures = 0, checks = 0;
 const fail = (name, msg) => { failures++; console.error(`  ✗ ${name}: ${msg}`); };
