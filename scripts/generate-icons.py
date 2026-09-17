@@ -9,7 +9,7 @@ Masters (dem-vault 85_assets/kotiva/masters/brand-icon/, client drop 2026-07-17)
 Outputs (assets/):
   favicon.svg           the vector glyph, squared to the master's 283.46 canvas geometry
   favicon-48.png        48x48, straight downscale of the keyline master (transparent)
-  apple-touch-icon.png  180x180, opaque cream plate — iOS composites transparency onto BLACK,
+  apple-touch-icon.png  180x180, opaque white plate — iOS composites transparency onto BLACK,
                         which would render a black glyph invisible on the home screen.
 
 Usage: python scripts/generate-icons.py <path-to-masters-dir>
@@ -18,8 +18,8 @@ import sys
 import pathlib
 from PIL import Image
 
-# Brand cream, --bg of the default "ritual" theme (css/kotiva.css).
-PLATE = (247, 242, 235, 255)
+# KOTIVA white, --bg of the default "ritual" theme (css/kotiva.css).
+PLATE = (255, 255, 255, 255)
 # Glyph placement inside the square canvas, derived from the master's alpha bbox:
 # glyph 154.11x251.7 centred in 283.46 -> x 64.675, y 15.88 (keyline extends 15px beyond).
 # The keyline is not decoration — it is what makes the mark legible on a dark tab strip.

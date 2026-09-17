@@ -19,10 +19,10 @@
 <meta name="twitter:image" content="https://kotiva.co/assets/hero-warm-skincare.webp">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=20260720">
 <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png?v=20260720">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260720">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260915">
   <link rel="preload" href="fonts/FuturaNowVar-Roman.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/Montserrat-VariableFont_wght_25.woff2?v=sub01" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/kotiva.css?v=v4m">
+<link rel="stylesheet" href="css/kotiva.css?v=kc1">
 <style>
 .journal-hero {
   padding-top: calc(var(--nav-h) + 80px);
@@ -57,7 +57,7 @@
 }
 .jf-btn:first-child { padding-left: 0; }
 /* K12: --bronze is a SECOND brand-gold token defined outside the themed set (CLAUDE.md §6,
-   second-brand-token trap) carrying the same #C4956A that fails as small text — 2.40:1 at 9px.
+   second-brand-token trap) carrying the light accent #8AB7E9, which is never small text on a light surface.
    Routed to --accent-text like every other small-gold text role. */
 .jf-btn:hover, .jf-btn.active { color: var(--accent-text); }
 /* FEATURE */
@@ -68,7 +68,7 @@
 }
 .jf-visual-wrap {
   overflow: hidden;
-  background: #0e0c0a;
+  background: var(--bg);
   min-height: 460px;
   display: flex;
   align-items: center;
@@ -79,7 +79,7 @@
   font-family: var(--font-logo);
   font-size: 240px;
   font-weight: 900;
-  color: rgba(245,240,232,0.04);
+  color: rgba(255,255,255,0.04);
   transition: transform 0.6s var(--ease-out);
   user-select: none;
 }
@@ -217,7 +217,7 @@
   outline: none;
   font-family: var(--font-body);
 }
-.nl-input::placeholder { color: var(--fg-dim); }
+.nl-input::placeholder { color: var(--fg-mid); } /* --fg-dim measured 4.43:1 on --bg-alt */
 .nl-submit {
   font-family: var(--font-display);
   font-size: 9px;
@@ -256,7 +256,7 @@
   <div class="nav-inner">
     <a class="nav-logo" href="index.html" aria-label="KOTIVA Home">
       <img class="logo-dark" src="assets/kotiva-logo.svg?v=lg1" alt="KOTIVA" height="28" />
-      <img class="logo-light" src="assets/kotiva-logo-white.svg?v=lg1" alt="KOTIVA" height="28" style="display:none;" />
+      <img class="logo-light" src="assets/kotiva-logo-white.svg?v=lg2" alt="KOTIVA" height="28" style="display:none;" />
     </a>
     <div class="nav-links" role="list">
       <a class="nav-link" href="index.html" role="listitem">Home</a>
@@ -338,12 +338,12 @@
           <p class="t-body">New articles, ingredient guides, and routine tips — delivered before anyone else.</p>
         </div>
         <div class="reveal reveal-delay-2">
-          <p class="t-eyebrow" style="margin-bottom:8px; color:var(--fg-dim);">Subscribe to the Journal</p>
+          <p class="t-eyebrow" style="margin-bottom:8px; color:var(--fg-mid);">Subscribe to the Journal</p>
           <div class="nl-form-row">
             <input type="email" class="nl-input" id="j-email" placeholder="Your email address" aria-label="Email address" required>
             <button class="nl-submit" onclick="handleJournalNL()">Subscribe</button>
           </div>
-          <p style="margin-top:12px; font-size:11px; color:var(--fg-dim); font-family:var(--font-body);">No spam. Unsubscribe anytime.</p>
+          <p style="margin-top:12px; font-size:11px; color:var(--fg-mid); font-family:var(--font-body);">No spam. Unsubscribe anytime.</p>
         </div>
       </div>
     </div>
@@ -407,8 +407,8 @@ function renderFeature(article) {
   if (!el) return;
   el.innerHTML = `
     <!-- K34: data-theme="editorial" is REQUIRED here, not decorative. This block hardcodes
-         background:#0e0c0a but sits inside a light-themed page, so every design token it used
-         resolved to its LIGHT-surface value — --script came out #8B3A2A terracotta on near-black,
+         a dark background but sits inside a light-themed page, so every design token it used
+         resolved to its LIGHT-surface value — light-theme tokens landed on a dark ground,
          measured 2.54:1 at 32px (needs 3.0). The token system already solves this: the editorial
          theme defines --script as gold precisely because, in its own words, "terracotta is too
          dark on dark bg". Declaring the theme fixes every token inside this block at once rather
@@ -485,7 +485,7 @@ function handleJournalNL() {
   if (!input || !btn) return;
   if (!input.value || !input.value.includes('@')) {
     input.placeholder = 'Enter a valid email';
-    input.style.outline = '1px solid rgba(204,34,34,0.4)';
+    input.style.outline = '1px solid rgba(215,40,47,0.85)';
     return;
   }
   const originalText = btn.textContent;
@@ -493,14 +493,14 @@ function handleJournalNL() {
   btn.disabled = true;
   kotivaSubmitToInbox({ type: 'newsletter', email: input.value }).then(() => {
     btn.textContent = 'Subscribed ✓';
-    btn.style.background = '#2d6a42';
+    btn.style.background = '#004539';
     btn.style.color = '#fff';
     input.disabled = true;
   }).catch(() => {
     btn.textContent = originalText;
     btn.disabled = false;
     input.placeholder = 'Something went wrong — try again';
-    input.style.outline = '1px solid rgba(204,34,34,0.4)';
+    input.style.outline = '1px solid rgba(215,40,47,0.85)';
   });
 }
 
@@ -525,7 +525,7 @@ renderDeepDives();
     if(!stuck&&window.scrollY+n>=triggerY){
       stuck=true;
       ph.style.cssText='display:block;height:'+jf.offsetHeight+'px';
-      jf.style.cssText='position:fixed;top:'+n+'px;left:0;right:0;z-index:90;background:var(--bg,#0d0d0d);border-bottom:1px solid var(--border);padding-left:var(--gutter,24px);padding-right:var(--gutter,24px);overflow-x:auto;scrollbar-width:none;';
+      jf.style.cssText='position:fixed;top:'+n+'px;left:0;right:0;z-index:90;background:var(--bg,#231F20);border-bottom:1px solid var(--border);padding-left:var(--gutter,24px);padding-right:var(--gutter,24px);overflow-x:auto;scrollbar-width:none;';
     } else if(stuck&&window.scrollY+n<triggerY){
       stuck=false;
       ph.style.display='none';

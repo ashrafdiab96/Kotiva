@@ -4,8 +4,15 @@
   "description": "Premium skincare website for KOTIVA™ — doctor-approved formulations for the MENA market.",
   "main": "index.js",
   "scripts": {
-    "test": "node scripts/test-routine-engine.mjs && node scripts/check-consistency.js && node scripts/check-global-consistency.js && node scripts/generate-routine-model.js --check",
+    "test": "node scripts/test-routine-engine.mjs && node scripts/check-consistency.js && node scripts/check-global-consistency.js && node scripts/generate-routine-model.js --check && node scripts/validate-palette.mjs",
     "test:routine": "node scripts/test-routine-engine.mjs",
+    "validate:palette": "node scripts/validate-palette.mjs",
+    "audit:colour-inventory": "node scripts/colour-inventory.mjs",
+    "audit:contrast": "node scripts/contrast-audit.mjs",
+    "audit:computed-style": "node scripts/computed-style-audit.mjs",
+    "audit:colour-diff": "node scripts/colour-diff-audit.mjs",
+    "screenshots": "node scripts/screenshot-pages.mjs",
+    "screenshots:compare": "node scripts/compare-screenshots.mjs",
     "gen:routine-model": "node scripts/generate-routine-model.js",
     "check": "node scripts/check-consistency.js",
     "check:global": "node scripts/check-global-consistency.js"
