@@ -15,6 +15,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\ShippingZone;
 use App\Services\Payments\PaymentGateway;
 use App\Support\OrderNumber;
@@ -142,8 +143,14 @@ final class CheckoutService
                 'subtotal' => $subtotal,
                 'shipping_fee' => $shippingFee,
                 'discount_total' => '0.00',
-                // Extracted from the inclusive total, never added to it.
-                'vat_amount' => Order::vatPortionOf($grandTotal, (float) config('kotiva.vat_rate')),
+                // Extracted from the inclusive total, never added to it. Read
+                // through Setting so the dashboard's VAT field actually
+                // governs new orders; config remains the fallback before any
+                // row exists.
+                'vat_amount' => Order::vatPortionOf(
+                    $grandTotal,
+                    (float) Setting::get('vat_rate', config('kotiva.vat_rate'))
+                ),
                 'grand_total' => $grandTotal,
                 'shipping_zone_id' => $details->zoneId,
                 'shipping_city_id' => $details->cityId,

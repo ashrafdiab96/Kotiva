@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 /**
  * What a zone charges, and how long it takes.
@@ -60,6 +61,31 @@ final class ShippingRate extends Model
     public function scopeActive(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    /**
+     * Make this the zone's one active rate, retiring any others.
+     *
+     * The table deliberately has no unique constraint on zone_id, so a zone
+     * keeps its rate history — but a quote reads activeRate(), which is
+     * latestOfMany() over the active rows. Two active rates would therefore
+     * leave an older one silently shadowed rather than visibly wrong, which is
+     * the kind of pricing bug nobody notices until a customer is charged the
+     * wrong fee. Retiring the others makes "active" mean exactly one row.
+     */
+    public function activate(): void
+    {
+        DB::transaction(function (): void {
+            self::query()
+                ->where('zone_id', $this->zone_id)
+                ->whereKeyNot($this->getKey())
+                ->where('is_active', true)
+                ->update(['is_active' => false]);
+
+            if (! $this->is_active) {
+                $this->forceFill(['is_active' => true])->save();
+            }
+        });
     }
 
     /**

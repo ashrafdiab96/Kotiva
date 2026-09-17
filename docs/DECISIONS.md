@@ -429,3 +429,67 @@ shorthand for "orders that count".
 This interpretation previously existed only as a docblock with no test defending it, which is how
 such a rule gets silently flipped later. `OrderStatusRevenueTest` now pins the exact set, so changing
 it becomes a deliberate act with a failing test attached.
+
+## D-30 — Shipping rates are history, and the city import runs inline
+
+**Rates.** `shipping_rates` has no unique constraint on `zone_id`, and `ShippingZone::activeRate()`
+is `latestOfMany()` over the active rows — so the schema deliberately keeps a zone's rate history.
+That design has one sharp edge: two active rates leave the older one silently *shadowed* rather than
+visibly wrong, and the shop quietly charges a fee nobody chose.
+
+So `ShippingRate::activate()` makes a rate exclusive in a transaction — it retires the zone's other
+active rows and keeps them as history rather than deleting them. The relation manager on the zone
+page calls it after any create or edit that leaves a rate active, and offers "Use this rate" on a
+retired one. The zones table carries a "Quotable" column because an active zone with no active rate
+cannot be quoted at all, and `ShippingQuote` treats that as *unavailable*, which is emphatically not
+free delivery — without the column such a zone simply looks fine.
+
+§7.3 also states that changing a rate must never alter existing orders. That holds by construction:
+CheckoutService writes `shipping_fee` once at placement and nothing reads a rate back afterwards. It
+was asserted nowhere, so `ShippingAdminTest` now pins it — a placed order keeps the 25.00 it was
+charged while new quotes move to 60.00.
+
+**City import.** Filament ships `ImportAction`, and its three tables are migrated. It is not used
+here: it dispatches a queued `Bus::batch`, and dev runs the `database` queue driver, so an upload
+would report success and then do nothing at all until a worker ran. A city list is a handful of short
+rows, so `CityCsvImporter` runs inline and reports what it did immediately.
+
+It upserts on `(zone_id, name_en)` — the table's own unique key — so re-importing a file is
+idempotent exactly as re-running ShippingSeeder is; blind inserts would throw on the second run. It
+strips the UTF-8 BOM Excel writes (otherwise the first city is named "\u{FEFF}Riyadh" and duplicates
+on the next import), skips a detected header row, reports rows with no city name instead of dropping
+them silently, and fills a blank Arabic name but never overwrites one an admin typed by hand.
+
+## D-31 — Settings that actually govern, and a bar that retunes rather than rewrites
+
+Two of the fields §7.6 asks for were decorative when I found them. `vat_rate` and
+`low_stock_threshold` were seeded into the settings table, but every reader consulted
+`config()` — `CheckoutService` for VAT, `ProductResource` for the new-product default. An admin
+could have edited VAT on the dashboard, seen it saved, and had every subsequent order keep the old
+rate: the tax on the receipt would simply have been wrong. Both now read
+`Setting::get(key, config(...))`, the same pattern `cart_ttl_hours` and `cod_enabled` already used,
+with config as the pre-row fallback. `CheckoutFlowTest` pins it end to end — a rate of 5% yields
+14.28 VAT on a 300.00 order where the config default gives 39.13.
+
+VAT is entered as a percentage and stored as a rate. A field storing what the admin literally typed
+would turn "15" into 1500% VAT, which is the kind of error that looks fine in the form and is
+catastrophic on every order afterwards.
+
+Access is `canAccess()`, not `shouldRegisterNavigation()`. Filament consults the former before
+registering navigation *and* aborts 403 on mount and hydrate, so one override both hides the page
+and refuses the URL; hiding alone would have been cosmetic. A test types the URL as a manager and
+as staff to prove it.
+
+Invalid notification addresses are refused by the form rather than silently filtered, so the admin
+is told and the list that was already delivering order mail is left intact — verified by probe:
+nothing at all is written when validation fails, not even the page's other fields. Blank entries are
+a separate case: Laravel's `email` rule treats an empty string as absent, so validation passes and
+`save()` drops it. Both behaviours were measured before being asserted, after two wrong assumptions
+about which one applied.
+
+**The announcement bar** is styled entirely in `shop.css`. `kotiva.css` fixes `.nav` at `top:0` with
+`height:var(--nav-h)` and offsets page content with `calc(var(--nav-h) + …)` in six separate rules.
+Rather than edit any of them, `html.has-announcement` retunes `--nav-h` to include the bar so every
+one of those offsets self-corrects, and `.nav`'s own height is re-pinned since it would otherwise
+grow with the token. The bar text is `nowrap` with an ellipsis on purpose: if it wrapped, the
+`--announce-h` token would be a lie and the nav would sit on top of the content it is meant to clear.

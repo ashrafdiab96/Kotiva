@@ -1235,3 +1235,56 @@ html[data-mode="dark"] .checkout-step.is-done .checkout-step-num {
   .checkout-steps-list { gap: 12px; }
   .checkout-step-label { display: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANNOUNCEMENT BAR (§7.6)
+   Rendered above the nav when the setting is on.
+
+   kotiva.css fixes .nav at top:0 with height:var(--nav-h), and six rules
+   offset page content with calc(var(--nav-h) + …). Rather than edit any of
+   them, has-announcement retunes --nav-h to include the bar, so every one of
+   those offsets self-corrects — and .nav's own height is re-pinned here,
+   since it would otherwise grow with the token.
+   ═══════════════════════════════════════════════════════════════════ */
+:root { --announce-h: 40px; }
+
+html.has-announcement { --nav-h: calc(72px + var(--announce-h)); }
+html.has-announcement .nav { height: 72px; top: var(--announce-h); }
+
+/* The nav auto-hides on scroll and sticky elements re-offset to 0; with a bar
+   present they must stop below it instead of sliding underneath. */
+html.has-announcement.nav-hidden .filter-sticky { top: var(--announce-h); }
+
+.kotiva-announce {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--announce-h);
+  z-index: 1001; /* above .nav's 1000, so the nav hides behind it */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  background: #005DBA;
+  color: #FFFFFF;
+}
+
+.kotiva-announce-text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  /* Single line, always. A wrapping bar would make --announce-h a lie and the
+     nav would sit on top of the page content. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  :root { --announce-h: 36px; }
+  .kotiva-announce-text { font-size: 9px; letter-spacing: 0.14em; }
+}

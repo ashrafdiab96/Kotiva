@@ -8,6 +8,7 @@ use App\Filament\Concerns\GatedByRole;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\StockMovementsRelationManager;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Services\ProductImageService;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -252,7 +253,9 @@ final class ProductResource extends Resource
             Forms\Components\TextInput::make('low_stock_threshold')
                 ->numeric()
                 ->minValue(0)
-                ->default((int) config('kotiva.stock.low_stock_threshold'))
+                // The dashboard default, so changing it in Settings governs the
+                // next product rather than only the config file.
+                ->default((int) Setting::get('low_stock_threshold', config('kotiva.stock.low_stock_threshold')))
                 ->helperText('At or below this, the shop shows "Only N left" and an alert is raised.'),
 
             Forms\Components\TextInput::make('weight_grams')

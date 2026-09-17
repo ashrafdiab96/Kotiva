@@ -15,6 +15,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductStockMovement;
+use App\Models\Setting;
 use App\Models\ShippingCity;
 use App\Models\ShippingRate;
 use App\Models\ShippingZone;
@@ -187,6 +188,26 @@ final class CheckoutFlowTest extends TestCase
         $this->assertSame('100.00', $order->subtotal);
         $this->assertSame('25.00', $order->shipping_fee);
         $this->assertSame('125.00', $order->grand_total);
+    }
+
+    #[Test]
+    public function the_vat_rate_setting_governs_a_new_order(): void
+    {
+        // Without this the dashboard's VAT field would be decorative: it is
+        // stored, shown and edited, while every order keeps using the config
+        // value — misstating the tax on every receipt after a rate change.
+        Setting::put('vat_rate', 0.05);
+
+        $product = $this->product(stock: 10, price: '150.00');
+        $zone = $this->zone(fee: '25.00', threshold: '300.00');
+        $cart = $this->startCart($product, 2);
+
+        $order = app(CheckoutService::class)->place($cart, $this->details($zone), app(CashOnDeliveryGateway::class));
+
+        // 300.00 inclusive at 5%: 300 x 0.05 / 1.05 = 14.2857…, truncated to
+        // 14.28 by bcdiv. At the config default of 15% it would be 39.13.
+        $this->assertSame('300.00', $order->grand_total);
+        $this->assertSame('14.28', $order->vat_amount);
     }
 
     #[Test]

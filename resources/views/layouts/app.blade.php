@@ -17,7 +17,9 @@
     $v = config('app.asset_version');
 @endphp
 <!DOCTYPE html>
-<html lang="en" data-theme="ritual">
+{{-- has-announcement retunes --nav-h so every existing calc(var(--nav-h) + …)
+     offset in kotiva.css accounts for the bar without those rules changing. --}}
+<html lang="en" data-theme="ritual"@if (! empty($announcementText ?? null)) class="has-announcement"@endif>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -40,6 +42,15 @@
      NAVIGATION
 ═══════════════════════════════════════ -->
 <a class="skip-link" href="#main-content">Skip to content</a>
+@if (! empty($announcementText ?? null))
+  {{-- Above the nav (§7.6). After the skip link, which must stay the first
+       focusable element on the page. role="status" rather than "alert": this
+       is standing information, not something that just happened, so it should
+       not interrupt a screen reader mid-sentence. --}}
+  <div class="kotiva-announce" role="status">
+    <p class="kotiva-announce-text">{{ $announcementText }}</p>
+  </div>
+@endif
 <nav class="nav transparent" id="main-nav" role="navigation">
   <div class="nav-inner">
     <a class="nav-logo" href="{{ route('home') }}" aria-label="KOTIVA Home">
