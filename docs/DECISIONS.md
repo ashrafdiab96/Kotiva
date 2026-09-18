@@ -493,3 +493,134 @@ Rather than edit any of them, `html.has-announcement` retunes `--nav-h` to inclu
 one of those offsets self-corrects, and `.nav`'s own height is re-pinned since it would otherwise
 grow with the token. The bar text is `nowrap` with an ellipsis on purpose: if it wrapped, the
 `--announce-h` token would be a lie and the nav would sit on top of the content it is meant to clear.
+
+## D-32 — Product import: two passes, the ledger, and a page instead of a modal
+
+**Two passes.** `ProductImporter::validate()` reads every row and writes nothing; `import()` then
+writes the valid rows in one transaction. That makes the brief's all-or-nothing rule a decision taken
+on a finished report, not something discovered after half the catalog has changed. "Skip invalid
+rows" is an explicit opt-in on the page.
+
+**Rules a careless import would break quietly**, each pinned by `ProductImportTest`:
+
+* Stock is a *target level*, applied as the difference through `StockService` with reason `import`.
+  The column is never written directly, so the ledger still sums to `stock_qty`. An unchanged level
+  writes no movement (the service rejects a zero delta anyway).
+* On an update, an empty or unmapped cell leaves the field alone — a repricing sheet of four columns
+  must not wipe every description. An existing product's slug never changes unless the file says so;
+  it is a live, indexed URL.
+* Categories match on `Str::slug(name)`, exactly as ProductSeeder creates them, so "Face Care" finds
+  the seeded row instead of cloning it. New slugs are de-duplicated (`kotiva-serum-2`); an
+  Arabic-only name falls back to the SKU.
+* A soft-deleted SKU is restored and updated. The SKU index covers trashed rows, so "create" would
+  otherwise die on an integrity error no admin could act on.
+* An image *URL* is refused: `Product::resolveImagePath()` treats anything outside `assets/` as a
+  storage path, so it would render as a broken `/storage/https://…` image rather than fail visibly.
+* Filter tags are free-form slugs, not limited to the six pills. Seven launch products carry
+  `cleanser`, which has no pill; the pills come from config, so an extra tag cannot invent one.
+  Restricting them would have made an unedited export fail to re-import. The same fact exposed a bug
+  in the product form: its tag checkboxes listed only the pills, leaving `cleanser` in the data where
+  an admin could neither see nor remove it. It now lists the product's own extra tags, marked
+  "no pill", and a test proves saving keeps them.
+
+**Round trip.** The product export uses exactly the import's columns. Re-importing an unedited export
+of the real 25-product catalog reports 25 unchanged, 0 updated, and leaves 13 compared columns
+identical — `science` byte for byte. That needed one correction found while planning the test:
+the reader originally trimmed every cell, which would have rewritten whitespace in the approved
+science texts that ScienceRenderer's output is checked against. Long-text fields now keep their
+exact content.
+
+**Formula injection.** Every exported cell goes through `CsvExports::safe()`, which prefixes `'` to
+anything a spreadsheet would execute (`=`, `+`, `-`, `@`, tab, CR). Order exports carry text
+customers typed; a name of `=HYPERLINK(…)` would otherwise run on whichever admin opened the file.
+The importer reverses the guard so it survives a round trip. The order export follows the
+customer-data capability: staff work orders but do not download the customer list.
+
+**Format is chosen, not guessed.** The reader is picked from the upload's own extension.
+openspout's `ReaderFactory` is deprecated precisely because guessing is brittle.
+
+**A page, not a modal.** The brief asks for "a Filament action on the Products list". The action
+exists, and it opens a dedicated page. Preview, remapping, a row-level error report and a re-check
+need state that survives several round trips, and a modal that closes on the first validation error
+is the wrong container for that. The upload is copied to private storage at once, because Livewire's
+temporary file can be garbage-collected before a queued job reaches it.
+
+**Queued above 100 rows**, as the brief says. The job re-validates rather than trusting the page's
+earlier check, is not retried (a half-understood failure re-run automatically could apply the same
+stock change twice), deletes its file, and reports through the panel's notification bell. That
+needed the notifications table and `->databaseNotifications()`, neither of which existed. The bell
+reports start and finish, not a percentage: the brief's "progress notification" is met at that grain.
+
+## D-33 — Phase 6 hardening: what the audit found, not just what the brief listed
+
+The §8 rules were already in place: all four named endpoints throttled, FormRequests everywhere,
+`X-CSRF-TOKEN` from the meta tag, and placements, status changes and refused reservations logged
+with the order number or SKU. Checking them turned up four real gaps, each now fixed and pinned
+by a test.
+
+1. **Two of the four throttles were never tested.** Contact and newsletter were; `POST /cart/items`
+   and `POST /checkout/payment` were configured but unproven. `HardeningTest` now drives each past
+   its limit and requires a 429.
+2. **A published default admin password.** `.env.example` ships `KOTIVA_ADMIN_PASSWORD=ChangeMe!2026`.
+   Copy that file to production, run `--seed`, and the store has a super admin whose password is in
+   the repository. `AdminSeeder` now **throws** on that exact value when `APP_ENV=production`. It
+   throws rather than warns, because a warning in a deploy log gets read after the account exists.
+   Local setup is unaffected. `.env.example` also now defaults to MySQL, the production target, not
+   SQLite.
+3. **Checkout errors were visible but silent.** A failed shipping submit showed 14 error elements
+   on screen, yet no field carried `aria-invalid` or `aria-describedby` and nothing was announced. A
+   screen-reader user would submit a bad phone number and hear nothing. Each error is now tied to its
+   field, and a `role="alert"` summary is announced on load. `CheckoutAccessibilityTest` requires
+   both and checks that a clean form carries no error markers. The rest of the audit, run over HTTP
+   with a real session across 14 storefront pages including cart and checkout, was clean: alt text,
+   labels, accessible names, unique IDs, valid `aria-*` references, skip-link target, one `h1` per
+   page. The audit was itself checked against planted faults. The mini-cart already closed on
+   Escape, trapped focus and returned it.
+4. **The payment seam was a comment, not code.** `PaymentGateway`'s docblock promised the checkout
+   "talks to this interface, never a concrete class", yet `CheckoutController` injected
+   `CashOnDeliveryGateway`, so a second gateway would have needed controller surgery. A small
+   `PaymentGateways` registry, bound in `AppServiceProvider`, is now the only thing checkout sees. A
+   reflection test fails if a concrete gateway is ever injected again. Found while writing the
+   README's "how to add a gateway" section: the instructions could not be written truthfully until
+   this was fixed.
+
+## D-34 — What the real-browser run found
+
+The §12 browser gate, run with Playwright (Chromium 149), passed: 11 storefront pages × light
+desktop, dark desktop and a 390px phone, with no console errors, no failed or 4xx/5xx requests, no
+horizontal overflow on mobile, and dark mode confirmed as actually applied. The full walk passed too:
+add to cart, change quantity, checkout, order, dashboard sign-in, find the order, confirm it, cancel
+it. Underneath, three queued emails were sent, the phone typed as `0551234567` was stored as
+`+966551234567`, both status moves were attributed in the history, and the stock ledger returned to
+exactly 50 with its sum matching `stock_qty`. Getting there surfaced two things.
+
+**1. Headless Chromium stops painting after any link click, because of the site's view transition.**
+`kotiva.css` has used `@view-transition { navigation: auto; }` (a 260ms crossfade) since the
+initial commit. In headless Chromium, both the headless shell and the full "new headless" mode, a
+page reached by clicking a link produces no frames at all, so screenshots and clicks time out. This
+is **not** a KOTIVA bug and nothing in this work caused it. It reproduces on a bare two-page HTML
+site containing only that one rule, with no Laravel, no KOTIVA CSS and no JS (no frame in 10s). Remove
+the rule and the page paints in 65–77ms; on KOTIVA pages, stripping it at the network layer restores
+painting in 632ms. The rule is left in place: it is part of the approved visual identity and has
+shipped on the live static site since the start.
+
+**Not verified:** whether windowed desktop Chrome is affected. Checking that would have meant
+opening a browser window on the developer's machine unasked. The browser walk therefore runs with
+`reducedMotion: 'reduce'`, a path the site already supports (the same stylesheet turns the transition
+off for reduced-motion visitors), so the real production CSS and JS are exercised unchanged. **Before
+launch, click through a few pages in ordinary desktop Chrome and Safari.** If navigation ever
+appears to hang for a few seconds, this rule is the first suspect.
+
+**2. The dashboard was the only part of the product that reached third-party hosts.** The
+storefront makes zero external requests, because its fonts are self-hosted. Filament's defaults did
+not: Inter came from `fonts.bunny.net` (in this environment one request timed out and the dashboard
+waited on it), and each avatar came from `ui-avatars.com`, which sends every admin's name to a third
+party on every page. The panel now uses the brand's own self-hosted Montserrat — the storefront's
+`@font-face`, pointing at the same file — and `InitialsAvatarProvider` draws the initials as an
+inline SVG. A browser run confirms zero external requests on both halves, and `HardeningTest` fails
+if either host reappears.
+
+The same run also showed why "the dashboard returns 200" was never enough. The first screenshot
+showed every widget as an empty box. Those were Filament's lazy-load placeholders, captured before
+the widgets loaded; once settled, all six rendered with the right figures and 4 charts. The distinction
+was only visible by looking.

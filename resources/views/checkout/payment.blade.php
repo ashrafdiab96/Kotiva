@@ -48,7 +48,7 @@
 
             @if ($codEnabled)
               <label class="checkout-method is-selected">
-                <input type="radio" name="payment_method" value="cod" checked required>
+                <input type="radio" name="payment_method" value="cod" checked required @error('payment_method') aria-invalid="true" aria-describedby="payment_method-error" @enderror>
                 <span class="checkout-method-body">
                   <span class="checkout-method-name">Cash on Delivery</span>
                   <span class="checkout-method-note">Pay the courier when your order arrives.</span>
@@ -57,13 +57,15 @@
             @else
               <p class="cart-error" role="alert">No payment method is currently available. Please contact us to complete your order.</p>
             @endif
-            @error('payment_method')<p class="form-error">{{ $message }}</p>@enderror
+            @error('payment_method')<p class="form-error" id="payment_method-error" role="alert">{{ $message }}</p>@enderror
 
             <label class="checkout-check">
-              <input type="checkbox" name="terms" value="1" @checked(old('terms'))>
+              <input type="checkbox" name="terms" value="1" @checked(old('terms')) @error('terms') aria-invalid="true" aria-describedby="terms-error" @enderror>
               <span>I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener">Terms &amp; Conditions</a>.</span>
             </label>
-            @error('terms')<p class="form-error">{{ $message }}</p>@enderror
+            {{-- role="alert": this is usually the only error on the step, and
+                 without it a failed Place Order is silent to a screen reader. --}}
+            @error('terms')<p class="form-error" id="terms-error" role="alert">{{ $message }}</p>@enderror
 
             <button type="submit" class="form-submit" @disabled(! $codEnabled)>Place Order</button>
           </div>

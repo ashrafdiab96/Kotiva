@@ -180,10 +180,14 @@ final class ProductResource extends Resource
 
             Forms\Components\CheckboxList::make('filter_tags')
                 ->label('Shop filters')
-                ->options(self::getFilterTagOptions())
+                // The shop's pills, plus any other tag this product already
+                // carries. Seven launch products are tagged `cleanser`, which
+                // has no pill; listing only the pills would leave that tag in
+                // the data where the admin could neither see nor remove it.
+                ->options(fn (?Product $record): array => self::getFilterTagOptions() + self::extraTagOptions($record))
                 ->columns(3)
                 ->columnSpanFull()
-                ->helperText('Controls which shop filter pills this product appears under.'),
+                ->helperText('Controls which shop filter pills this product appears under. Tags marked "no pill" are kept on the product but are not a shop filter.'),
 
             Forms\Components\Textarea::make('science')
                 ->rows(12)
@@ -294,6 +298,25 @@ final class ProductResource extends Resource
         $filters = config('kotiva.shop.filters', []);
 
         return array_diff_key($filters, ['all' => '']);
+    }
+
+    /**
+     * Tags on this product that are not shop pills, labelled as such.
+     *
+     * @return array<string, string>
+     */
+    public static function extraTagOptions(?Product $record): array
+    {
+        $pills = self::getFilterTagOptions();
+        $extra = [];
+
+        foreach ($record->filter_tags ?? [] as $tag) {
+            if (! array_key_exists($tag, $pills)) {
+                $extra[$tag] = $tag.' (no pill)';
+            }
+        }
+
+        return $extra;
     }
 
     public static function table(Table $table): Table

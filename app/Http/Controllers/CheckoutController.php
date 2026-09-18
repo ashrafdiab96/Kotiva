@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentMethod;
 use App\Exceptions\CheckoutException;
 use App\Http\Requests\PlaceOrderRequest;
 use App\Http\Requests\ShippingDetailsRequest;
@@ -14,7 +15,7 @@ use App\Models\ShippingZone;
 use App\Services\CartService;
 use App\Services\CheckoutDetails;
 use App\Services\CheckoutService;
-use App\Services\Payments\CashOnDeliveryGateway;
+use App\Services\Payments\PaymentGateways;
 use App\Services\ShippingCalculator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -41,7 +42,7 @@ final class CheckoutController extends Controller
         private readonly CartService $carts,
         private readonly CheckoutService $checkout,
         private readonly ShippingCalculator $shipping,
-        private readonly CashOnDeliveryGateway $gateway,
+        private readonly PaymentGateways $gateways,
     ) {}
 
     public function index(): RedirectResponse
@@ -156,7 +157,7 @@ final class CheckoutController extends Controller
                 $quote->available ? $quote->fee : '0.00'
             ),
             'checkoutToken' => $token,
-            'codEnabled' => $this->gateway->isEnabled(),
+            'codEnabled' => $this->gateways->isEnabled(PaymentMethod::CashOnDelivery),
         ]);
     }
 
@@ -207,7 +208,9 @@ final class CheckoutController extends Controller
             $order = $this->checkout->place(
                 cart: $cart,
                 details: CheckoutDetails::fromSession($saved),
-                gateway: $this->gateway,
+                // The gateway for the method the shopper chose, via the
+                // registry — never a concrete class named here.
+                gateway: $this->gateways->for(PaymentMethod::from((string) $request->validated('payment_method'))),
                 ipAddress: $request->ip(),
                 userAgent: $request->userAgent(),
             );

@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use App\Services\Payments\CashOnDeliveryGateway;
+use App\Services\Payments\PaymentGateways;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\ServiceProvider;
@@ -14,7 +16,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Every payment gateway the checkout may offer. Adding one is a case on
+        // PaymentMethod, an implementation of PaymentGateway, and a line here.
+        $this->app->singleton(PaymentGateways::class, fn ($app): PaymentGateways => new PaymentGateways([
+            $app->make(CashOnDeliveryGateway::class),
+        ]));
     }
 
     /**

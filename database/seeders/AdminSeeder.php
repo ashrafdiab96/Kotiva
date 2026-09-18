@@ -19,6 +19,13 @@ use Illuminate\Support\Facades\Log;
  */
 final class AdminSeeder extends Seeder
 {
+    /**
+     * The value .env.example ships with. It is published in the repository,
+     * so a production install seeded with it would have a super admin whose
+     * password anyone reading the repo already knows.
+     */
+    public const EXAMPLE_PASSWORD = 'ChangeMe!2026';
+
     public function run(): void
     {
         // Via config, not env(): env() returns null once config:cache has run,
@@ -32,6 +39,15 @@ final class AdminSeeder extends Seeder
             Log::warning('AdminSeeder skipped — KOTIVA_ADMIN_EMAIL / KOTIVA_ADMIN_PASSWORD are not set');
 
             return;
+        }
+
+        if ($password === self::EXAMPLE_PASSWORD && app()->isProduction()) {
+            // Refused rather than warned about: a warning in a deploy log is
+            // read after the account already exists.
+            throw new \RuntimeException(
+                'KOTIVA_ADMIN_PASSWORD is still the example value from .env.example. '
+                .'Set a real password before seeding a production install.'
+            );
         }
 
         Admin::firstOrCreate(

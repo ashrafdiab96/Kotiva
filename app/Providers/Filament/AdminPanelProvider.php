@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\InitialsAvatarProvider;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -58,6 +60,16 @@ final class AdminPanelProvider extends PanelProvider
             ])
             // §7: dark mode enabled, matching the storefront's own toggle.
             ->darkMode()
+            // Nothing in the dashboard leaves the domain: the brand's own
+            // self-hosted Montserrat instead of Inter from fonts.bunny.net, and
+            // initials drawn locally instead of sending admin names to
+            // ui-avatars.com on every page load.
+            ->font('Montserrat', url: asset('css/admin-font.css'), provider: LocalFontProvider::class)
+            ->defaultAvatarProvider(InitialsAvatarProvider::class)
+            // The bell. A queued product import finishes after the page that
+            // started it may be closed, so its outcome is delivered here.
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
