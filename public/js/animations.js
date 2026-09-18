@@ -274,6 +274,38 @@
     });
   }
 
+  /* ── RAIL ARROWS (best sellers) ──
+     Prev/next buttons scroll the rail by one card; each button is disabled at its end. */
+  function initRailArrows() {
+    document.querySelectorAll('.bestsellers-section').forEach(function (section) {
+      var wrap = section.querySelector('.bestsellers-scroll');
+      var buttons = section.querySelectorAll('.bs-arrow');
+      if (!wrap || !buttons.length) return;
+
+      function step() {
+        var card = wrap.querySelector('.bs-card');
+        return card ? card.getBoundingClientRect().width + 16 : wrap.clientWidth * 0.8;
+      }
+
+      function update() {
+        var max = wrap.scrollWidth - wrap.clientWidth - 2;
+        buttons.forEach(function (btn) {
+          var dir = Number(btn.getAttribute('data-rail-dir'));
+          btn.disabled = dir < 0 ? wrap.scrollLeft <= 2 : wrap.scrollLeft >= max;
+        });
+      }
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          wrap.scrollBy({ left: Number(btn.getAttribute('data-rail-dir')) * step(), behavior: 'smooth' });
+        });
+      });
+      wrap.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    });
+  }
+
   /* ── PIN-SCRUB PRODUCT RAIL ──
      Vertical scroll drives horizontal product motion. This is NOT scroll-jacking: no wheel
      event is ever read, captured or preventDefault()'d. The mechanism is a tall wrapper
@@ -531,7 +563,9 @@
     initStaggerChildren();
     initReveal();
     initParallax();
-    initPinRail();
+    /* initPinRail() disabled: the mouse wheel now scrolls the page, and the rail is moved
+       with the arrow buttons (initRailArrows), drag, or touch swipe instead. */
+    initRailArrows();
     if (!reduce) initCountUp();
     if (!reduce) initMomentumScroll();
     initIngredientHover();

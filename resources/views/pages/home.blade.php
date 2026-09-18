@@ -311,7 +311,7 @@
 <!-- ═══════════════════════════════════════
      DOCTOR APPROVED — editorial
 ═══════════════════════════════════════ -->
-<section data-theme="editorial" class="doctor-section" aria-label="Doctor approved">
+<section data-theme="editorial-bg-white" class="doctor-section" aria-label="Doctor approved">
   <div class="doctor-content reveal-left">
     <!-- K33: the "The Kotiva Standard" eyebrow was deleted rather than reworded. It duplicated
          the Brand-philosophy eyebrow above and collided with the heading of the section 5,400px
@@ -336,14 +336,14 @@
 <!-- ═══════════════════════════════════════
      ROUTINE FINDER CTA — editorial
 ═══════════════════════════════════════ -->
-<section data-theme="editorial" class="routine-cta" aria-label="Find your routine">
+<section data-theme="editorial-bg-white" class="routine-cta" aria-label="Find your routine">
   <div class="routine-cta-image">
     <img src="{{ asset('assets/home-routine-ritual-v2.webp') }}" alt="A woman applies face cream during her morning ritual in warm natural light" data-parallax="0.10" style="position:absolute;top:-7%;left:0;width:100%;height:114%;object-fit:cover;object-position:center 20%;transform:scaleX(-1);" />
     <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(106,50,119,0.55) 0%,rgba(106,50,119,0.15) 60%,transparent 100%);"></div>
   </div>
   <div class="routine-cta-content reveal-right">
     <p class="t-eyebrow">Personalised For You</p>
-    <h2 class="t-display t-display-md" style="color:var(--fg);">Your skin.<br/>Your ritual.</h2>
+    <h2 class="t-display t-display-md" style="color:var(--script);">Your skin.<br/>Your ritual.</h2>
     <p class="t-body" style="max-width:380px;">Answer 7 questions about your skin type and concerns. We'll build your morning and evening routine from the Kotiva range — precisely matched to you.</p>
     <a class="btn btn-gold" href="{{ route('routine-finder') }}">Start the Quiz</a>
   </div>
@@ -383,7 +383,13 @@
           <p class="t-eyebrow mb-16">Most Loved</p>
           <h2 class="t-display t-display-md" style="color:var(--fg);">The Essentials</h2>
         </div>
-        <a class="btn btn-outline-light" href="{{ route('shop.index') }}" style="color:rgba(255,255,255,0.78);border-color:rgba(255,255,255,0.40);">View All {{ $catalogCount }} →</a>
+        <div class="bs-header-actions">
+          <div class="bs-arrows">
+            <button type="button" class="bs-arrow" data-rail-dir="-1" aria-label="Previous products" disabled>&#8592;</button>
+            <button type="button" class="bs-arrow" data-rail-dir="1" aria-label="Next products">&#8594;</button>
+          </div>
+          <a class="btn btn-outline-light" href="{{ route('shop.index') }}" style="color:rgba(255,255,255,0.78);border-color:rgba(255,255,255,0.40);">View All {{ $catalogCount }} →</a>
+        </div>
       </div>
     </div>
     <div class="bestsellers-scroll" role="region" aria-label="Best sellers">

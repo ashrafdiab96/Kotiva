@@ -137,6 +137,35 @@ html[data-mode="dark"] .skip-link { background: #FFFFFF; color: #231F20; }
   --shadow-hover: 0 16px 48px rgba(0,0,0,0.45);
 }
 
+/* THEME: EDITORIAL-BG-WHITE — editorial layout on a white surface (dark ink, KOTIVA blue text accent) */
+[data-theme="editorial-bg-white"] {
+  --bg:           #FFFFFF;
+  --bg-alt:       rgba(138,183,233,0.18);
+  --bg-card:      rgba(138,183,233,0.10);
+  --fg:           #231F20;
+  --fg-mid:       rgba(35,31,32,0.72);
+  --fg-dim:       rgba(35,31,32,0.62);
+  --accent:       #8AB7E9;
+  --accent-light: #8AB7E9;
+  --accent-deep:  #005DBA;
+  --accent-text:  #005DBA; /* #8AB7E9 is never text on a light surface (brief §2.1) */
+  --border:       rgba(35,31,32,0.12);
+  --border-strong:rgba(35,31,32,0.30);
+  --script:       #D7282F;
+  --shadow:       0 8px 32px rgba(35,31,32,0.08);
+  --shadow-hover: 0 16px 48px rgba(35,31,32,0.14);
+  background: var(--bg);
+  color: var(--fg);
+}
+[data-theme="editorial-bg-white"] .credential-badge {
+  border-color: var(--border-strong);
+  color: var(--fg-mid);
+}
+[data-theme="editorial-bg-white"] .credential-badge:hover {
+  border-color: var(--accent-text);
+  color: var(--accent-text);
+}
+
 /* THEME: CLINICAL — white science */
 [data-theme="clinical"] {
   --bg:           #FFFFFF;
@@ -778,7 +807,7 @@ input, textarea, select { font: inherit; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 560px;
-}
+} 
 .doctor-content {
   padding: clamp(60px, 8vw, 120px) clamp(40px, 5vw, 80px);
   display: flex;
@@ -1680,7 +1709,8 @@ section[id] { scroll-margin-top: calc(var(--nav-h) + 16px); }
 /* Dark mode base — ritual sections AND the page root (pages without an explicit
    data-theme on <html>, e.g. inner pages) get the KOTIVA dark neutral. */
 html[data-mode="dark"],
-html[data-mode="dark"] [data-theme="ritual"] {
+html[data-mode="dark"] [data-theme="ritual"],
+html[data-mode="dark"] [data-theme="editorial-bg-white"] {
   --bg:           #231F20;
   --bg-alt:       rgba(255,255,255,0.04);
   --bg-card:      rgba(255,255,255,0.07);
@@ -1934,6 +1964,27 @@ html[data-mode="dark"] .nav-theme-btn .icon-sun  { display: block; }
   margin-bottom: clamp(20px, 2.4vw, 32px);
   width: 100%;
 }
+/* Rail prev/next arrows, beside "View All" */
+.bs-header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.bs-arrows { display: flex; gap: 10px; }
+.bs-arrow {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.40);
+  background: transparent;
+  color: #FFFFFF;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+}
+.bs-arrow:hover:not(:disabled) { background: #FFFFFF; color: #231F20; border-color: #FFFFFF; }
+.bs-arrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.bs-arrow:disabled { opacity: 0.35; cursor: default; }
 .bs-card-meta {
   display: flex;
   align-items: baseline;
@@ -2255,7 +2306,7 @@ html[data-mode="dark"] .scroll-progress-bar { background: linear-gradient(90deg,
   text-transform: uppercase;
   letter-spacing: 0.01em;
   line-height: 0.88;
-  color: var(--fg);
+  color: var(--script);
   margin-bottom: 20px;
   border-left: 3px solid var(--accent);
   padding-left: 20px;
