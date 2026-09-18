@@ -383,15 +383,12 @@
           <p class="t-eyebrow mb-16">Most Loved</p>
           <h2 class="t-display t-display-md" style="color:var(--fg);">The Essentials</h2>
         </div>
-        <div class="bs-header-actions">
-          <div class="bs-arrows">
-            <button type="button" class="bs-arrow" data-rail-dir="-1" aria-label="Previous products" disabled>&#8592;</button>
-            <button type="button" class="bs-arrow" data-rail-dir="1" aria-label="Next products">&#8594;</button>
-          </div>
-          <a class="btn btn-outline-light" href="{{ route('shop.index') }}" style="color:rgba(255,255,255,0.78);border-color:rgba(255,255,255,0.40);">View All {{ $catalogCount }} →</a>
-        </div>
+        <a class="btn btn-outline-light" href="{{ route('shop.index') }}" style="color:rgba(255,255,255,0.78);border-color:rgba(255,255,255,0.40);">View All {{ $catalogCount }} →</a>
       </div>
     </div>
+    <div class="bs-slider">
+    <button type="button" class="bs-arrow bs-arrow-prev" data-rail-dir="-1" aria-label="Previous products" disabled>&#8592;</button>
+    <button type="button" class="bs-arrow bs-arrow-next" data-rail-dir="1" aria-label="Next products">&#8594;</button>
     <div class="bestsellers-scroll" role="region" aria-label="Best sellers">
     <div class="bestsellers-track" data-stagger="70">
       @foreach ($bestSellers as $p)
@@ -422,6 +419,8 @@
       </a>
     </div>
     </div>
+    </div>
+    <div class="bs-dots" role="group" aria-label="Choose product slide"></div>
     <div class="pin-rail-progress" aria-hidden="true"></div>
    </div>
   </div>

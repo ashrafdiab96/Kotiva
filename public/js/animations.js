@@ -274,34 +274,79 @@
     });
   }
 
-  /* ── RAIL ARROWS (best sellers) ──
-     Prev/next buttons scroll the rail by one card; each button is disabled at its end. */
+  /* ── PRODUCT SLIDER (best sellers) ──
+     Arrows move one card; one dot per slide (card or the "more products" end card) jumps to it.
+     Each arrow is disabled at its end, and the dot of the card nearest the left edge is active. */
   function initRailArrows() {
     document.querySelectorAll('.bestsellers-section').forEach(function (section) {
       var wrap = section.querySelector('.bestsellers-scroll');
       var buttons = section.querySelectorAll('.bs-arrow');
-      if (!wrap || !buttons.length) return;
+      var dotsBox = section.querySelector('.bs-dots');
+      if (!wrap) return;
+      var slides = Array.prototype.slice.call(wrap.querySelectorAll('.bs-card, .bs-end'));
+      var dots = [];
 
-      function step() {
-        var card = wrap.querySelector('.bs-card');
-        return card ? card.getBoundingClientRect().width + 16 : wrap.clientWidth * 0.8;
+      function maxScroll() { return wrap.scrollWidth - wrap.clientWidth; }
+
+      // Scroll position that brings a slide to the rail's left padding edge.
+      function offsetOf(slide) {
+        var pad = parseFloat(getComputedStyle(wrap).paddingLeft) || 0;
+        var left = slide.getBoundingClientRect().left - wrap.getBoundingClientRect().left + wrap.scrollLeft - pad;
+        return Math.max(0, Math.min(left, maxScroll()));
+      }
+
+      function currentIndex() {
+        if (wrap.scrollLeft >= maxScroll() - 2) return slides.length - 1;
+        var best = 0, bestDist = Infinity;
+        slides.forEach(function (s, i) {
+          var d = Math.abs(offsetOf(s) - wrap.scrollLeft);
+          if (d < bestDist) { bestDist = d; best = i; }
+        });
+        return best;
+      }
+
+      function goTo(i) {
+        i = Math.max(0, Math.min(i, slides.length - 1));
+        wrap.scrollTo({ left: offsetOf(slides[i]), behavior: 'smooth' });
+      }
+
+      if (dotsBox) {
+        slides.forEach(function (s, i) {
+          var dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'bs-dot';
+          dot.setAttribute('aria-label', 'Go to slide ' + (i + 1) + ' of ' + slides.length);
+          dot.addEventListener('click', function () { goTo(i); });
+          dotsBox.appendChild(dot);
+          dots.push(dot);
+        });
       }
 
       function update() {
-        var max = wrap.scrollWidth - wrap.clientWidth - 2;
+        var idx = currentIndex();
+        dots.forEach(function (d, i) {
+          d.classList.toggle('is-active', i === idx);
+          if (i === idx) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+        });
         buttons.forEach(function (btn) {
           var dir = Number(btn.getAttribute('data-rail-dir'));
-          btn.disabled = dir < 0 ? wrap.scrollLeft <= 2 : wrap.scrollLeft >= max;
+          btn.disabled = dir < 0 ? wrap.scrollLeft <= 2 : wrap.scrollLeft >= maxScroll() - 2;
         });
       }
 
       buttons.forEach(function (btn) {
         btn.addEventListener('click', function () {
-          wrap.scrollBy({ left: Number(btn.getAttribute('data-rail-dir')) * step(), behavior: 'smooth' });
+          goTo(currentIndex() + Number(btn.getAttribute('data-rail-dir')));
         });
       });
-      wrap.addEventListener('scroll', update, { passive: true });
+
+      var raf = null;
+      wrap.addEventListener('scroll', function () {
+        if (raf) return;
+        raf = requestAnimationFrame(function () { raf = null; update(); });
+      }, { passive: true });
       window.addEventListener('resize', update);
+      window.addEventListener('load', update);
       update();
     });
   }

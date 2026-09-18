@@ -1964,15 +1964,19 @@ html[data-mode="dark"] .nav-theme-btn .icon-sun  { display: block; }
   margin-bottom: clamp(20px, 2.4vw, 32px);
   width: 100%;
 }
-/* Rail prev/next arrows, beside "View All" */
-.bs-header-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.bs-arrows { display: flex; gap: 10px; }
+/* Product slider: arrows over the rail's left/right edges, dots below */
+.bs-slider { position: relative; }
 .bs-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  transform: translateY(-50%);
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.40);
-  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.55);
+  background: rgba(106,50,119,0.85);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
   color: #FFFFFF;
   font-size: 20px;
   line-height: 1;
@@ -1984,7 +1988,40 @@ html[data-mode="dark"] .nav-theme-btn .icon-sun  { display: block; }
 }
 .bs-arrow:hover:not(:disabled) { background: #FFFFFF; color: #231F20; border-color: #FFFFFF; }
 .bs-arrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.bs-arrow:disabled { opacity: 0.35; cursor: default; }
+.bs-arrow:disabled { opacity: 0; pointer-events: none; }
+.bs-arrow-prev { left: clamp(12px, 2vw, 32px); }
+.bs-arrow-next { right: clamp(12px, 2vw, 32px); }
+.bs-dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: clamp(8px, 1.5vw, 20px);
+  position: relative;
+  z-index: 2;
+}
+.bs-dot {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bs-dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.45);
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.bs-dot:hover::before { background: rgba(255,255,255,0.8); }
+.bs-dot.is-active::before { width: 24px; background: #FFFFFF; }
+.bs-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 999px; }
+@media (max-width: 768px) {
+  .bs-arrow { width: 42px; height: 42px; font-size: 17px; }
+}
 .bs-card-meta {
   display: flex;
   align-items: baseline;
