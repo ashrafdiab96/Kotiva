@@ -134,6 +134,6 @@ return [
     |
     */
 
-    'asset_version' => env('KOTIVA_ASSET_VERSION', 'k1'),
+    'asset_version' => env('KOTIVA_ASSET_VERSION', 'k2'),
 
 ];

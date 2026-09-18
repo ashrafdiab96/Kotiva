@@ -233,17 +233,50 @@ input, textarea, select { font: inherit; }
 .btn {
   display: inline-flex;
   align-items: center;
+  /* Centred, not start-aligned: .btn also rides on <button>, and a button
+     stretched by its parent would otherwise hug its left edge. */
+  justify-content: center;
+  text-align: center;
   gap: 8px;
   padding: 14px 32px;
+  /* A transparent hairline on the base so a filled .btn and an outlined one
+     measure the same height, instead of differing by the outline's 3px. */
+  border: 1.5px solid transparent;
   border-radius: var(--radius-pill);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
   transition: all var(--transition);
   white-space: nowrap;
   min-height: 48px;
+}
+.btn:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 3px; }
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* PRIMARY — the single solid, unmissable action in a view: add to cart, go to
+   checkout, place order. Ink fill, page-background text.
+   Hover resolves to KOTIVA blue literally rather than through --accent-deep,
+   which flips to #FFFFFF on dark and editorial surfaces and would leave the
+   hover state indistinguishable from the resting one. */
+.btn-primary {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+.btn-primary:hover:not([disabled]) {
+  background: var(--k-blue);
+  color: var(--k-white);
+  border-color: var(--k-blue);
+  transform: translateY(-1px);
 }
 .btn-gold {
   background: var(--accent);

@@ -1097,6 +1097,175 @@ html[data-mode="dark"] .product-card-add-btn:hover:not([disabled]) {
   text-transform: none;
 }
 
+/* ── CHECKOUT FIELDS ─────────────────────────────────────
+   .form-field / .form-row / .form-submit were only ever declared inside the
+   contact page's own <style> block, so checkout rendered them as raw browser
+   controls. They are declared here scoped to .checkout-form: the contact page
+   keeps its editorial underline fields, and checkout gets bordered boxes,
+   which suit a ten-field address form and make the .has-error border visible.
+   ─────────────────────────────────────────────────────── */
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.checkout-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.checkout-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* kotiva.css gives .form-group a bottom margin; here the column gap above
+     owns the rhythm, so the two must not stack. */
+  margin-bottom: 0;
+}
+
+.checkout-form .form-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.checkout-form .form-field {
+  width: 100%;
+  min-height: 50px;
+  padding: 13px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  /* background-COLOR, never the shorthand: select.form-field paints its chevron
+     through background-image, and a later shorthand would reset the image's
+     repeat and position and tile it across the field. */
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.checkout-form .form-field::placeholder { color: var(--fg-dim); }
+
+.checkout-form .form-field:focus {
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 3px rgba(0, 93, 186, 0.15);
+}
+
+/* Redeclared after :focus so an invalid field still reads red while focused. */
+.checkout-form .form-field.has-error { border-color: var(--script); }
+.checkout-form .form-field.has-error:focus {
+  border-color: var(--script);
+  box-shadow: 0 0 0 3px rgba(215, 40, 47, 0.16);
+}
+
+.checkout-form select.form-field {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23005DBA' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  /* The expanded <option> list is painted by the OS, not the page. Without a
+     declared scheme the popup renders light while the options inherit the
+     page's light-on-dark text — invisible in dark mode. Same fix as contact. */
+  color-scheme: light;
+}
+
+.checkout-form select.form-field option,
+.checkout-form select.form-field optgroup { color: #231F20; background: #FFFFFF; }
+
+.checkout-form textarea.form-field {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* Native checkbox and radio, tinted and sized up — the defaults were tiny and
+   read as browser chrome next to the rest of the page. */
+.checkout-check input,
+.checkout-method input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--k-blue);
+  cursor: pointer;
+}
+
+.checkout-form .form-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 6px;
+  padding: 16px 32px;
+  border: 1.5px solid var(--fg);
+  border-radius: var(--radius-pill);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.checkout-form .form-submit:hover:not([disabled]) {
+  background: var(--k-blue);
+  color: var(--k-white);
+  border-color: var(--k-blue);
+  transform: translateY(-1px);
+}
+
+.checkout-form .form-submit:focus-visible {
+  outline: 2px solid var(--accent-deep);
+  outline-offset: 3px;
+}
+
+.checkout-form .form-submit[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* The payment step's only method sits selected on load; give it a visible
+   selected state rather than leaving it identical to an unchosen option. */
+.checkout-method.is-selected,
+.checkout-method:has(input:checked) {
+  border-color: var(--accent-text);
+  background: var(--bg-card);
+}
+
+html[data-mode="dark"] .checkout-form .form-field {
+  border-color: rgba(255, 255, 255, 0.28);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+html[data-mode="dark"] .checkout-form .form-field:focus {
+  box-shadow: 0 0 0 3px rgba(138, 183, 233, 0.22);
+}
+
+html[data-mode="dark"] .checkout-form select.form-field {
+  color-scheme: dark;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238AB7E9' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+}
+
+html[data-mode="dark"] .checkout-form select.form-field option,
+html[data-mode="dark"] .checkout-form select.form-field optgroup { color: #FFFFFF; background: #231F20; }
+
+@media (max-width: 640px) {
+  .checkout-form .form-row { grid-template-columns: 1fr; }
+}
+
 .checkout-check {
   display: flex;
   align-items: flex-start;

@@ -20,7 +20,7 @@
         {{-- A plain POST form. shop.js adds the zone→city fetch and the live
              fee, but the server also renders the city list and recalculates on
              submit, so this works with JS off. --}}
-        <form class="contact-form checkout-form" method="POST" action="{{ route('checkout.shipping.store') }}" data-checkout-shipping>
+        <form class="checkout-form" method="POST" action="{{ route('checkout.shipping.store') }}" data-checkout-shipping>
           @csrf
           <input type="hidden" name="subtotal" value="{{ $review->subtotal }}" />
 
