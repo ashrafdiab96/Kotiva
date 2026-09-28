@@ -47,10 +47,11 @@ final class ProductController extends Controller
         $activeIds = Product::query()->active()->orderBy('id')->pluck('id')->all();
         $position = (int) array_search($product->getKey(), $activeIds, true) + 1;
 
-        $zone = ($product->filter_tags ?? [])[0] ?? null;
-        /** @var array<string, array{name: string, filter: string}> $crumbs */
-        $crumbs = config('kotiva.zone_crumbs');
-        $zoneCrumb = $crumbs[$zone] ?? ['name' => 'All Products', 'filter' => 'all'];
+        // Breadcrumb position 2 is the product's category — the same key the
+        // shop's filter pills use, so the crumb lands on the matching pill.
+        $zoneCrumb = $product->category
+            ? ['name' => $product->category->name, 'filter' => $product->category->slug]
+            : ['name' => 'All Products', 'filter' => 'all'];
 
         return view('product.show', [
             'product' => $product,

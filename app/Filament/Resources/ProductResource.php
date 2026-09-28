@@ -17,7 +17,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use League\Flysystem\UnableToCheckFileExistence;
 
 /**
  * Products (§7.2).
@@ -202,7 +204,7 @@ final class ProductResource extends Resource
     private static function mediaFields(): array
     {
         return [
-            Forms\Components\FileUpload::make('image')
+            self::keepCatalogArtwork(Forms\Components\FileUpload::make('image'))
                 ->label('Main image')
                 ->image()
                 ->imagePreviewHeight('180')
@@ -216,7 +218,7 @@ final class ProductResource extends Resource
                 ->deleteUploadedFileUsing(fn (?string $file): null => tap(null, fn () => app(ProductImageService::class)->delete($file)))
                 ->helperText('Stored as a 1200px WebP with a 600px thumbnail. The 25 launch products keep their existing committed artwork until replaced here.'),
 
-            Forms\Components\FileUpload::make('gallery')
+            self::keepCatalogArtwork(Forms\Components\FileUpload::make('gallery'))
                 ->multiple()
                 ->image()
                 ->reorderable()
@@ -228,6 +230,74 @@ final class ProductResource extends Resource
                 ->deleteUploadedFileUsing(fn (?string $file): null => tap(null, fn () => app(ProductImageService::class)->delete($file)))
                 ->columnSpanFull(),
         ];
+    }
+
+    /**
+     * Teach a FileUpload about the committed launch artwork.
+     *
+     * The 25 launch products store `assets/products/...` — a file under
+     * public/, not on the `public` disk. Filament's default hydration keeps
+     * only paths that exist on the field's disk, so the field loaded EMPTY and
+     * the next save of any other field wrote null over the image. These two
+     * callbacks replace the defaults so an `assets/` path survives hydration
+     * and previews from public/; disk paths behave exactly as before.
+     */
+    private static function keepCatalogArtwork(Forms\Components\FileUpload $upload): Forms\Components\FileUpload
+    {
+        return $upload
+            ->afterStateHydrated(static function (Forms\Components\FileUpload $component, string|array|null $state): void {
+                $files = collect(Arr::wrap($state))
+                    ->filter(static function ($file) use ($component): bool {
+                        if (! is_string($file) || $file === '') {
+                            return false;
+                        }
+
+                        // Never drop committed artwork, even if the file is
+                        // missing — silently losing the stored path is the bug.
+                        if (str_starts_with($file, 'assets/')) {
+                            return true;
+                        }
+
+                        try {
+                            return $component->getDisk()->exists($file);
+                        } catch (UnableToCheckFileExistence) {
+                            return false;
+                        }
+                    })
+                    ->mapWithKeys(static fn (string $file): array => [(string) Str::uuid() => $file])
+                    ->all();
+
+                $component->state($files);
+            })
+            ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
+                if (str_starts_with($file, 'assets/')) {
+                    $path = public_path($file);
+
+                    return is_file($path) ? [
+                        'name' => basename($file),
+                        'size' => (int) filesize($path),
+                        'type' => mime_content_type($path) ?: null,
+                        'url' => asset($file),
+                    ] : null;
+                }
+
+                $storage = $component->getDisk();
+
+                try {
+                    if (! $storage->exists($file)) {
+                        return null;
+                    }
+                } catch (UnableToCheckFileExistence) {
+                    return null;
+                }
+
+                return [
+                    'name' => basename($file),
+                    'size' => $storage->size($file),
+                    'type' => $storage->mimeType($file),
+                    'url' => $storage->url($file),
+                ];
+            });
     }
 
     /**

@@ -106,6 +106,16 @@ return [
             'sunscreen' => 'spf',
         ],
 
+        /*
+         | The shop pills are the product categories, keyed by category slug.
+         | Old links and indexed URLs used the retired tag names; each one here
+         | 301s to the matching category slug.
+         */
+        'category_aliases' => [
+            'sunscreen' => 'spf',
+            'treatments' => 'treatment',
+        ],
+
         'sorts' => [
             'featured' => 'Featured',
             'price_asc' => 'Price: Low to High',

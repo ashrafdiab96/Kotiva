@@ -126,7 +126,7 @@
         <nav class="footer-links" aria-label="Shop links">
           <a href="{{ route('shop.index') }}">All Products</a><a href="{{ route('shop.index', ['filter' => 'face']) }}">Face Care</a>
           <a href="{{ route('shop.index', ['filter' => 'body']) }}">Body Care</a><a href="{{ route('shop.index', ['filter' => 'serums']) }}">Serums</a>
-          <a href="{{ route('shop.index', ['filter' => 'sunscreen']) }}">SPF</a><a href="{{ route('shop.index', ['filter' => 'hair']) }}">Hair</a>
+          <a href="{{ route('shop.index', ['filter' => 'spf']) }}">SPF</a><a href="{{ route('shop.index', ['filter' => 'hair']) }}">Hair</a>
         </nav>
       </div>
       <div><div class="footer-col-title">Company</div>

@@ -133,7 +133,7 @@
     var nav = document.querySelector('.nav');
     if (!nav) return;
 
-    var isEditorialHero = document.querySelector('.hero[data-theme="editorial"], .shop-hero');
+    var isEditorialHero = document.querySelector('.hero[data-theme="editorial"], .hero-banner, .shop-hero');
     var isTransparent = !!isEditorialHero;
 
     var lastScrollY = Math.max(0, window.scrollY);

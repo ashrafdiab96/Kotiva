@@ -3,7 +3,8 @@
 @section('meta')
   <title>kotiva™ — Doctor-Approved Skincare</title>
   <meta name="description" content="Doctor-approved skincare, perfected by science and tailored for you. Explore 25 products formulated with clinically proven ingredients across cleansers, serums, SPF, body and hair care." />
-  <link rel="preload" as="image" href="{{ asset('assets/hero-campaign-v3.webp') }}" fetchpriority="high" />
+  <link rel="preload" as="image" href="{{ asset('img/hero/IMG_1954.JPG.jpeg') }}" media="(min-width: 768px)" fetchpriority="high" />
+  <link rel="preload" as="image" href="{{ asset('img/hero/IMG_1951.JPG.jpeg') }}" media="(max-width: 767px)" fetchpriority="high" />
   <link rel="canonical" href="{{ config('kotiva.site_origin') }}/" />
   <meta property="og:title" content="kotiva™ — Doctor-Approved Skincare" />
   <meta property="og:description" content="Doctor-approved skincare, perfected by science and tailored for you. Explore 25 products formulated with clinically proven ingredients for every skin type." />
@@ -11,11 +12,11 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="KOTIVA" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/hero-campaign-v3.webp" />
+  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/img/hero/IMG_1954.JPG.jpeg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="kotiva™ — Doctor-Approved Skincare" />
   <meta name="twitter:description" content="Doctor-approved skincare, perfected by science and tailored for you. 25 products formulated with clinically proven ingredients, for every skin type." />
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/hero-campaign-v3.webp" />
+  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/img/hero/IMG_1954.JPG.jpeg" />
 @endsection
 
 @section('main_attrs')aria-label="Main content"@endsection
@@ -23,27 +24,25 @@
 @push('styles')
 @verbatim
 <style>
-@media (max-width:640px){
-  /* K30-C (2026-08-19) — retuned for the new campaign hero. At 375px this 1.78 AR source is
-     cropped to a ~26% sliver of its width, so a landscape frame with the subject on the RIGHT
-     and the copy area on the LEFT cannot deliver both: measured across six crop positions,
-     any position showing her face put the H1 at 2.3–2.7:1 (12–21% of the block under 3:1),
-     and any position holding contrast cut her face off entirely. Structural, not a crop-tuning
-     problem — so the crop keeps the FACE (78%) and a vertical text-panel scrim carries the type.
-     Measured at this setting: H1 p5 7.9:1 (0% under 3:1), 15px sub p5 5.5:1, face still reading
-     at L*29. The previous value (50% 30%) was tuned for the OLD hero's centred subject and now
-     lands on hair and shoulder with the face outside the frame. */
-  .hero-bg img{ object-position:78% 26% !important; }
-  .hero-scrim-bottom{ background:linear-gradient(to top,rgba(106,50,119,0.25) 0%,rgba(106,50,119,0.10) 55%,transparent 100%) !important; }
-  .hero-overlay{
-    background:linear-gradient(to bottom,
-      rgba(106,50,119,0.10) 0%,
-      rgba(106,50,119,0.40) 22%,
-      rgba(106,50,119,0.70) 34%,
-      rgba(106,50,119,0.70) 72%,
-      rgba(106,50,119,0.62) 92%,
-      rgba(106,50,119,0.62) 100%) !important;
-  }
+/* Campaign banner hero — the artwork carries its own logo, headline and CTA, so the frame is
+   never cropped: each slide keeps its source aspect ratio (16:9 desktop, 2:3 mobile). It sits
+   under the transparent nav; the ::after scrim keeps the white nav legible over light artwork. */
+.hero-banner{ position:relative; background:#F4EFEC; overflow:hidden; aspect-ratio:5461/3072; }
+.hero-banner::after{ content:''; position:absolute; top:0; left:0; right:0; height:calc(var(--nav-h) + 48px); z-index:1; pointer-events:none; background:linear-gradient(to bottom, rgba(35,31,32,.42) 0%, rgba(35,31,32,.18) 55%, transparent 100%); }
+.hero-banner-slide{ position:absolute; inset:0; display:block; opacity:0; visibility:hidden; transition:opacity .8s ease, visibility 0s linear .8s; }
+.hero-banner-slide.is-active{ opacity:1; visibility:visible; transition:opacity .8s ease, visibility 0s; }
+.hero-banner-slide picture, .hero-banner-slide img{ display:block; width:100%; height:100%; }
+.hero-banner-slide img{ object-fit:cover; }
+.hero-banner-dots{ position:absolute; left:50%; bottom:clamp(12px,2vw,24px); transform:translateX(-50%); z-index:2; display:flex; gap:10px; }
+.hero-banner-dot{ width:10px; height:10px; padding:0; border-radius:50%; border:1px solid rgba(35,31,32,.45); background:rgba(255,255,255,.7); cursor:pointer; transition:background .3s ease, width .3s ease; }
+.hero-banner-dot.is-active{ width:28px; border-radius:5px; background:#231F20; border-color:#231F20; }
+.hero-banner-dot:focus-visible{ outline:2px solid #231F20; outline-offset:3px; }
+.hero-banner-title{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media (max-width:767px){
+  .hero-banner{ aspect-ratio:2048/3072; }
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-banner-slide, .hero-banner-slide.is-active{ transition:none; }
 }
 </style>
 @endverbatim
@@ -52,62 +51,70 @@
 @section('content')
 
 <!-- ═══════════════════════════════════════
-     HERO — editorial
+     HERO — campaign banner slider
 ═══════════════════════════════════════ -->
-<!-- R-143a hero tonal retune (2026-08-18) — the client's "feels dark", answered without a redesign.
-     Before: four stacked darkening layers (img dimmed to 0.82 + kotiva.css's full-frame .hero-overlay
-     wash + two frame-wide scrims) left the hero at mean luminance 58/255, 74% of pixels below 25%
-     brightness — measured. After: darkness is SHAPED instead of poured — a left text-panel gradient
-     plus a soft radial under the title, photo at full opacity. Measured: 67/255 desktop, 70 mobile;
-     every reading-text element >=4.5:1 worst-case behind actual glyphs. Values, method and variant
-     history: 40_projects/kotiva/r143-k30-asset-plan-2026-08-18.md. The mobile block exists because
-     the desktop-shaped radial misbehaves at 390px — measured, not assumed. -->
-<style>
-@media (max-width:640px){
-  /* K30-C (2026-08-19) — retuned for the new campaign hero. At 375px this 1.78 AR source is
-     cropped to a ~26% sliver of its width, so a landscape frame with the subject on the RIGHT
-     and the copy area on the LEFT cannot deliver both: measured across six crop positions,
-     any position showing her face put the H1 at 2.3–2.7:1 (12–21% of the block under 3:1),
-     and any position holding contrast cut her face off entirely. Structural, not a crop-tuning
-     problem — so the crop keeps the FACE (78%) and a vertical text-panel scrim carries the type.
-     Measured at this setting: H1 p5 7.9:1 (0% under 3:1), 15px sub p5 5.5:1, face still reading
-     at L*29. The previous value (50% 30%) was tuned for the OLD hero's centred subject and now
-     lands on hair and shoulder with the face outside the frame. */
-  .hero-bg img{ object-position:78% 26% !important; }
-  .hero-scrim-bottom{ background:linear-gradient(to top,rgba(106,50,119,0.25) 0%,rgba(106,50,119,0.10) 55%,transparent 100%) !important; }
-  .hero-overlay{
-    background:linear-gradient(to bottom,
-      rgba(106,50,119,0.10) 0%,
-      rgba(106,50,119,0.40) 22%,
-      rgba(106,50,119,0.70) 34%,
-      rgba(106,50,119,0.70) 72%,
-      rgba(106,50,119,0.62) 92%,
-      rgba(106,50,119,0.62) 100%) !important;
-  }
-}
-</style>
-<section class="hero" data-theme="editorial" aria-label="Hero">
-  <div class="hero-bg" style="background:#6A3277;">
-    <img src="{{ asset('assets/hero-campaign-v3.webp') }}" alt="A woman resting her fingertips against her cheek in soft, warm daylight" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:40% 28%;opacity:1;" />
-    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 65% 40%, rgba(106,50,119,0.14) 0%, transparent 55%);"></div>
-    <div class="hero-scrim-bottom" style="position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(to top,rgba(106,50,119,0.46) 0%,rgba(106,50,119,0.18) 48%,transparent 100%);"></div>
-    <div class="hero-scrim-top" style="position:absolute;top:0;left:0;right:0;height:30%;background:linear-gradient(to bottom,rgba(106,50,119,0.46),transparent);"></div>
-  </div>
-  <div class="hero-overlay" style="background:linear-gradient(to right,rgba(106,50,119,0.34) 0%,rgba(106,50,119,0.16) 42%,rgba(106,50,119,0.03) 66%,transparent 80%);"></div>
-  <div class="hero-content">
-    <p class="hero-tagline">Doctor-Approved Skincare</p>
-    <p class="hero-script-accent">for every skin. every ritual.</p>
-    <h1 class="hero-title">Skin That<br/>Performs.</h1>
-    <p class="hero-sub">Doctor-approved. Science-backed. Made for you.</p>
-    <div class="hero-ctas">
-      <a class="btn btn-gold" href="{{ route('routine-finder') }}">Find My Routine</a>
-      <a class="btn btn-outline-light" href="{{ route('shop.index') }}">Discover the Range</a>
-    </div>
-  </div>
-  <div class="hero-scroll" aria-hidden="true">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+<section class="hero-banner" aria-roledescription="carousel" aria-label="Kotiva campaigns">
+  <h1 class="hero-banner-title">kotiva™ — Doctor-Approved Skincare</h1>
+  <a class="hero-banner-slide is-active" href="{{ route('shop.index') }}" aria-roledescription="slide" aria-label="1 of 2: 25+ formulas, each built around one job — shop the range">
+    <picture>
+      <source media="(max-width: 767px)" srcset="{{ asset('img/hero/IMG_1951.JPG.jpeg') }}" width="2048" height="3072" />
+      <img src="{{ asset('img/hero/IMG_1954.JPG.jpeg') }}" width="5461" height="3072" alt="25+ formulas, each built around one job. Doctor-approved skincare for stress-free routines — three women holding kotiva products." fetchpriority="high" />
+    </picture>
+  </a>
+  <a class="hero-banner-slide" href="{{ route('routine-finder') }}" aria-roledescription="slide" aria-label="2 of 2: Right-sized for your routine — build your kit in 7 questions" aria-hidden="true" tabindex="-1">
+    <picture>
+      <source media="(max-width: 767px)" srcset="{{ asset('img/hero/IMG_1952.JPG.jpeg') }}" width="2048" height="3072" />
+      <img src="{{ asset('img/hero/IMG_1953.JPG.jpeg') }}" width="5461" height="3072" alt="Right-sized for your routine. Build your customized routine kit in 7 questions — a basket of kotiva products." loading="lazy" />
+    </picture>
+  </a>
+  <div class="hero-banner-dots" role="group" aria-label="Choose slide">
+    <button type="button" class="hero-banner-dot is-active" aria-label="Show slide 1" aria-current="true"></button>
+    <button type="button" class="hero-banner-dot" aria-label="Show slide 2"></button>
   </div>
 </section>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var slides = root.querySelectorAll('.hero-banner-slide');
+  var dots = root.querySelectorAll('.hero-banner-dot');
+  var current = 0, timer = null, INTERVAL = 6000;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function show(i) {
+    current = (i + slides.length) % slides.length;
+    slides.forEach(function (s, n) {
+      var on = n === current;
+      s.classList.toggle('is-active', on);
+      s.setAttribute('aria-hidden', on ? 'false' : 'true');
+      s.tabIndex = on ? 0 : -1;
+    });
+    dots.forEach(function (d, n) {
+      d.classList.toggle('is-active', n === current);
+      if (n === current) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+    });
+  }
+  function start() { if (!reduce && !timer) timer = setInterval(function () { show(current + 1); }, INTERVAL); }
+  function stop() { clearInterval(timer); timer = null; }
+
+  dots.forEach(function (d, n) { d.addEventListener('click', function () { stop(); show(n); start(); }); });
+  root.addEventListener('mouseenter', stop);
+  root.addEventListener('mouseleave', start);
+  root.addEventListener('focusin', stop);
+  root.addEventListener('focusout', start);
+
+  /* Swipe on touch devices */
+  var x0 = null;
+  root.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  root.addEventListener('touchend', function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 40) { stop(); show(current + (dx < 0 ? 1 : -1)); start(); }
+  }, { passive: true });
+
+  start();
+})();
+</script>
 
 <!-- ═══════════════════════════════════════
      MARQUEE STRIP
@@ -269,7 +276,7 @@
       <div class="category-card-arrow" aria-hidden="true">→</div>
     </a>
 
-    <a class="category-card" href="{{ route('shop.index', ['filter' => 'treatments']) }}" aria-label="Shop Treatments">
+    <a class="category-card" href="{{ route('shop.index', ['filter' => 'treatment']) }}" aria-label="Shop Treatments">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
         <img src="{{ asset('assets/categories/cat-treatments-v4.webp') }}" alt="A woman pressing treatment cream into her cheek with her fingertips." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
@@ -281,7 +288,7 @@
       <div class="category-card-arrow" aria-hidden="true">→</div>
     </a>
 
-    <a class="category-card" href="{{ route('shop.index', ['filter' => 'sunscreen']) }}" aria-label="Shop Sunscreen">
+    <a class="category-card" href="{{ route('shop.index', ['filter' => 'spf']) }}" aria-label="Shop Sunscreen">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
         <img src="{{ asset('assets/categories/cat-spf-v3.webp') }}" alt="A woman turning her face toward warm sunlight, skin protected and even." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>

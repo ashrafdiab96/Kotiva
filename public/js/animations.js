@@ -572,7 +572,7 @@
   function initLogoSwap() {
     var nav = document.querySelector('.nav');
     if (!nav) return;
-    var hero = document.querySelector('.hero, .shop-hero');
+    var hero = document.querySelector('.hero, .hero-banner, .shop-hero');
     if (!hero) return;
     var io = new IntersectionObserver(function () {
       if (typeof updateNavLogo === 'function') updateNavLogo();

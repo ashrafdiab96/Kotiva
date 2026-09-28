@@ -67,7 +67,7 @@
      what layout.js filters and counts on, so filtering and the grid-orphan
      rule are unaffected. --}}
 @foreach ($products as $product)
-      <div class="product-card{{ $product->isSoldOut() ? ' is-sold-out' : '' }}" data-tags="{{ implode(',', $product->filter_tags ?? []) }}" style="border:none;">
+      <div class="product-card{{ $product->isSoldOut() ? ' is-sold-out' : '' }}" data-tags="{{ $product->category?->slug }}" style="border:none;">
         <a class="product-card-link" href="{{ route('product.show', ['slug' => $product->slug]) }}">
           <div class="product-card-img">
             <img src="{{ $product->imageUrl() }}" alt="{{ $product->displayName() }}" loading="lazy" />

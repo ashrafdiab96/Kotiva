@@ -152,6 +152,31 @@ final class ProductAdminTest extends TestCase
     }
 
     #[Test]
+    public function saving_the_edit_form_keeps_the_committed_launch_artwork(): void
+    {
+        $this->actingAsAdmin();
+        $product = $this->product();
+
+        // A launch product: its images live under public/assets, not on the
+        // `public` disk the upload field stores to. The default FileUpload
+        // hydration dropped these, so a plain rename wrote null over them.
+        $image = 'assets/products/kot010-after-sun-cream.webp';
+        $gallery = ['assets/products/kot009-sun-protection-spf50.webp'];
+        $product->forceFill(['image' => $image, 'gallery' => $gallery])->save();
+
+        Livewire::test(EditProduct::class, ['record' => $product->getRouteKey()])
+            ->fillForm(['name' => 'Renamed By Test'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $product->refresh();
+
+        $this->assertSame('Renamed By Test', $product->name);
+        $this->assertSame($image, $product->image, 'an edit that does not touch Media must keep the main image');
+        $this->assertSame($gallery, $product->gallery, 'an edit that does not touch Media must keep the gallery');
+    }
+
+    #[Test]
     public function creating_a_product_records_its_opening_stock_as_a_movement(): void
     {
         $this->actingAsAdmin();

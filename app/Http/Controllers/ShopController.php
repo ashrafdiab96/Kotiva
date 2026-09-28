@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,8 +14,10 @@ use Illuminate\Http\Request;
 /**
  * Product listing.
  *
- * Filtering stays client-side on `data-tags`, exactly as the static site did —
- * the pills are instant, and a visitor with JS off still gets the full grid.
+ * Filtering stays client-side on `data-tags` — the pills are instant, and a
+ * visitor with JS off still gets the full grid. Each pill is a product category
+ * (keyed by its slug) and each card is tagged with its own category's slug, so
+ * the Category set in the admin is what decides where a product is listed.
  * Sorting is server-side via ?sort= so a sorted listing is linkable and
  * crawlable, and each sort link carries the active filter through.
  */
@@ -23,9 +26,10 @@ final class ShopController extends Controller
     public function index(Request $request): View|RedirectResponse
     {
         /** @var array<string, string> $aliases */
-        $aliases = config('kotiva.shop.filter_aliases');
+        $aliases = config('kotiva.shop.category_aliases');
 
-        // Old indexed URLs used ?filter=sunscreen; the catalog tag is "spf".
+        // Old indexed URLs used tag names (?filter=sunscreen, ?filter=treatments)
+        // that differ from the category slugs.
         // Redirect rather than silently accept, so there is one canonical URL
         // and the client-side pill script finds a pill matching the param.
         $requested = (string) $request->query('filter', '');
@@ -49,18 +53,20 @@ final class ShopController extends Controller
             $sort
         )->get();
 
-        /** @var array<string, string> $filters */
-        $filters = config('kotiva.shop.filters');
-
         // Counts come from the same collection that renders, so a pill can
-        // never promise a number the grid does not contain.
-        $counts = [];
-        foreach ($filters as $tag => $label) {
-            $counts[$tag] = $tag === 'all'
-                ? $products->count()
-                : $products->filter(
-                    fn (Product $p): bool => in_array($tag, $p->filter_tags ?? [], true)
-                )->count();
+        // never promise a number the grid does not contain. A category with no
+        // active products gets no pill rather than an empty "(0)" one.
+        $perCategory = $products->countBy('category_id');
+
+        $filters = ['all' => 'All'];
+        $counts = ['all' => $products->count()];
+
+        foreach (Category::query()->active()->orderBy('sort_order')->orderBy('name')->get() as $category) {
+            $count = (int) $perCategory->get($category->getKey(), 0);
+            if ($count > 0) {
+                $filters[$category->slug] = $category->name;
+                $counts[$category->slug] = $count;
+            }
         }
 
         return view('shop.index', [
