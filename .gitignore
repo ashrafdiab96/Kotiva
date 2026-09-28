@@ -12,6 +12,26 @@ Thumbs.db
 # Dependencies / editor / agent
 node_modules/
 .claude/
+/vendor
 
 # Local scratch / design-review previews — never part of the deployable site
 scratch/
+
+# Laravel
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+/.phpunit.cache
+/public/build
+/public/storage
+/storage/*.key
+/storage/pail
+/auth.json
+Homestead.json
+Homestead.yaml
+/.idea
+/.vscode
+/.fleet
+/.nova
+/.zed

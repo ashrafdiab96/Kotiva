@@ -1,0 +1,15 @@
+/*
+ * The dashboard's typeface: the storefront's own self-hosted Montserrat.
+ *
+ * Filament's default loads Inter from fonts.bunny.net, which made the admin
+ * the only part of the site depending on a third-party host — slow or blocked,
+ * and the dashboard stalled on it. This declaration is the storefront's own,
+ * pointing at the same file, so both halves of the product share one UI face
+ * and neither reaches outside the domain.
+ */
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-VariableFont_wght_25.woff2?v=sub01') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}

@@ -1,0 +1,20 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+
+    paths:
+        - app
+        - config
+        - database
+        - routes
+        - tests
+
+    excludePaths:
+        - legacy/*
+
+    # Corrects PHPDoc in the framework that does not match its own runtime
+    # behaviour. See each stub for what it fixes and why.
+    stubFiles:
+        - phpstan/stubs/Seeder.stub
