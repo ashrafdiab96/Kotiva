@@ -9,6 +9,8 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Services\StockService;
+use App\Support\Money;
+use App\Support\Vat;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -45,7 +47,16 @@ final class ProductImporter
     public const FIELDS = [
         'sku' => ['SKU', 'string', true],
         'name' => ['Name', 'string', true],
-        'price' => ['Price', 'money', true],
+        /*
+         | Neither price column is individually required, but a row must carry
+         | at least one — see priceColumnsMissing() and resolvePrices().
+         |
+         | Marking both required would break every sheet the client already
+         | has, all of which carry a single "price" column; marking neither and
+         | checking nothing would let a sheet create a product at 0.00.
+         */
+        'price_excl_vat' => ['Price excl. VAT', 'money', false],
+        'price_incl_vat' => ['Price incl. VAT', 'money', false],
         'category' => ['Category', 'string', true],
         'slug' => ['Slug', 'slug', false],
         'compare_at_price' => ['Compare-at price', 'money', false],
@@ -79,7 +90,36 @@ final class ProductImporter
         'product' => 'name',
         'product_name' => 'name',
         'title' => 'name',
-        'price_sar' => 'price',
+
+        /*
+         | A bare "price" maps to the VAT-INCLUSIVE column, because that is what
+         | it meant in every sheet exported before dual pricing existed and in
+         | the import screen's own documentation. Reading an old sheet's prices
+         | as net would quietly cut the catalog by the VAT.
+         |
+         | The exclusive spellings are listed because the client's brochure and
+         | supplier sheets use several of them, and a mapping the admin has to
+         | correct by hand on every import is a mapping that eventually gets
+         | corrected wrongly.
+         */
+        'price' => 'price_incl_vat',
+        'price_sar' => 'price_incl_vat',
+        'price_inc_vat' => 'price_incl_vat',
+        'price_including_vat' => 'price_incl_vat',
+        'price_with_vat' => 'price_incl_vat',
+        'price_with_tax' => 'price_incl_vat',
+        'price_incl_tax' => 'price_incl_vat',
+        'gross_price' => 'price_incl_vat',
+
+        'price_exc_vat' => 'price_excl_vat',
+        'price_ex_vat' => 'price_excl_vat',
+        'price_excluding_vat' => 'price_excl_vat',
+        'price_without_vat' => 'price_excl_vat',
+        'price_without_tax' => 'price_excl_vat',
+        'price_excl_tax' => 'price_excl_vat',
+        'price_before_vat' => 'price_excl_vat',
+        'net_price' => 'price_excl_vat',
+
         'category_name' => 'category',
         'stock' => 'stock_qty',
         'qty' => 'stock_qty',
@@ -94,6 +134,15 @@ final class ProductImporter
         'freefrom' => 'free_from',
         'howtouse' => 'how_to_use',
     ];
+
+    /**
+     * Money figures that were calculated or that disagree, collected during a
+     * validate() pass and reported alongside it. Reset per pass, so validating
+     * twice does not report the same row twice.
+     *
+     * @var list<string>
+     */
+    private array $warnings = [];
 
     public function __construct(private readonly StockService $stock) {}
 
@@ -146,7 +195,22 @@ final class ProductImporter
             }
         }
 
+        // Either price column satisfies the requirement; the other is derived
+        // at the configured rate. Neither means the file cannot price anything.
+        if ($this->priceColumnsMissing($mapping)) {
+            $missing[] = 'Price excl. VAT or Price incl. VAT';
+        }
+
         return $missing;
+    }
+
+    /**
+     * @param  array<string, int|null>  $mapping
+     */
+    public function priceColumnsMissing(array $mapping): bool
+    {
+        return ($mapping['price_excl_vat'] ?? null) === null
+            && ($mapping['price_incl_vat'] ?? null) === null;
     }
 
     /* ── pass 1: validate ────────────────────────────────────── */
@@ -156,6 +220,8 @@ final class ProductImporter
      */
     public function validate(SpreadsheetData $data, array $mapping): ImportReport
     {
+        $this->warnings = [];
+
         // Catalog-sized, so preloading beats a query per row.
         $slugOwners = Product::withTrashed()->pluck('sku', 'slug')->all();
 
@@ -198,7 +264,7 @@ final class ProductImporter
             }
         }
 
-        return new ImportReport($valid, $errors);
+        return new ImportReport($valid, $errors, $this->warnings);
     }
 
     /**
@@ -240,7 +306,88 @@ final class ProductImporter
             $row[$field] = $value;
         }
 
+        $messages = array_merge($messages, $this->resolvePrices($row));
+
         return [$row, $messages];
+    }
+
+    /**
+     * Settle a row's two prices, filling in whichever the sheet omitted.
+     *
+     * The rules, in order:
+     *
+     *   - Both supplied: BOTH are kept exactly as given. If they disagree with
+     *     the configured rate the row is accepted and the disagreement is
+     *     recorded as a warning, never silently corrected — an import must not
+     *     be able to overwrite a price the client typed deliberately.
+     *   - One supplied: the other is derived at the configured rate, because
+     *     there is no supplied figure to preserve.
+     *   - Neither: an error. A sheet that cannot price a product must not
+     *     create one at zero.
+     *
+     * @param  array<string, mixed>  $row
+     * @return list<string> blocking messages
+     */
+    private function resolvePrices(array &$row): array
+    {
+        $exclusive = $row['price_excl_vat'] ?? null;
+        $inclusive = $row['price_incl_vat'] ?? null;
+
+        if (! is_string($exclusive) && ! is_string($inclusive)) {
+            return ['A price is required: supply Price excl. VAT, Price incl. VAT, or both.'];
+        }
+
+        if (is_string($exclusive) && is_string($inclusive)) {
+            if (Money::compare($inclusive, $exclusive) < 0) {
+                return ['Price incl. VAT ('.$inclusive.') is lower than Price excl. VAT ('.$exclusive.'). Check the two columns have not been swapped.'];
+            }
+
+            if (! Vat::pricesAgree($exclusive, $inclusive)) {
+                $this->warnings[] = sprintf(
+                    'SKU %s: %s excl. VAT implies %s at %s VAT, but the file says %s. Both values were imported unchanged.',
+                    $row['sku'] ?? '(no SKU)',
+                    $exclusive,
+                    Vat::inclusiveOf($exclusive),
+                    Vat::rateLabel(),
+                    $inclusive,
+                );
+            }
+
+            return [];
+        }
+
+        /*
+         | Only one column was supplied, so the other is calculated at the
+         | configured rate — and SAID SO.
+         |
+         | On an update this replaces a stored price that itself came off a
+         | brochure, which is the one case where recalculation touches an
+         | explicitly supplied figure. Leaving the stored counterpart alone
+         | instead would leave the product priced inconsistently in the shop,
+         | which is worse; so it is recalculated, and the admin is told which
+         | products were affected and what the new figure is.
+         */
+        $sku = $row['sku'] ?? '(no SKU)';
+
+        if (is_string($exclusive)) {
+            $row['price_incl_vat'] = Vat::inclusiveOf($exclusive);
+
+            $this->warnings[] = sprintf(
+                'SKU %s: the file had no VAT-inclusive price, so it was calculated as %s from %s at %s VAT.',
+                $sku, $row['price_incl_vat'], $exclusive, Vat::rateLabel(),
+            );
+
+            return [];
+        }
+
+        $row['price_excl_vat'] = Vat::exclusiveOf($inclusive);
+
+        $this->warnings[] = sprintf(
+            'SKU %s: the file had no VAT-exclusive price, so it was calculated as %s from %s at %s VAT.',
+            $sku, $row['price_excl_vat'], $inclusive, Vat::rateLabel(),
+        );
+
+        return [];
     }
 
     /**

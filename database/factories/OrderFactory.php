@@ -31,10 +31,26 @@ final class OrderFactory extends Factory
             'payment_method' => PaymentMethod::CashOnDelivery,
             'payment_status' => PaymentStatus::Unpaid,
             'currency' => 'SAR',
+            /*
+             | A reconciling breakdown at 15%, with delivery treated as
+             | VAT-inclusive — the project's default rule.
+             |
+             |   merchandise 300.00 incl = 260.87 net + 39.13 VAT
+             |   delivery     25.00 incl =            +  3.26 VAT
+             |   total       325.00       containing    42.39 VAT
+             |
+             | The figures are written out rather than computed so a test that
+             | breaks the arithmetic cannot also break the fixture that would
+             | have caught it.
+             */
             'subtotal' => '300.00',
+            'subtotal_excl_vat' => '260.87',
             'shipping_fee' => '25.00',
             'discount_total' => '0.00',
             'vat_amount' => '42.39',
+            'product_vat_amount' => '39.13',
+            'shipping_vat_amount' => '3.26',
+            'vat_rate' => '0.150000',
             'grand_total' => '325.00',
             'shipping_zone_id' => null,
             'shipping_city_id' => null,

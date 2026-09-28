@@ -10,6 +10,9 @@ use App\Filament\Resources\ProductResource\RelationManagers\StockMovementsRelati
 use App\Models\Product;
 use App\Models\Setting;
 use App\Services\ProductImageService;
+use App\Support\Money;
+use App\Support\Vat;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -115,12 +118,56 @@ final class ProductResource extends Resource
                 ->default(0)
                 ->helperText('Lower numbers appear first in the shop.'),
 
-            Forms\Components\TextInput::make('price')
+            /*
+             | Both brochure prices, side by side and both required.
+             |
+             | Neither field recalculates the other. The client's two A2
+             | brochures are both signed off, and a form that "helpfully"
+             | overwrote a typed figure with excl × 1.15 would silently replace
+             | an approved price with a computed one — the exact failure this
+             | design exists to prevent. Instead each field carries a live hint
+             | naming what the other implies at the configured rate, and a
+             | disagreement is reported on save for a person to resolve.
+             */
+            Forms\Components\TextInput::make('price_excl_vat')
+                ->label('Price excluding VAT')
                 ->required()
                 ->numeric()
                 ->minValue(0)
+                ->live(onBlur: true)
                 ->prefix(config('kotiva.currency.code'))
-                ->helperText('VAT-inclusive, as displayed to the customer.'),
+                ->helperText('From the VAT-exclusive brochure. This is the price the shop, the home page and the product page display, and what price sorting uses.')
+                ->hint(fn (Forms\Get $get): ?string => self::priceHint($get, 'excl'))
+                ->hintColor('warning'),
+
+            Forms\Components\TextInput::make('price_incl_vat')
+                ->label('Price including VAT')
+                ->required()
+                ->numeric()
+                ->minValue(0)
+                ->live(onBlur: true)
+                ->prefix(config('kotiva.currency.code'))
+                ->helperText('From the VAT-inclusive brochure. This is what the customer is charged at checkout.')
+                ->hint(fn (Forms\Get $get): ?string => self::priceHint($get, 'incl'))
+                ->hintColor('warning')
+                // The one hard rule. The two prices may legitimately disagree
+                // with the configured rate — a brochure is allowed to round to
+                // a round number — but an inclusive price BELOW the exclusive
+                // one is not a pricing decision, it is a transposition, and it
+                // would make the order's VAT negative.
+                ->rule(static function (Forms\Get $get): Closure {
+                    return static function (string $attribute, mixed $value, Closure $fail) use ($get): void {
+                        $exclusive = $get('price_excl_vat');
+
+                        if (! is_numeric($value) || ! is_numeric($exclusive)) {
+                            return;
+                        }
+
+                        if (Money::compare(Money::of($value), Money::of($exclusive)) < 0) {
+                            $fail('The VAT-inclusive price cannot be lower than the VAT-exclusive price. Check the two figures have not been swapped.');
+                        }
+                    };
+                }),
 
             Forms\Components\TextInput::make('compare_at_price')
                 ->numeric()
@@ -358,6 +405,39 @@ final class ProductResource extends Resource
     }
 
     /**
+     * The live warning shown beside a price field when the two disagree at the
+     * configured VAT rate.
+     *
+     * Returns null while they agree, so the form is quiet in the normal case
+     * and the hint means something when it appears. It states the counterpart
+     * the rate implies and leaves the decision to the admin — nothing here
+     * writes a value.
+     */
+    public static function priceHint(Forms\Get $get, string $field): ?string
+    {
+        $exclusive = $get('price_excl_vat');
+        $inclusive = $get('price_incl_vat');
+
+        if (! is_numeric($exclusive) || ! is_numeric($inclusive)) {
+            return null;
+        }
+
+        $excl = Money::of($exclusive);
+        $incl = Money::of($inclusive);
+
+        if (Vat::pricesAgree($excl, $incl)) {
+            return null;
+        }
+
+        $currency = (string) config('kotiva.currency.code');
+        $rate = Vat::rateLabel();
+
+        return $field === 'incl'
+            ? sprintf('%s VAT on %s would be %s', $rate, Money::format($excl, $currency), Money::format(Vat::inclusiveOf($excl), $currency))
+            : sprintf('%s implies %s before %s VAT', Money::format($incl, $currency), Money::format(Vat::exclusiveOf($incl), $currency), $rate);
+    }
+
+    /**
      * The curated pill taxonomy, minus the "all" pseudo-filter.
      *
      * @return array<string, string>
@@ -407,7 +487,27 @@ final class ProductResource extends Resource
 
                 Tables\Columns\TextColumn::make('category.name')->label('Category')->sortable()->badge(),
 
-                Tables\Columns\TextColumn::make('price')
+                Tables\Columns\TextColumn::make('price_excl_vat')
+                    ->label('Excl. VAT')
+                    ->money(config('kotiva.currency.code'))
+                    ->sortable()
+                    // The warning icon is the discrepancy flag at list level:
+                    // an admin scanning the catalog after a rate change can see
+                    // which rows need a decision without opening each one.
+                    ->icon(fn (Product $record): ?string => $record->pricesAgreeWithVatRate()
+                        ? null
+                        : 'heroicon-o-exclamation-triangle')
+                    ->iconColor('warning')
+                    ->tooltip(fn (Product $record): ?string => $record->pricesAgreeWithVatRate()
+                        ? null
+                        : sprintf(
+                            'The two prices differ by %s from %s VAT. Neither has been changed — open the product to resolve it.',
+                            Money::format($record->vatDiscrepancy(), (string) config('kotiva.currency.code')),
+                            Vat::rateLabel()
+                        )),
+
+                Tables\Columns\TextColumn::make('price_incl_vat')
+                    ->label('Incl. VAT')
                     ->money(config('kotiva.currency.code'))
                     ->sortable(),
 
@@ -459,6 +559,16 @@ final class ProductResource extends Resource
                             default => $query,
                         };
                     }),
+
+                // Everything whose two prices no longer reconcile at the
+                // current VAT rate — the list to work through after a rate
+                // change. In SQL rather than in PHP so it works on a catalog of
+                // any size and composes with the paginator; see the scope for
+                // why its numbers are literals.
+                Tables\Filters\Filter::make('vat_mismatch')
+                    ->label('VAT price mismatch')
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->whereRaw(Product::vatMismatchExpression())),
 
                 Tables\Filters\TrashedFilter::make(),
             ])

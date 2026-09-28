@@ -140,10 +140,47 @@ final class ShippingCalculatorTest extends TestCase
     #[Test]
     public function the_grand_total_adds_shipping_without_adding_vat(): void
     {
-        // Prices are VAT-inclusive, so nothing is added for tax.
-        $this->assertSame('325.00', $this->calculator->grandTotal('300.00', '25.00'));
-        $this->assertSame('300.00', $this->calculator->grandTotal('300.00', '0.00'));
-        $this->assertSame('315.00', $this->calculator->grandTotal('300.00', '25.00', '10.00'));
+        /*
+         | Delivery is ADDED to the VAT-inclusive merchandise total, and nothing
+         | is added for tax on top of either: under the default treatment the
+         | fee already contains its VAT, which is reported separately and never
+         | charged twice.
+         |
+         | 260.87 net / 300.00 gross, delivered for 25.00.
+         */
+        $zone = $this->zoneWithRate('25.00', null);
+
+        $totals = $this->calculator->totals($zone, '260.87', '300.00');
+
+        $this->assertSame('300.00', $totals->merchandiseInclVat);
+        $this->assertSame('25.00', $totals->shippingFee);
+        $this->assertSame('325.00', $totals->grandTotal);
+        $this->assertSame('39.13', $totals->productVat);
+        $this->assertSame('3.26', $totals->shippingVat, 'extracted from the fee, not added to it');
+        $this->assertSame('42.39', $totals->vatTotal);
+
+        // Free delivery: the fee is zero and contributes no VAT.
+        $free = $this->calculator->totals($this->zoneWithRate('25.00', '300.00'), '260.87', '300.00');
+        $this->assertSame('0.00', $free->shippingFee);
+        $this->assertSame('0.00', $free->shippingVat);
+        $this->assertSame('300.00', $free->grandTotal);
+
+        // A discount comes off the payable total.
+        $discounted = $this->calculator->totals($zone, '260.87', '300.00', '10.00');
+        $this->assertSame('315.00', $discounted->grandTotal);
+    }
+
+    #[Test]
+    public function an_unquotable_zone_yields_no_payable_total_rather_than_a_free_one(): void
+    {
+        // "No delivery determined" and "delivery costs nothing" are different
+        // answers, and only one of them may be shown as a total.
+        $totals = $this->calculator->totals(null, '260.87', '300.00');
+
+        $this->assertFalse($totals->shippingResolved);
+        $this->assertSame('0.00', $totals->shippingFee);
+        $this->assertSame('300.00', $totals->grandTotal, 'merchandise only, with nothing assumed about delivery');
+        $this->assertSame('Calculated at checkout', $totals->shippingLabel('SAR'));
     }
 
     #[Test]

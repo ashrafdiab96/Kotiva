@@ -78,7 +78,7 @@
           <div class="product-card-body">
             <div class="product-card-name">{{ $product->displayName() }}</div>
             <div class="product-card-desc">{{ $product->category->name }} · {{ $product->skin_type }}</div>
-            <div class="product-card-price">{{ config('kotiva.currency.code') }} {{ number_format((float) $product->price, 2) }}<small>VAT incl.</small></div>
+            <div class="product-card-price">{{ config('kotiva.currency.code') }} {{ number_format((float) $product->price_excl_vat, 2) }}<small>excl. VAT</small></div>
             <div class="product-card-footer"><span class="badge-concern">{{ $product->concern }}</span><span class="product-card-cta">{{ $product->isSoldOut() ? 'Sold out' : 'Discover' }}</span></div>
           </div>
         </a>

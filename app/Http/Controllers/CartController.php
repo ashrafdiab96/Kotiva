@@ -11,6 +11,8 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Services\MoneyTotals;
+use App\Support\Vat;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -38,6 +40,10 @@ final class CartController extends Controller
         return view('cart.index', [
             'cart' => $cart,
             'items' => $cart instanceof Cart ? $cart->items : collect(),
+            // Computed server-side, like every other figure the shopper sees.
+            'totals' => $cart instanceof Cart
+                ? $cart->totals()
+                : MoneyTotals::merchandise('0.00', '0.00'),
         ]);
     }
 
@@ -136,16 +142,43 @@ final class CartController extends Controller
      */
     private function payload(?Cart $cart): array
     {
+        $currency = config('kotiva.currency.code');
+
         if (! $cart instanceof Cart) {
-            return ['count' => 0, 'subtotal' => '0.00', 'currency' => config('kotiva.currency.code'), 'items' => []];
+            return [
+                'count' => 0,
+                'subtotal' => '0.00',
+                'subtotal_incl_vat' => '0.00',
+                'vat_amount' => '0.00',
+                'total_incl_vat' => '0.00',
+                'vat_rate_label' => Vat::rateLabel(),
+                'currency' => $currency,
+                'items' => [],
+            ];
         }
 
         $cart->loadMissing('items.product');
 
+        $totals = $cart->totals();
+
         return [
             'count' => $cart->itemCount(),
-            'subtotal' => $cart->subtotal(),
-            'currency' => config('kotiva.currency.code'),
+            /*
+             | `subtotal` is the VAT-EXCLUSIVE merchandise total, matching what
+             | the cart page and the mini-cart display. The inclusive figure and
+             | the VAT travel with it so the drawer can state the full position
+             | without doing arithmetic — public/js/shop.js renders these, it
+             | never adds anything up (§6.3).
+             |
+             | `total_incl_vat` is deliberately NOT called `total`: delivery has
+             | not been quoted yet, so no figure here is the payable amount.
+             */
+            'subtotal' => $totals->merchandiseExclVat,
+            'subtotal_incl_vat' => $totals->merchandiseInclVat,
+            'vat_amount' => $totals->productVat,
+            'total_incl_vat' => $totals->merchandiseInclVat,
+            'vat_rate_label' => $totals->vatRateLabel(),
+            'currency' => $currency,
             'items' => $cart->items->map(fn (CartItem $item): array => [
                 'id' => $item->getKey(),
                 'product_id' => $item->product_id,
@@ -154,8 +187,10 @@ final class CartController extends Controller
                 'image' => (string) $item->product->imageUrl(),
                 'url' => route('product.show', ['slug' => $item->product->slug]),
                 'qty' => $item->qty,
-                'unit_price' => $item->unitPrice(),
-                'line_total' => $item->lineTotal(),
+                'unit_price' => $item->unitPriceExclVat(),
+                'line_total' => $item->lineTotalExclVat(),
+                'unit_price_incl_vat' => $item->unitPriceInclVat(),
+                'line_total_incl_vat' => $item->lineTotalInclVat(),
                 'max_qty' => max($item->qty, $item->product->maxOrderableQty()),
                 'price_changed' => $item->priceHasChanged(),
             ])->values()->all(),

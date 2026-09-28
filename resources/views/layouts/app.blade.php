@@ -168,11 +168,22 @@
     <ul class="mini-cart-items" data-mini-cart-items role="list"></ul>
 
     <footer class="mini-cart-foot">
+      {{-- Mirrors the cart page: net merchandise, then the VAT, then the
+           inclusive figure. shop.js fills all three from the server's own
+           totals and adds nothing up itself. --}}
       <div class="mini-cart-subtotal-row">
-        <span>Subtotal</span>
+        <span>Subtotal <small>excl. VAT</small></span>
         <span data-mini-cart-subtotal>{{ config('kotiva.currency.code') }} 0.00</span>
       </div>
-      <p class="mini-cart-note">Shipping calculated at checkout. All prices include VAT.</p>
+      <div class="mini-cart-subtotal-row mini-cart-vat-row">
+        <span data-mini-cart-vat-label>VAT</span>
+        <span data-mini-cart-vat>{{ config('kotiva.currency.code') }} 0.00</span>
+      </div>
+      <div class="mini-cart-subtotal-row mini-cart-total-row">
+        <span>Total <small>incl. VAT</small></span>
+        <span data-mini-cart-total>{{ config('kotiva.currency.code') }} 0.00</span>
+      </div>
+      <p class="mini-cart-note">Product prices exclude VAT. VAT is included in the total; shipping is added at checkout.</p>
       <a class="btn btn-outline mini-cart-view" href="{{ route('cart.index') }}">View Cart</a>
       <a class="btn btn-primary mini-cart-checkout" href="{{ route('checkout.index') }}">Checkout</a>
     </footer>

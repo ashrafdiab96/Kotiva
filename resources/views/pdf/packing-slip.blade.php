@@ -94,9 +94,10 @@
   <table>
     <tr>
       <td class="cell label" style="border-bottom-width:0.75pt;">Product</td>
-      <td class="cell label num" style="border-bottom-width:0.75pt; width:12%;">Qty</td>
-      <td class="cell label num" style="border-bottom-width:0.75pt; width:20%;">Unit</td>
-      <td class="cell label num" style="border-bottom-width:0.75pt; width:20%;">Total</td>
+      <td class="cell label num" style="border-bottom-width:0.75pt; width:10%;">Qty</td>
+      <td class="cell label num" style="border-bottom-width:0.75pt; width:18%;">Unit excl. VAT</td>
+      <td class="cell label num" style="border-bottom-width:0.75pt; width:18%;">Unit incl. VAT</td>
+      <td class="cell label num" style="border-bottom-width:0.75pt; width:18%;">Total incl. VAT</td>
     </tr>
     @foreach ($order->items as $item)
       <tr>
@@ -105,6 +106,10 @@
           <div class="meta" style="padding-top:2pt;">{{ $item->sku_snapshot }}</div>
         </td>
         <td class="cell num" style="font-family:{{ $display }}; font-weight:bold;">{{ $item->qty }}</td>
+        {{-- Both unit prices, from the line's own snapshots. The slip doubles
+             as the document a customer checks a return against, and the net
+             figure is the one they saw on the shop. --}}
+        <td class="cell num meta">{{ $order->currency }} {{ $item->unit_price_excl_vat }}</td>
         <td class="cell num meta">{{ $order->currency }} {{ $item->unit_price }}</td>
         <td class="cell num" style="font-family:{{ $display }}; font-weight:bold;">{{ $order->currency }} {{ $item->line_total }}</td>
       </tr>
@@ -118,7 +123,15 @@
       <td>
         <table>
           <tr>
-            <td class="meta" style="padding:3pt 0;">Subtotal</td>
+            <td class="meta" style="padding:3pt 0;">Merchandise excl. VAT</td>
+            <td class="num" style="padding:3pt 0;">{{ $order->currency }} {{ $order->subtotal_excl_vat }}</td>
+          </tr>
+          <tr>
+            <td class="meta" style="padding:3pt 0;">VAT ({{ $order->vatRateLabel() }})</td>
+            <td class="num" style="padding:3pt 0;">{{ $order->currency }} {{ $order->vat_amount }}</td>
+          </tr>
+          <tr>
+            <td class="meta" style="padding:3pt 0;">Merchandise incl. VAT</td>
             <td class="num" style="padding:3pt 0;">{{ $order->currency }} {{ $order->subtotal }}</td>
           </tr>
           <tr>
@@ -139,7 +152,9 @@
           </tr>
           <tr>
             <td colspan="2" class="meta" style="padding-top:5pt; font-size:9pt;">
-              Includes {{ $order->currency }} {{ $order->vat_amount }} VAT. Prices are VAT-inclusive.
+              Total includes {{ $order->currency }} {{ $order->vat_amount }} VAT at {{ $order->vatRateLabel() }}
+              ({{ $order->currency }} {{ $order->product_vat_amount }} on goods,
+              {{ $order->currency }} {{ $order->shipping_vat_amount }} on delivery).
             </td>
           </tr>
         </table>

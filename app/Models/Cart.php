@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Services\MoneyTotals;
+use App\Support\Money;
 use Carbon\CarbonInterface;
 use Database\Factories\CartFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -58,17 +60,39 @@ final class Cart extends Model
     }
 
     /**
-     * Totals are computed from the live product price, not the snapshot: the
-     * snapshot exists to detect a change, not to price the order.
+     * Merchandise excluding VAT — the cart page's headline figure.
+     *
+     * Computed from the live product price, not the snapshot: the snapshot
+     * exists to detect a change, not to price the order.
      */
-    public function subtotal(): string
+    public function subtotalExclVat(): string
     {
-        $total = $this->items->reduce(
-            fn (string $carry, CartItem $item): string => bcadd($carry, $item->lineTotal(), 2),
-            '0.00'
-        );
+        return Money::sum($this->items->map(fn (CartItem $item): string => $item->lineTotalExclVat()));
+    }
 
-        return $total;
+    /**
+     * Merchandise including VAT. Not a payable total on the cart page —
+     * delivery has not been quoted yet.
+     */
+    public function subtotalInclVat(): string
+    {
+        return Money::sum($this->items->map(fn (CartItem $item): string => $item->lineTotalInclVat()));
+    }
+
+    /**
+     * The cart's breakdown: merchandise net, the VAT it contains, and the
+     * VAT-inclusive merchandise total. Delivery is deliberately unresolved —
+     * the cart has no address, so it has no fee to state and must not present
+     * one.
+     *
+     * There is no `subtotal()` any more, on purpose. It used to mean the
+     * VAT-inclusive total, and a method of that name whose meaning silently
+     * flipped to exclusive is the single most likely way this change could
+     * undercharge somebody.
+     */
+    public function totals(): MoneyTotals
+    {
+        return MoneyTotals::merchandise($this->subtotalExclVat(), $this->subtotalInclVat());
     }
 
     public function itemCount(): int

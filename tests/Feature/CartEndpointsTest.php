@@ -405,16 +405,35 @@ final class CartEndpointsTest extends TestCase
     public function the_summary_reports_server_computed_totals(): void
     {
         $product = $this->product(10);
-        $product->update(['price' => '100.00']);
+        $product->update(['price_excl_vat' => '100.00', 'price_incl_vat' => '115.00']);
 
         $this->startCart($product, 3);
 
+        /*
+         | `subtotal` is the VAT-EXCLUSIVE merchandise total, matching what the
+         | cart page and the mini-cart display. The inclusive figure and the VAT
+         | travel with it so the drawer never has to do arithmetic, and
+         | `total_incl_vat` is named so it cannot be read as the payable amount:
+         | delivery has not been quoted at this point.
+         */
         $this->cartJson('GET', '/cart/summary')
             ->assertOk()
             ->assertJson([
                 'count' => 3,
                 'subtotal' => '300.00',
+                'subtotal_incl_vat' => '345.00',
+                'vat_amount' => '45.00',
+                'total_incl_vat' => '345.00',
+                'vat_rate_label' => '15%',
                 'currency' => 'SAR',
+                'items' => [[
+                    'qty' => 3,
+                    'unit_price' => '100.00',
+                    'line_total' => '300.00',
+                    'unit_price_incl_vat' => '115.00',
+                    'line_total_incl_vat' => '345.00',
+                    'price_changed' => false,
+                ]],
             ]);
     }
 

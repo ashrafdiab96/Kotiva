@@ -6,6 +6,8 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\Money;
+use App\Support\Vat;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -32,7 +34,13 @@ final class ProductFactory extends Factory
             'concern' => 'Hydration',
             'action' => 'Hydration',
             'volume' => '200ml',
-            'price' => $this->faker->randomFloat(2, 80, 400),
+            // Generated as a whole-riyal net price so the inclusive figure is
+            // exact at 2dp, the way the real brochure prices are. A random
+            // fractional net price would put half the factory's products into
+            // the "prices disagree" state and make every unrelated test look
+            // like a VAT bug.
+            'price_excl_vat' => $netPrice = (string) $this->faker->numberBetween(80, 400).'.00',
+            'price_incl_vat' => Vat::inclusiveOf($netPrice),
             'compare_at_price' => null,
             'description' => $this->faker->paragraph(),
             'benefits' => [$this->faker->sentence(), $this->faker->sentence()],
@@ -52,6 +60,30 @@ final class ProductFactory extends Factory
             'meta_description' => $this->faker->sentence(),
             'weight_grams' => null,
         ];
+    }
+
+    /**
+     * A product priced from an explicit VAT-exclusive figure, with the
+     * inclusive price derived at the configured rate.
+     */
+    public function pricedAt(string $exclVat): self
+    {
+        return $this->state(fn (): array => [
+            'price_excl_vat' => Money::of($exclVat),
+            'price_incl_vat' => Vat::inclusiveOf(Money::of($exclVat)),
+        ]);
+    }
+
+    /**
+     * Both prices set independently — the case where a brochure states a
+     * figure the VAT rate does not predict.
+     */
+    public function pricedWith(string $exclVat, string $inclVat): self
+    {
+        return $this->state(fn (): array => [
+            'price_excl_vat' => Money::of($exclVat),
+            'price_incl_vat' => Money::of($inclVat),
+        ]);
     }
 
     public function soldOut(): self

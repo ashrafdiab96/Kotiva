@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Support\Vat;
 use Database\Factories\OrderItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,9 +24,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $sku_snapshot
  * @property string $name_snapshot
  * @property string|null $image_snapshot
- * @property string $unit_price
+ * @property string $unit_price VAT-inclusive, as charged.
+ * @property string $unit_price_excl_vat VAT-exclusive, as displayed in the shop.
  * @property int $qty
- * @property string $line_total
+ * @property string $line_total VAT-inclusive.
+ * @property string $line_total_excl_vat VAT-exclusive.
+ * @property string $vat_amount The VAT this line contains.
+ * @property string $vat_rate The rate it was computed at.
  */
 final class OrderItem extends Model
 {
@@ -39,17 +44,33 @@ final class OrderItem extends Model
         'name_snapshot',
         'image_snapshot',
         'unit_price',
+        'unit_price_excl_vat',
         'qty',
         'line_total',
+        'line_total_excl_vat',
+        'vat_amount',
+        'vat_rate',
     ];
 
     protected function casts(): array
     {
         return [
             'unit_price' => 'decimal:2',
+            'unit_price_excl_vat' => 'decimal:2',
             'line_total' => 'decimal:2',
+            'line_total_excl_vat' => 'decimal:2',
+            'vat_amount' => 'decimal:2',
+            'vat_rate' => 'decimal:6',
             'qty' => 'integer',
         ];
+    }
+
+    /**
+     * "15%" — the rate applied to THIS line, from its own snapshot.
+     */
+    public function vatRateLabel(): string
+    {
+        return Vat::rateLabel(number_format((float) $this->vat_rate, 6, '.', ''));
     }
 
     /** @return BelongsTo<Order, $this> */

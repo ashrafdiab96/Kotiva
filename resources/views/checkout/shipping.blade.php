@@ -22,7 +22,9 @@
              submit, so this works with JS off. --}}
         <form class="checkout-form" method="POST" action="{{ route('checkout.shipping.store') }}" data-checkout-shipping>
           @csrf
-          <input type="hidden" name="subtotal" value="{{ $review->subtotal }}" />
+          {{-- No subtotal is posted from here. The live shipping quote is
+               priced from the server's own cart (see ShippingCityApiController),
+               so there is no amount in this form for a browser to edit. --}}
 
           {{-- Announced on load, so a screen-reader user learns the submit
                failed; each message below is also tied to its own field. --}}
@@ -138,20 +140,17 @@
       <aside class="cart-summary" aria-label="Order summary">
         <h2 class="cart-summary-title">Summary</h2>
 
-        <div class="cart-summary-row">
-          <span>Subtotal</span>
-          <span>{{ config('kotiva.currency.code') }} {{ $review->subtotal }}</span>
-        </div>
-
-        <div class="cart-summary-row cart-summary-muted">
-          <span>Shipping</span>
-          {{-- Filled in live once an area is chosen; the server recalculates
-               on submit regardless of what was displayed. --}}
-          <span data-shipping-fee>Select a delivery area</span>
-        </div>
+        {{-- Filled in live once an area is chosen. The fee comes from the
+             server's own quote against the server's own cart, and checkout
+             recalculates on submit regardless of what was displayed. --}}
+        @include('checkout._summary', [
+          'totals' => $totals,
+          'shippingSlot' => '<span data-shipping-fee>'
+            . e($totals->shippingLabel((string) config('kotiva.currency.code'), 'Select a delivery area'))
+            . '</span>',
+        ])
 
         <p class="cart-summary-note" data-shipping-estimate hidden></p>
-        <p class="cart-summary-note">All prices include 15% VAT.</p>
 
         <a class="btn btn-outline cart-continue" href="{{ route('checkout.review') }}">Back to Review</a>
         <p class="cart-summary-cod">Cash on delivery available.</p>

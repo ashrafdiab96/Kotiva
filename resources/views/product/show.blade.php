@@ -29,9 +29,16 @@
             'url' => $pageUrl,
             'availability' => $product->schemaAvailability(),
             'itemCondition' => 'https://schema.org/NewCondition',
-            'price' => number_format((float) $product->price, 2, '.', ''),
+            /*
+             | The structured price must be the one the page displays, or a
+             | crawler reports a mismatch between the markup and the visible
+             | price. The page now leads with the VAT-exclusive figure, so this
+             | states that figure and flags it as tax-exclusive rather than
+             | quietly keeping the old inclusive number.
+             */
+            'price' => number_format((float) $product->price_excl_vat, 2, '.', ''),
             'priceCurrency' => config('kotiva.currency.code'),
-            'valueAddedTaxIncluded' => true,
+            'valueAddedTaxIncluded' => false,
         ],
     ];
 
@@ -82,8 +89,12 @@
 .pdp-skin-type { font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 16px; }
 .pdp-name { font-family: var(--font-display); font-size: clamp(28px, 3vw, 48px); font-weight: 900; letter-spacing: 0.03em; text-transform: uppercase; line-height: 1.0; color: var(--fg); margin-bottom: 8px; }
 .pdp-category { font-family: var(--font-display); font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 16px; }
-.pdp-price { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: 0.04em; color: var(--fg); margin-bottom: 28px; display: flex; align-items: baseline; gap: 10px; }
+.pdp-price { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: 0.04em; color: var(--fg); margin-bottom: 6px; display: flex; align-items: baseline; gap: 10px; }
 .pdp-price-vat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-dim); }
+/* The inclusive price: secondary to the headline, but not a footnote — it is
+   the amount the customer will actually be charged. Takes over the margin the
+   headline price used to carry, so the block below it does not move. */
+.pdp-price-incl { font-family: var(--font-ui); font-size: 13px; letter-spacing: 0.02em; color: var(--fg-dim); margin-bottom: 28px; }
 .pdp-claim { font-family: var(--font-script); font-size: clamp(18px, 1.8vw, 28px); color: var(--script); margin-bottom: 28px; }
 .pdp-divider { height: 1px; background: var(--border); margin: 28px 0; }
 .pdp-description { font-size: 15px; line-height: 1.8; color: var(--fg-mid); font-family: var(--font-body); margin-bottom: 32px; }
@@ -152,7 +163,12 @@ html[data-mode="dark"] .pdp-stock.is-out .pdp-stock-dot { background: rgba(255,2
       <div class="pdp-skin-type">{{ $product->skin_type }}</div>
       <h1 class="pdp-name">{{ $product->name }}</h1>
       <div class="pdp-category">{{ $product->category->name }}@if ($product->volume) &middot; {{ $product->volume }}@endif</div>
-      <div class="pdp-price"><span>{{ config('kotiva.currency.code') }} {{ number_format((float) $product->price, 2) }}</span><span class="pdp-price-vat">VAT included</span></div>
+      {{-- The headline price is VAT-EXCLUSIVE, matching the shop listing and
+           the home rail. The inclusive price is stated immediately beneath it
+           rather than left to checkout, so nobody reaches the payment step and
+           meets a figure they have not seen before. --}}
+      <div class="pdp-price"><span>{{ config('kotiva.currency.code') }} {{ number_format((float) $product->price_excl_vat, 2) }}</span><span class="pdp-price-vat">excl. VAT</span></div>
+      <div class="pdp-price-incl">{{ config('kotiva.currency.code') }} {{ number_format((float) $product->price_incl_vat, 2) }} including {{ \App\Support\Vat::rateLabel() }} VAT</div>
 
       @if ($product->isSoldOut())
         <div class="pdp-stock is-out"><span class="pdp-stock-dot"></span>Sold out</div>
@@ -263,6 +279,11 @@ html[data-mode="dark"] .pdp-stock.is-out .pdp-stock-dot { background: rgba(255,2
           <div class="product-card-body">
             <div class="product-card-name">{{ $rel->displayName() }}</div>
             <div class="product-card-desc">{{ $rel->category->name }} &middot; {{ $rel->skin_type }}</div>
+            {{-- These are the same .product-card component the shop listing
+                 uses, and it carries a price there. Showing one here too —
+                 VAT-exclusive and labelled identically — means a shopper meets
+                 the same figure in the same place on every card in the site. --}}
+            <div class="product-card-price">{{ config('kotiva.currency.code') }} {{ number_format((float) $rel->price_excl_vat, 2) }}<small>excl. VAT</small></div>
             <div class="product-card-footer"><span class="badge-concern">{{ $rel->concern }}</span><span class="product-card-cta">{{ $rel->isSoldOut() ? 'Sold out' : 'Discover' }}</span></div>
           </div>
         </a>

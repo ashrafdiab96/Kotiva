@@ -43,7 +43,7 @@
               <div class="cart-item-body">
                 <a class="cart-item-name" href="{{ route('product.show', ['slug' => $item->product->slug]) }}">{{ $item->product->displayName() }}</a>
                 <div class="cart-item-meta">{{ $item->product->category->name }}@if ($item->product->volume) &middot; {{ $item->product->volume }}@endif</div>
-                <div class="cart-item-unit">{{ config('kotiva.currency.code') }} {{ $item->unitPrice() }} <small>VAT incl.</small></div>
+                <div class="cart-item-unit">{{ config('kotiva.currency.code') }} {{ $item->unitPriceExclVat() }} <small>excl. VAT</small></div>
 
                 @if ($item->product->isSoldOut())
                   <p class="cart-item-warn">This product is now sold out.</p>
@@ -71,7 +71,7 @@
                 <button class="cart-qty-apply" type="submit">Update</button>
               </form>
 
-              <div class="cart-item-total">{{ config('kotiva.currency.code') }} {{ $item->lineTotal() }}</div>
+              <div class="cart-item-total">{{ config('kotiva.currency.code') }} {{ $item->lineTotalExclVat() }}</div>
 
               <form method="POST" action="{{ route('cart.items.destroy', ['item' => $item->getKey()]) }}" data-cart-remove>
                 @csrf
@@ -85,9 +85,19 @@
         <aside class="cart-summary" aria-label="Order summary">
           <h2 class="cart-summary-title">Summary</h2>
 
+          {{-- The cart is stated NET, because that is the price on every card
+               the shopper clicked to get here. The VAT is then shown as its own
+               line and rolled into a clearly-labelled inclusive figure, so the
+               VAT-exclusive subtotal is never the last number on the panel and
+               can never be mistaken for the amount payable. --}}
           <div class="cart-summary-row">
-            <span>Subtotal</span>
-            <span data-cart-subtotal>{{ config('kotiva.currency.code') }} {{ $cart->subtotal() }}</span>
+            <span>Subtotal <small>excl. VAT</small></span>
+            <span data-cart-subtotal>{{ config('kotiva.currency.code') }} {{ $totals->merchandiseExclVat }}</span>
+          </div>
+
+          <div class="cart-summary-row">
+            <span>VAT ({{ $totals->vatRateLabel() }})</span>
+            <span data-cart-vat>{{ config('kotiva.currency.code') }} {{ $totals->productVat }}</span>
           </div>
 
           <div class="cart-summary-row cart-summary-muted">
@@ -95,12 +105,15 @@
             <span>Calculated at checkout</span>
           </div>
 
-          <p class="cart-summary-note">All prices include 15% VAT.</p>
-
           <div class="cart-summary-row cart-summary-total">
-            <span>Total</span>
-            <span data-cart-total>{{ config('kotiva.currency.code') }} {{ $cart->subtotal() }}</span>
+            <span>Total <small>incl. VAT</small></span>
+            <span data-cart-total>{{ config('kotiva.currency.code') }} {{ $totals->merchandiseInclVat }}</span>
           </div>
+
+          <p class="cart-summary-note">
+            Product prices are shown excluding VAT. {{ $totals->vatRateLabel() }} VAT is
+            calculated and included in the total above, and delivery is added at checkout.
+          </p>
 
           <a class="btn btn-primary cart-checkout" href="{{ route('checkout.index') }}">Proceed to Checkout</a>
           <a class="btn btn-outline cart-continue" href="{{ route('shop.index') }}">Continue Shopping</a>

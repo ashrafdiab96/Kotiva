@@ -15,9 +15,9 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
 use App\Models\Product;
-use App\Models\Setting;
 use App\Models\ShippingZone;
 use App\Services\Payments\PaymentGateway;
+use App\Support\Money;
 use App\Support\OrderNumber;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -52,7 +52,6 @@ final class CheckoutService
         $cart->loadMissing('items.product');
 
         $lines = [];
-        $subtotal = '0.00';
 
         foreach ($cart->items as $item) {
             $product = $item->product;
@@ -61,21 +60,30 @@ final class CheckoutService
                 continue;
             }
 
-            $lineTotal = $item->lineTotal();
-            $subtotal = bcadd($subtotal, $lineTotal, 2);
-
-            $lines[] = new CheckoutLine(
-                item: $item,
-                product: $product,
-                unitPrice: $item->unitPrice(),
-                lineTotal: $lineTotal,
-                priceChanged: $item->priceHasChanged(),
-                previousPrice: number_format((float) $item->unit_price_snapshot, 2, '.', ''),
-                unavailable: ! $product->is_active,
-            );
+            $lines[] = CheckoutLine::fromCartItem($item, $product);
         }
 
-        return new CheckoutReview($lines, $subtotal);
+        return CheckoutReview::fromLines($lines);
+    }
+
+    /**
+     * The review with a delivery quote applied, giving the full breakdown the
+     * shipping, payment and confirmation steps all display.
+     *
+     * One method rather than each controller action assembling its own totals:
+     * the shopper sees this figure three times before they commit to it, and
+     * it must be the same figure each time and the same one that `place()`
+     * charges.
+     */
+    public function reviewWithShipping(Cart $cart, ?ShippingZone $zone): CheckoutReview
+    {
+        $review = $this->review($cart);
+
+        return $review->withTotals($this->shipping->totals(
+            $zone,
+            $review->subtotalExclVat(),
+            $review->subtotalInclVat(),
+        ));
     }
 
     /**
@@ -103,10 +111,16 @@ final class CheckoutService
         $order = DB::transaction(function () use ($cart, $details, $gateway, $ipAddress, $userAgent): Order {
             $zone = ShippingZone::query()->find($details->zoneId);
 
-            // Re-read and lock every product, then re-check it. Anything read
-            // before the lock is already stale.
+            /*
+             | Re-read and lock every product, then re-price BOTH figures from
+             | the locked row. Anything read before the lock is already stale,
+             | and nothing the browser submitted is consulted at any point —
+             | the request carries an address and a payment method, never an
+             | amount.
+             */
             $lines = [];
-            $subtotal = '0.00';
+            $merchandiseExclVat = Money::zero();
+            $merchandiseInclVat = Money::zero();
 
             foreach ($cart->items as $item) {
                 $product = Product::query()
@@ -120,16 +134,21 @@ final class CheckoutService
                     );
                 }
 
-                $unitPrice = number_format((float) $product->price, 2, '.', '');
-                $lineTotal = bcmul($unitPrice, (string) $item->qty, 2);
-                $subtotal = bcadd($subtotal, $lineTotal, 2);
+                $unitPriceInclVat = $product->priceInclVat();
+                $unitPriceExclVat = $product->priceExclVat();
 
-                $lines[] = [$item, $product, $unitPrice, $lineTotal];
+                $lineTotalInclVat = Money::multiplyByQty($unitPriceInclVat, $item->qty);
+                $lineTotalExclVat = Money::multiplyByQty($unitPriceExclVat, $item->qty);
+
+                $merchandiseInclVat = Money::add($merchandiseInclVat, $lineTotalInclVat);
+                $merchandiseExclVat = Money::add($merchandiseExclVat, $lineTotalExclVat);
+
+                $lines[] = [$item, $product, $unitPriceInclVat, $unitPriceExclVat, $lineTotalInclVat, $lineTotalExclVat];
             }
 
-            $quote = $this->shipping->quote($zone, $subtotal);
-            $shippingFee = $quote->available ? $quote->fee : '0.00';
-            $grandTotal = $this->shipping->grandTotal($subtotal, $shippingFee);
+            // One breakdown, computed once, inside the lock. Every figure
+            // written to the order below comes from here.
+            $totals = $this->shipping->totals($zone, $merchandiseExclVat, $merchandiseInclVat);
 
             $customer = $this->customerFor($details);
 
@@ -140,18 +159,31 @@ final class CheckoutService
                 'payment_method' => PaymentMethod::from($gateway->method()),
                 'payment_status' => $gateway->initialStatus(),
                 'currency' => config('kotiva.currency.code'),
-                'subtotal' => $subtotal,
-                'shipping_fee' => $shippingFee,
-                'discount_total' => '0.00',
-                // Extracted from the inclusive total, never added to it. Read
-                // through Setting so the dashboard's VAT field actually
-                // governs new orders; config remains the fallback before any
-                // row exists.
-                'vat_amount' => Order::vatPortionOf(
-                    $grandTotal,
-                    (float) Setting::get('vat_rate', config('kotiva.vat_rate'))
-                ),
-                'grand_total' => $grandTotal,
+                /*
+                 | The order's immutable money snapshot. `subtotal` keeps its
+                 | original meaning — merchandise VAT-INCLUDED — so every
+                 | receipt, packing slip and export already in circulation
+                 | still reads correctly; the net figure is stored alongside it
+                 | rather than replacing it.
+                 |
+                 | Product VAT is the difference between the two authoritative
+                 | brochure prices, not a recomputation at the rate: it is the
+                 | VAT actually contained in what was charged. Shipping VAT is
+                 | separate and follows the configured delivery treatment.
+                 | Neither is ever added to the total — vat_amount reports what
+                 | is inside grand_total.
+                 */
+                'subtotal' => $totals->merchandiseInclVat,
+                'subtotal_excl_vat' => $totals->merchandiseExclVat,
+                'shipping_fee' => $totals->shippingFee,
+                'discount_total' => $totals->discountTotal,
+                'vat_amount' => $totals->vatTotal,
+                'product_vat_amount' => $totals->productVat,
+                'shipping_vat_amount' => $totals->shippingVat,
+                // The rate is snapshotted too, so a receipt reprinted after a
+                // rate change still describes the transaction that happened.
+                'vat_rate' => $totals->vatRate,
+                'grand_total' => $totals->grandTotal,
                 'shipping_zone_id' => $details->zoneId,
                 'shipping_city_id' => $details->cityId,
                 'shipping_name' => $details->fullName(),
@@ -167,7 +199,7 @@ final class CheckoutService
                 'user_agent' => $userAgent === null ? null : mb_substr($userAgent, 0, 512),
             ]);
 
-            foreach ($lines as [$item, $product, $unitPrice, $lineTotal]) {
+            foreach ($lines as [$item, $product, $unitPriceInclVat, $unitPriceExclVat, $lineTotalInclVat, $lineTotalExclVat]) {
                 /** @var CartItem $item */
                 /** @var Product $product */
                 OrderItem::create([
@@ -176,9 +208,19 @@ final class CheckoutService
                     'sku_snapshot' => $product->sku,
                     'name_snapshot' => $product->name,
                     'image_snapshot' => $product->image,
-                    'unit_price' => $unitPrice,
+                    // Both prices are snapshotted. unit_price and line_total
+                    // keep their original VAT-inclusive meaning, so existing
+                    // receipts and slips are unaffected; the net figures and
+                    // the line's own VAT sit beside them, because credit notes
+                    // and partial refunds work a line at a time and must not
+                    // re-derive an old line at today's rate.
+                    'unit_price' => $unitPriceInclVat,
+                    'unit_price_excl_vat' => $unitPriceExclVat,
                     'qty' => $item->qty,
-                    'line_total' => $lineTotal,
+                    'line_total' => $lineTotalInclVat,
+                    'line_total_excl_vat' => $lineTotalExclVat,
+                    'vat_amount' => Money::sub($lineTotalInclVat, $lineTotalExclVat),
+                    'vat_rate' => $totals->vatRate,
                 ]);
 
                 // The units already left stock when they were reserved at
@@ -203,7 +245,8 @@ final class CheckoutService
             Log::info('Order placed', [
                 'order_no' => $order->order_no,
                 'customer_id' => $customer->id,
-                'grand_total' => $grandTotal,
+                'grand_total' => $totals->grandTotal,
+                'vat_amount' => $totals->vatTotal,
                 'items' => count($lines),
             ]);
 

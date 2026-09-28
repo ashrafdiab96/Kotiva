@@ -399,11 +399,15 @@
     <div class="bestsellers-scroll" role="region" aria-label="Best sellers">
     <div class="bestsellers-track" data-stagger="70">
       @foreach ($bestSellers as $p)
-      <a class="bs-card" href="{{ route('product.show', ['slug' => $p->slug]) }}" aria-label="{{ $p->displayName() }}, {{ config('kotiva.currency.code') }} {{ number_format((float) $p->price, 2) }}">
+      <a class="bs-card" href="{{ route('product.show', ['slug' => $p->slug]) }}" aria-label="{{ $p->displayName() }}, {{ config('kotiva.currency.code') }} {{ number_format((float) $p->price_excl_vat, 2) }} excluding VAT">
         <div class="bs-card-img"><img src="{{ $p->heroImageUrl() }}" alt="{{ $p->displayName() }}" width="200" height="200" style="--s:1.0" loading="lazy" /></div>
         <div class="bs-card-body">
           <div class="bs-card-name">{{ $p->displayName() }}</div>
-          <div class="bs-card-meta"><span class="bs-card-price">{{ config('kotiva.currency.code') }} {{ number_format((float) $p->price, 2) }}</span><span class="bs-card-vol">{{ $p->volume }}</span></div>
+          {{-- Excluding VAT, labelled the same way as the shop card. The
+               qualifier sits inside .bs-card-price so animations.js's focus
+               ramp (which sets opacity on that element) carries it with the
+               figure rather than leaving the label at a different brightness. --}}
+          <div class="bs-card-meta"><span class="bs-card-price">{{ config('kotiva.currency.code') }} {{ number_format((float) $p->price_excl_vat, 2) }}<small>excl. VAT</small></span><span class="bs-card-vol">{{ $p->volume }}</span></div>
           <div class="bs-card-foot"><span class="badge-concern">{{ $p->concern }}</span><span class="bs-card-cta">Discover</span></div>
         </div>
       </a>

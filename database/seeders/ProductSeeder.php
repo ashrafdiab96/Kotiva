@@ -8,6 +8,8 @@ use App\Enums\StockMovementReason;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductStockMovement;
+use App\Support\Money;
+use App\Support\Vat;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -25,6 +27,15 @@ use RuntimeException;
 final class ProductSeeder extends Seeder
 {
     private const INITIAL_STOCK = 50;
+
+    /**
+     * The authoritative catalog prices, generated from the client's two A2
+     * brochures. See pricesFor().
+     */
+    private const BROCHURE_PRICES = 'docs/pricing/brochure-prices.json';
+
+    /** @var array<string, array{price_excl_vat: string, price_incl_vat: string}>|null */
+    private ?array $brochurePrices = null;
 
     /**
      * The home page's bestseller rail was hand-ordered in index.html. That
@@ -123,7 +134,7 @@ final class ProductSeeder extends Seeder
                 'concern' => $row['concern'] ?? null,
                 'action' => $row['action'] ?? null,
                 'volume' => $row['volume'] ?? null,
-                'price' => $row['price'],
+                ...$this->pricesFor((string) $row['kot'], $row['price']),
                 'compare_at_price' => null,
                 'description' => $description,
                 'benefits' => $row['benefits'] ?? [],
@@ -156,6 +167,124 @@ final class ProductSeeder extends Seeder
 
             $product->forceFill(['stock_qty' => self::INITIAL_STOCK])->save();
         }
+    }
+
+    /**
+     * A product's two authoritative prices.
+     *
+     * Both come from the client's A2 brochures, extracted to
+     * docs/pricing/brochure-prices.json by docs/pricing/extract-brochure-prices.mjs.
+     * That file — not this seeder, and not the legacy JS bundle — is the source
+     * of truth for what a product costs, because the brochures are what the
+     * client signed off.
+     *
+     * The legacy bundle's `price` is used only as a FALLBACK, for a SKU the
+     * brochures do not cover. Its value is VAT-inclusive (verified: all 25
+     * launch prices equal the inclusive brochure exactly), so the exclusive
+     * figure is derived from it at the configured rate in that case — and the
+     * two are cross-checked below, so a brochure the client revises without
+     * updating the bundle is reported rather than quietly ignored.
+     *
+     * @return array{price_excl_vat: string, price_incl_vat: string}
+     */
+    private function pricesFor(string $sku, mixed $legacyInclusive): array
+    {
+        $brochure = $this->brochurePrices()[$sku] ?? null;
+
+        if ($brochure === null) {
+            $inclusive = Money::of($legacyInclusive);
+
+            $this->warn(
+                "  {$sku} is not in the brochure data; pricing it from the legacy bundle at ".Vat::rateLabel().' VAT.'
+            );
+
+            return [
+                'price_excl_vat' => Vat::exclusiveOf($inclusive),
+                'price_incl_vat' => $inclusive,
+            ];
+        }
+
+        // Both brochure values are written verbatim. If they disagree with the
+        // configured rate, that is the client's decision and it is reported,
+        // not corrected.
+        if (! Vat::pricesAgree($brochure['price_excl_vat'], $brochure['price_incl_vat'])) {
+            $this->warn(sprintf(
+                '  %s: brochure prices %s excl. / %s incl. do not agree at %s VAT. Both seeded unchanged.',
+                $sku, $brochure['price_excl_vat'], $brochure['price_incl_vat'], Vat::rateLabel()
+            ));
+        }
+
+        return [
+            'price_excl_vat' => $brochure['price_excl_vat'],
+            'price_incl_vat' => $brochure['price_incl_vat'],
+        ];
+    }
+
+    /**
+     * A pricing note for whoever is running the seeder.
+     *
+     * Silent when there is no console attached — a seeder run from a test has
+     * nowhere to write, and a pricing note is not worth a fatal error.
+     */
+    private function warn(string $message): void
+    {
+        $this->command?->warn($message);
+    }
+
+    /**
+     * The brochure mapping, keyed by SKU. Read once per seeder run.
+     *
+     * @return array<string, array{price_excl_vat: string, price_incl_vat: string}>
+     */
+    private function brochurePrices(): array
+    {
+        if ($this->brochurePrices !== null) {
+            return $this->brochurePrices;
+        }
+
+        $path = base_path(self::BROCHURE_PRICES);
+
+        if (! is_file($path)) {
+            throw new RuntimeException(
+                'Brochure price data missing: '.self::BROCHURE_PRICES
+                .'. Regenerate it with `node docs/pricing/extract-brochure-prices.mjs`.'
+            );
+        }
+
+        $decoded = json_decode((string) file_get_contents($path), true);
+
+        if (! is_array($decoded) || ! isset($decoded['products']) || ! is_array($decoded['products'])) {
+            throw new RuntimeException(self::BROCHURE_PRICES.' is not a brochure price report.');
+        }
+
+        // The extractor records anything it could not map unambiguously.
+        // Seeding prices from a file that knows it is incomplete is exactly the
+        // guessing the mapping step exists to avoid.
+        if (($decoded['problems'] ?? []) !== []) {
+            throw new RuntimeException(
+                'Brochure price data reports unresolved problems; resolve them before seeding: '
+                .implode(' ', (array) $decoded['problems'])
+            );
+        }
+
+        $map = [];
+
+        foreach ($decoded['products'] as $product) {
+            $sku = (string) ($product['sku'] ?? '');
+            $excl = $product['price_excl_vat'] ?? null;
+            $incl = $product['price_incl_vat'] ?? null;
+
+            if ($sku === '' || ! is_string($excl) || ! is_string($incl)) {
+                continue;
+            }
+
+            $map[$sku] = [
+                'price_excl_vat' => Money::of($excl),
+                'price_incl_vat' => Money::of($incl),
+            ];
+        }
+
+        return $this->brochurePrices = $map;
     }
 
     /**

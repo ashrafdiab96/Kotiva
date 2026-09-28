@@ -71,6 +71,16 @@ final class ImportProducts extends Page
     /** @var list<string> */
     public array $errorLines = [];
 
+    /**
+     * Rows that import, but whose money figures were calculated or disagree
+     * with the configured VAT rate. Shown beside the errors, in a different
+     * colour: these are not failures, but they are not something to find out
+     * about from the storefront either.
+     *
+     * @var list<string>
+     */
+    public array $warningLines = [];
+
     public int $errorCount = 0;
 
     public ?int $validCount = null;
@@ -88,7 +98,7 @@ final class ImportProducts extends Page
             'upload' => ['required', 'file', 'max:10240', 'mimes:csv,txt,xlsx'],
         ]);
 
-        $this->reset(['headers', 'previewRows', 'totalRows', 'mapping', 'errorLines', 'errorCount', 'validCount']);
+        $this->reset(['headers', 'previewRows', 'totalRows', 'mapping', 'errorLines', 'warningLines', 'errorCount', 'validCount']);
         $this->discardStoredFile();
 
         $file = $this->upload;
@@ -137,7 +147,7 @@ final class ImportProducts extends Page
      */
     public function updatedMapping(): void
     {
-        $this->reset(['errorLines', 'errorCount', 'validCount']);
+        $this->reset(['errorLines', 'warningLines', 'errorCount', 'validCount']);
     }
 
     /**
@@ -325,6 +335,6 @@ final class ImportProducts extends Page
 
     private function resetUpload(): void
     {
-        $this->reset(['upload', 'extension', 'originalName', 'headers', 'previewRows', 'totalRows', 'mapping', 'skipInvalid', 'errorLines', 'errorCount', 'validCount']);
+        $this->reset(['upload', 'extension', 'originalName', 'headers', 'previewRows', 'totalRows', 'mapping', 'skipInvalid', 'errorLines', 'warningLines', 'errorCount', 'validCount']);
     }
 }

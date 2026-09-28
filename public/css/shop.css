@@ -718,6 +718,33 @@ html[data-mode="dark"] .cart-item-remove:hover {
   color: var(--fg);
 }
 
+/* The drawer now states net, VAT and gross rather than one figure, so the rows
+   need breathing room and a clear hierarchy: the VAT line is supporting
+   detail, the inclusive total is the one that matters. */
+.mini-cart-subtotal-row + .mini-cart-subtotal-row {
+  margin-top: 6px;
+}
+
+.mini-cart-subtotal-row small {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-left: 5px;
+}
+
+.mini-cart-vat-row {
+  font-weight: 600;
+  color: var(--fg-dim);
+}
+
+.mini-cart-total-row {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
 .mini-cart-note {
   font-family: var(--font-display);
   font-size: 9px;

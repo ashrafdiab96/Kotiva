@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Admin;
 use App\Models\Setting;
+use App\Support\Vat;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -78,6 +79,11 @@ final class ManageSettings extends Page
             ),
             // Stored as a rate, shown as a percentage.
             'vat_rate_percent' => round(((float) Setting::get('vat_rate', config('kotiva.vat_rate'))) * 100, 4),
+            // Read through Vat rather than Setting directly, so an unrecognised
+            // stored value falls back to the same default the storefront uses
+            // instead of showing an empty select.
+            'shipping_vat_mode' => Vat::shippingMode(),
+            'free_shipping_basis' => Vat::freeShippingBasis(),
             'announcement_enabled' => (bool) ($this->announcement()['enabled'] ?? false),
             'announcement_text' => (string) ($this->announcement()['text'] ?? ''),
         ]);
@@ -145,7 +151,31 @@ final class ManageSettings extends Page
                             ->maxValue(100)
                             ->required()
                             ->suffix('%')
-                            ->helperText('Prices are VAT-inclusive; this is the portion extracted for display on orders, never added to the price.'),
+                            ->helperText('Products carry both a VAT-exclusive and a VAT-inclusive price, and this rate changes neither. It labels the VAT lines shown to customers, and flags any product whose two prices stop agreeing with it.'),
+
+                        /*
+                         | Delivery's VAT treatment is a separate business
+                         | decision from the product rate, so it gets its own
+                         | control rather than being assumed.
+                         |
+                         | The default reproduces this project's original rule,
+                         | under which the existing delivery fees were approved.
+                         | Changing to "add VAT on top" genuinely increases what
+                         | customers pay, which is why the helper text says so.
+                         */
+                        Forms\Components\Select::make('shipping_vat_mode')
+                            ->label('VAT on delivery')
+                            ->options(Vat::shippingModeOptions())
+                            ->required()
+                            ->native(false)
+                            ->helperText('The first two report VAT differently but charge the same. The third increases the amount customers pay.'),
+
+                        Forms\Components\Select::make('free_shipping_basis')
+                            ->label('Free delivery measured on')
+                            ->options(Vat::freeShippingBasisOptions())
+                            ->required()
+                            ->native(false)
+                            ->helperText('Which merchandise total a zone\'s free-delivery threshold is compared against. Existing thresholds were set against the VAT-inclusive total.'),
                     ]),
 
                 Forms\Components\Section::make('Catalog')
@@ -193,6 +223,14 @@ final class ManageSettings extends Page
         Setting::put('low_stock_threshold', (int) $data['low_stock_threshold']);
         // Percentage back to a rate.
         Setting::put('vat_rate', round(((float) $data['vat_rate_percent']) / 100, 6));
+        // Validated against the known sets rather than trusted: an unexpected
+        // value here would change what customers are charged for delivery.
+        Setting::put('shipping_vat_mode', in_array($data['shipping_vat_mode'] ?? null, Vat::shippingModes(), true)
+            ? $data['shipping_vat_mode']
+            : Vat::SHIPPING_INCLUSIVE);
+        Setting::put('free_shipping_basis', ($data['free_shipping_basis'] ?? null) === Vat::BASIS_EXCLUSIVE
+            ? Vat::BASIS_EXCLUSIVE
+            : Vat::BASIS_INCLUSIVE);
         Setting::put('announcement_bar', [
             'enabled' => (bool) $data['announcement_enabled'],
             'text' => trim((string) ($data['announcement_text'] ?? '')),

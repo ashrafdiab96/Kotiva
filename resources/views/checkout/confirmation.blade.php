@@ -47,7 +47,7 @@
                        the same way even after the catalog changes. --}}
                   <span class="cart-item-name">{{ $item->name_snapshot }}</span>
                   <div class="cart-item-meta">{{ $item->sku_snapshot }}</div>
-                  <div class="cart-item-unit">{{ $order->currency }} {{ $item->unit_price }} &times; {{ $item->qty }}</div>
+                  <div class="cart-item-unit">{{ $order->currency }} {{ $item->unit_price }} <small>incl. VAT</small> &times; {{ $item->qty }}</div>
                 </div>
                 <div class="cart-item-total">{{ $order->currency }} {{ $item->line_total }}</div>
               </div>
@@ -73,8 +73,22 @@
       <aside class="cart-summary" aria-label="Order totals">
         <h2 class="cart-summary-title">Totals</h2>
 
+        {{-- Every figure is the order's own snapshot, at the rate the order was
+             placed at. A later price change or VAT rate change must leave this
+             page reading exactly as it does today. The breakdown is the same
+             one the payment step showed, in the same order. --}}
         <div class="cart-summary-row">
-          <span>Subtotal</span>
+          <span>Merchandise <small>excl. VAT</small></span>
+          <span>{{ $order->currency }} {{ $order->subtotal_excl_vat }}</span>
+        </div>
+
+        <div class="cart-summary-row">
+          <span>VAT ({{ $order->vatRateLabel() }})</span>
+          <span>{{ $order->currency }} {{ $order->vat_amount }}</span>
+        </div>
+
+        <div class="cart-summary-row">
+          <span>Merchandise <small>incl. VAT</small></span>
           <span>{{ $order->currency }} {{ $order->subtotal }}</span>
         </div>
 
@@ -83,12 +97,22 @@
           <span>{{ bccomp((string) $order->shipping_fee, '0.00', 2) === 0 ? 'Free' : $order->currency.' '.$order->shipping_fee }}</span>
         </div>
 
-        <p class="cart-summary-note">Includes {{ $order->currency }} {{ $order->vat_amount }} VAT.</p>
+        @if (bccomp((string) $order->discount_total, '0.00', 2) !== 0)
+          <div class="cart-summary-row">
+            <span>Discount</span>
+            <span>&minus; {{ $order->currency }} {{ $order->discount_total }}</span>
+          </div>
+        @endif
 
         <div class="cart-summary-row cart-summary-total">
-          <span>Total</span>
+          <span>Total paid</span>
           <span>{{ $order->currency }} {{ $order->grand_total }}</span>
         </div>
+
+        <p class="cart-summary-note">
+          Total includes {{ $order->currency }} {{ $order->vat_amount }} VAT
+          at {{ $order->vatRateLabel() }}.
+        </p>
 
         <a class="btn btn-primary cart-checkout" href="{{ route('shop.index') }}">Continue Shopping</a>
         <a class="btn btn-outline cart-continue" href="{{ route('contact') }}">Need Help?</a>

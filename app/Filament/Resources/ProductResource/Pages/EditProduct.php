@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Enums\StockMovementReason;
 use App\Exceptions\InsufficientStockException;
+use App\Filament\Concerns\ReportsVatDiscrepancy;
 use App\Filament\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\StockService;
@@ -18,6 +19,8 @@ use InvalidArgumentException;
 
 final class EditProduct extends EditRecord
 {
+    use ReportsVatDiscrepancy;
+
     protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
@@ -26,6 +29,11 @@ final class EditProduct extends EditRecord
             $this->adjustStockAction(),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        $this->reportVatDiscrepancy();
     }
 
     /**

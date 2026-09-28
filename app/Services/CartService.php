@@ -103,11 +103,15 @@ final class CartService
                 throw new InsufficientStockException($product, $currentQty + $qty, $currentQty);
             }
 
+            // Both prices are snapshotted: checkout compares each against the
+            // live product, because either moving on its own is a change the
+            // shopper has to be told about before they pay.
             $item = $existing ?? new CartItem([
                 'cart_id' => $cart->getKey(),
                 'product_id' => $product->getKey(),
                 'qty' => 0,
-                'unit_price_snapshot' => $product->price,
+                'unit_price_snapshot' => $product->priceInclVat(),
+                'unit_price_excl_vat_snapshot' => $product->priceExclVat(),
             ]);
 
             if (! $item->exists) {

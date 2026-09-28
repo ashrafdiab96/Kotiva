@@ -1,0 +1,218 @@
+{
+  "generated_by": "docs/pricing/extract-brochure-prices.mjs",
+  "vat_rate": 0.15,
+  "sources": {
+    "exclusive": "A2 BROCHURE WITH PRICES WITHOUT TAXES.pdf",
+    "inclusive": "A2 BROCHURE WITH PRICES.pdf"
+  },
+  "counts": {
+    "products": 25,
+    "exclusive_prices_found": 25,
+    "inclusive_prices_found": 25,
+    "exclusive_price_tokens": 25,
+    "inclusive_price_tokens": 25
+  },
+  "problems": [],
+  "products": [
+    {
+      "sku": "KOT001",
+      "brochure_heading": "Kotiva Micellar Water with",
+      "price_excl_vat": "135.00",
+      "price_incl_vat": "155.25",
+      "implied_incl_at_15pct": "155.25",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT002",
+      "brochure_heading": "kotiva acne cleansing gel",
+      "price_excl_vat": "145.00",
+      "price_incl_vat": "166.75",
+      "implied_incl_at_15pct": "166.75",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT003",
+      "brochure_heading": "kotiva Hyaluronic Facial Cleanser",
+      "price_excl_vat": "135.00",
+      "price_incl_vat": "155.25",
+      "implied_incl_at_15pct": "155.25",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT004",
+      "brochure_heading": "kotiva Facial Foam for Sensitive Skin",
+      "price_excl_vat": "135.00",
+      "price_incl_vat": "155.25",
+      "implied_incl_at_15pct": "155.25",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT005",
+      "brochure_heading": "Kotiva Glow up Water Essence Toner",
+      "price_excl_vat": "150.00",
+      "price_incl_vat": "172.50",
+      "implied_incl_at_15pct": "172.50",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT006",
+      "brochure_heading": "Kotiva Oil Control Foam",
+      "price_excl_vat": "145.00",
+      "price_incl_vat": "166.75",
+      "implied_incl_at_15pct": "166.75",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT007",
+      "brochure_heading": "Kotiva Face and Body Cleansing Foam",
+      "price_excl_vat": "135.00",
+      "price_incl_vat": "155.25",
+      "implied_incl_at_15pct": "155.25",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT008",
+      "brochure_heading": "Kotiva Post Fillers Lip Balm",
+      "price_excl_vat": "120.00",
+      "price_incl_vat": "138.00",
+      "implied_incl_at_15pct": "138.00",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT009",
+      "brochure_heading": "Kotiva Sun Protection Spf 50+",
+      "price_excl_vat": "160.00",
+      "price_incl_vat": "184.00",
+      "implied_incl_at_15pct": "184.00",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT010",
+      "brochure_heading": "Kotiva After Sun Cream",
+      "price_excl_vat": "120.00",
+      "price_incl_vat": "138.00",
+      "implied_incl_at_15pct": "138.00",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT011",
+      "brochure_heading": "Kotiva Younger Hand Cream",
+      "price_excl_vat": "125.00",
+      "price_incl_vat": "143.75",
+      "implied_incl_at_15pct": "143.75",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT012",
+      "brochure_heading": "Kotiva Whitening Hand Cream",
+      "price_excl_vat": "235.00",
+      "price_incl_vat": "270.25",
+      "implied_incl_at_15pct": "270.25",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT013",
+      "brochure_heading": "Kotiva Anti-Perspirant Roll On",
+      "price_excl_vat": "80.00",
+      "price_incl_vat": "92.00",
+      "implied_incl_at_15pct": "92.00",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT014",
+      "brochure_heading": "Kotiva Whitening Anti-Perspirant Roll On",
+      "price_excl_vat": "150.00",
+      "price_incl_vat": "172.50",
+      "implied_incl_at_15pct": "172.50",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT015",
+      "brochure_heading": "Kotiva Hydroshield Post Laser Cream",
+      "price_excl_vat": "170.00",
+      "price_incl_vat": "195.50",
+      "implied_incl_at_15pct": "195.50",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT016",
+      "brochure_heading": "Kotiva Triple Action Whitening Day Cream",
+      "price_excl_vat": "350.00",
+      "price_incl_vat": "402.50",
+      "implied_incl_at_15pct": "402.50",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT017",
+      "brochure_heading": "Kotiva Triple Action Whitening Night Cream",
+      "price_excl_vat": "350.00",
+      "price_incl_vat": "402.50",
+      "implied_incl_at_15pct": "402.50",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT018",
+      "brochure_heading": "Kotiva Triple Action Bikini Area Whitening Cream",
+      "price_excl_vat": "350.00",
+      "price_incl_vat": "402.50",
+      "implied_incl_at_15pct": "402.50",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT019",
+      "brochure_heading": "Kotiva Triple Action Whitening Wash Gel for Sensitive Area",
+      "price_excl_vat": "145.00",
+      "price_incl_vat": "166.75",
+      "implied_incl_at_15pct": "166.75",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT020",
+      "brochure_heading": "Kotiva Acne Control",
+      "price_excl_vat": "150.00",
+      "price_incl_vat": "172.50",
+      "implied_incl_at_15pct": "172.50",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT021",
+      "brochure_heading": "Kotiva Pores Off Serum",
+      "price_excl_vat": "200.00",
+      "price_incl_vat": "230.00",
+      "implied_incl_at_15pct": "230.00",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT022",
+      "brochure_heading": "Kotiva UV Balance Spf 50+",
+      "price_excl_vat": "160.00",
+      "price_incl_vat": "184.00",
+      "implied_incl_at_15pct": "184.00",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT023",
+      "brochure_heading": "Kotiva Anti-Hair Loss Ampoules",
+      "price_excl_vat": "300.00",
+      "price_incl_vat": "345.00",
+      "implied_incl_at_15pct": "345.00",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT024",
+      "brochure_heading": "Kotiva Anti-Hair Loss Shampoo",
+      "price_excl_vat": "150.00",
+      "price_incl_vat": "172.50",
+      "implied_incl_at_15pct": "172.50",
+      "brochures_agree": true
+    },
+    {
+      "sku": "KOT025",
+      "brochure_heading": "Siliscar Gel",
+      "price_excl_vat": "300.00",
+      "price_incl_vat": "345.00",
+      "implied_incl_at_15pct": "345.00",
+      "brochures_agree": true
+    }
+  ]
+}

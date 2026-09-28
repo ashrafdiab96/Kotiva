@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Enums\StockMovementReason;
+use App\Filament\Concerns\ReportsVatDiscrepancy;
 use App\Filament\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\StockService;
@@ -13,6 +14,8 @@ use Filament\Resources\Pages\CreateRecord;
 
 final class CreateProduct extends CreateRecord
 {
+    use ReportsVatDiscrepancy;
+
     protected static string $resource = ProductResource::class;
 
     /**
@@ -39,6 +42,8 @@ final class CreateProduct extends CreateRecord
 
     protected function afterCreate(): void
     {
+        $this->reportVatDiscrepancy();
+
         if ($this->openingStock === 0) {
             return;
         }

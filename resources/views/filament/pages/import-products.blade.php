@@ -15,7 +15,10 @@
     <x-filament::section>
         <x-slot name="heading">1. Choose a file</x-slot>
         <x-slot name="description">
-            A .csv or .xlsx file with a header row. Required columns: SKU, name, price, category.
+            A .csv or .xlsx file with a header row. Required columns: SKU, name, category, and at
+            least one price — "Price excl. VAT", "Price incl. VAT", or both. A plain "price" column
+            is read as VAT-inclusive, as it always was. Whichever price is missing is calculated at
+            the configured VAT rate and listed below; supply both and neither is ever recalculated.
             Lists (benefits, ingredients, free from, shop filters) are separated with a vertical bar: Hydrates|Plumps.
             Products are matched by SKU: existing ones are updated, new ones created.
         </x-slot>
@@ -127,6 +130,21 @@
                     @if ($errorCount > count($errorLines))
                         <li>…and {{ $errorCount - count($errorLines) }} more.</li>
                     @endif
+                </ul>
+            @endif
+
+            {{-- Amber, not red: these rows WILL import. They are listed because
+                 a price was calculated for them, or because the two prices in
+                 the file disagree at the configured VAT rate — neither is an
+                 error, and neither should be discovered from the shop. --}}
+            @if ($warningLines !== [])
+                <p style="margin-top:14px;font-weight:600;font-size:0.85rem;color:rgb(180,83,9);">
+                    Price notes — these rows will import as shown:
+                </p>
+                <ul style="margin-top:6px;padding-left:18px;list-style:disc;color:rgb(180,83,9);font-size:0.85rem;">
+                    @foreach ($warningLines as $line)
+                        <li>{{ $line }}</li>
+                    @endforeach
                 </ul>
             @endif
         </x-filament::section>

@@ -26,8 +26,11 @@ final class CsvExports
     {
         return self::stream('kotiva-products-template.csv', function ($out): void {
             fputcsv($out, array_keys(ProductImporter::FIELDS));
+            // Both prices, consistent at 15% — the shape an unedited export
+            // has, so the template teaches the round trip rather than the
+            // single-column habit the importer now has to warn about.
             fputcsv($out, array_map(self::safe(...), [
-                'KOT999', 'Kotiva Example Serum', '149.00', 'Serums', '', '', '50', '5',
+                'KOT999', 'Kotiva Example Serum', '149.00', '171.35', 'Serums', '', '', '50', '5',
                 'All Skin Types', 'Hydration', 'Hydrates', '30ml',
                 'One paragraph describing the product.',
                 'Hydrates|Plumps|Smooths', 'Apply two drops morning and night.', '',
@@ -49,7 +52,11 @@ final class CsvExports
 
             $query->with('category')->orderBy('sort_order')->lazy(200)->each(function (Product $p) use ($out): void {
                 fputcsv($out, array_map(self::safe(...), [
-                    $p->sku, $p->name, $p->price, $p->category->name, $p->slug,
+                    // Both prices are exported, so a re-import never has to
+                    // recalculate either one — an unedited round trip leaves
+                    // the catalog byte-identical, including a product whose two
+                    // prices deliberately disagree with the VAT rate.
+                    $p->sku, $p->name, $p->price_excl_vat, $p->price_incl_vat, $p->category->name, $p->slug,
                     $p->compare_at_price, $p->stock_qty, $p->low_stock_threshold,
                     $p->skin_type, $p->concern, $p->action, $p->volume,
                     $p->description, implode('|', $p->benefits ?? []), $p->how_to_use, $p->science,
@@ -73,7 +80,14 @@ final class CsvExports
             fputcsv($out, [
                 'order_no', 'placed_at', 'status', 'payment_status', 'payment_method',
                 'customer', 'email', 'phone', 'city', 'zone', 'units',
-                'subtotal', 'shipping_fee', 'vat_amount', 'grand_total', 'currency',
+                // The full VAT breakdown, so a bookkeeper can reconcile the
+                // export without reopening each order. subtotal keeps its
+                // original VAT-inclusive meaning; the net figure is a new
+                // column beside it rather than a changed one, because an
+                // existing saved report would otherwise start reading low.
+                'subtotal_excl_vat', 'subtotal', 'shipping_fee',
+                'product_vat_amount', 'shipping_vat_amount', 'vat_amount', 'vat_rate',
+                'grand_total', 'currency',
             ]);
 
             $query->with(['customer', 'shippingZone'])->withSum('items', 'qty')
@@ -83,7 +97,9 @@ final class CsvExports
                         $o->payment_status->label(), $o->payment_method->label(),
                         $o->customer?->fullName(), $o->customer?->email, $o->customer?->phone,
                         $o->shipping_city_name, $o->shippingZone?->name, (int) ($o->items_sum_qty ?? 0),
-                        $o->subtotal, $o->shipping_fee, $o->vat_amount, $o->grand_total, $o->currency,
+                        $o->subtotal_excl_vat, $o->subtotal, $o->shipping_fee,
+                        $o->product_vat_amount, $o->shipping_vat_amount, $o->vat_amount, $o->vat_rate,
+                        $o->grand_total, $o->currency,
                     ]));
                 });
         });

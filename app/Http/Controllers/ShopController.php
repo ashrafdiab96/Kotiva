@@ -86,8 +86,13 @@ final class ShopController extends Controller
     private function applySort(Builder $query, string $sort): Builder
     {
         return match ($sort) {
-            'price_asc' => $query->orderBy('price')->orderBy('name'),
-            'price_desc' => $query->orderByDesc('price')->orderBy('name'),
+            // Sorted on the price the listing DISPLAYS. Sorting on the
+            // inclusive price would be the same order today, but only because
+            // every product happens to share one VAT rate — the moment a
+            // product's two prices disagree, "Price: Low to High" would put
+            // the cards in an order the visible numbers contradict.
+            'price_asc' => $query->orderBy('price_excl_vat')->orderBy('name'),
+            'price_desc' => $query->orderByDesc('price_excl_vat')->orderBy('name'),
             'name_asc' => $query->orderBy('name'),
             'newest' => $query->orderByDesc('created_at')->orderByDesc('id'),
             // §6.1's default: featured first, then the curated sort_order.

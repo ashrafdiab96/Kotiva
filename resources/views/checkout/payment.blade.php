@@ -75,6 +75,9 @@
       <aside class="cart-summary" aria-label="Order summary">
         <h2 class="cart-summary-title">Summary</h2>
 
+        {{-- Line prices are VAT-inclusive, so they add up to the merchandise
+             figure below them and on to the total the shopper is about to
+             commit to. --}}
         @foreach ($review->lines as $line)
           <div class="cart-summary-row cart-summary-line">
             <span>{{ $line->product->displayName() }} &times; {{ $line->item->qty }}</span>
@@ -82,26 +85,10 @@
           </div>
         @endforeach
 
-        <div class="cart-summary-row">
-          <span>Subtotal</span>
-          <span>{{ config('kotiva.currency.code') }} {{ $review->subtotal }}</span>
-        </div>
-
-        <div class="cart-summary-row">
-          <span>Shipping</span>
-          <span>{{ $quote->feeLabel((string) config('kotiva.currency.code')) }}</span>
-        </div>
-
-        @if ($quote->estimateLabel)
-          <p class="cart-summary-note">Estimated delivery: {{ $quote->estimateLabel }}.</p>
-        @endif
-
-        <p class="cart-summary-note">All prices include 15% VAT.</p>
-
-        <div class="cart-summary-row cart-summary-total">
-          <span>Total</span>
-          <span>{{ config('kotiva.currency.code') }} {{ $grandTotal }}</span>
-        </div>
+        @include('checkout._summary', [
+          'totals' => $totals,
+          'shippingNote' => $quote->estimateLabel ? 'Estimated delivery: '.$quote->estimateLabel.'.' : null,
+        ])
 
         <a class="btn btn-outline cart-continue" href="{{ route('checkout.shipping') }}">Back to Shipping</a>
       </aside>

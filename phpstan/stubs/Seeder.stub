@@ -1,0 +1,20 @@
+<?php
+
+namespace Illuminate\Database;
+
+abstract class Seeder
+{
+    /**
+     * Illuminate\Database\Seeder declares this untyped, so it is NULL until a
+     * console command sets it — which is the state every seeder run from a test
+     * is in. The framework's own docblock says `Command`, and its own code then
+     * guards the property with isset(), so the docblock is simply wrong.
+     *
+     * Correcting it here rather than in our seeders means the null case is
+     * visible everywhere it actually exists, instead of each seeder having to
+     * redeclare an inherited property to say so.
+     *
+     * @var \Illuminate\Console\Command|null
+     */
+    protected $command;
+}

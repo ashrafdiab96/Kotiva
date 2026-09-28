@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Models\ShippingRate;
 use App\Models\ShippingZone;
+use App\Support\Money;
+use App\Support\Vat;
 
 /**
  * Works out what delivery costs and how long it takes.
@@ -17,11 +19,17 @@ use App\Models\ShippingZone;
 final class ShippingCalculator
 {
     /**
-     * Quote delivery for a zone at a given subtotal.
+     * Quote delivery for a zone against a merchandise total.
      *
      * A zone with no active rate returns an unavailable quote rather than a
      * free one. Defaulting to zero would silently ship for nothing the first
      * time someone adds a zone and forgets its rate.
+     *
+     * `$subtotal` is the FREE-SHIPPING BASIS amount, not "the subtotal" —
+     * there are now two merchandise totals and they differ by the VAT. Callers
+     * should get this from MoneyTotals::freeShippingBasisAmount() rather than
+     * choosing one, so a 300.00 threshold cannot mean 300.00 net on one page
+     * and 300.00 gross on the next. See App\Support\Vat::freeShippingBasis().
      */
     public function quote(?ShippingZone $zone, string $subtotal): ShippingQuote
     {
@@ -62,17 +70,34 @@ final class ShippingCalculator
             return null;
         }
 
-        $remaining = bcsub($quote->freeShippingThreshold, $subtotal, 2);
+        $remaining = Money::sub($quote->freeShippingThreshold, $subtotal);
 
-        return bccomp($remaining, '0.00', 2) > 0 ? $remaining : null;
+        return Money::isPositive($remaining) ? $remaining : null;
     }
 
     /**
-     * Grand total = subtotal + shipping - discount. Prices already include
-     * VAT, so nothing is added for tax here.
+     * The full breakdown for a basket with this quote applied: merchandise net
+     * and gross, product VAT, delivery and its VAT, and the payable total.
+     *
+     * Replaces the old grandTotal(): with two authoritative prices per product
+     * and a configurable delivery treatment, a bare `subtotal + fee - discount`
+     * no longer says which subtotal it means, and a caller passing the
+     * VAT-exclusive one would undercharge the customer by the VAT. Handing back
+     * a breakdown makes that mistake unrepresentable.
      */
-    public function grandTotal(string $subtotal, string $shippingFee, string $discount = '0.00'): string
-    {
-        return bcsub(bcadd($subtotal, $shippingFee, 2), $discount, 2);
+    public function totals(
+        ?ShippingZone $zone,
+        string $merchandiseExclVat,
+        string $merchandiseInclVat,
+        string $discount = '0.00',
+    ): MoneyTotals {
+        $basis = Vat::freeShippingAmount($merchandiseExclVat, $merchandiseInclVat);
+
+        return MoneyTotals::withShipping(
+            merchandiseExclVat: $merchandiseExclVat,
+            merchandiseInclVat: $merchandiseInclVat,
+            quote: $this->quote($zone, $basis),
+            discountTotal: $discount,
+        );
     }
 }

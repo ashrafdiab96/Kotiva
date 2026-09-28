@@ -321,29 +321,68 @@ final class OrderResource extends Resource
                             Infolists\Components\TextEntry::make('name_snapshot')->label('Product')->weight('bold'),
                             Infolists\Components\TextEntry::make('sku_snapshot')->label('SKU')->color('gray'),
                             Infolists\Components\TextEntry::make('qty')->label('Qty'),
+                            Infolists\Components\TextEntry::make('unit_price_excl_vat')
+                                ->label('Unit excl. VAT')
+                                ->money(fn (OrderItem $record): string => $record->order->currency),
+                            Infolists\Components\TextEntry::make('unit_price')
+                                ->label('Unit incl. VAT')
+                                ->money(fn (OrderItem $record): string => $record->order->currency),
                             Infolists\Components\TextEntry::make('line_total')
-                                ->label('Line total')
+                                ->label('Line total incl. VAT')
                                 // The line's own order, so a reprint shows the
                                 // currency the customer was charged in rather
                                 // than today's default.
                                 ->money(fn (OrderItem $record): string => $record->order->currency),
+                            Infolists\Components\TextEntry::make('vat_amount')
+                                ->label('Line VAT')
+                                ->money(fn (OrderItem $record): string => $record->order->currency)
+                                ->helperText(fn (OrderItem $record): string => 'At '.$record->vatRateLabel()),
                         ]),
                 ]),
 
+            /*
+             | The same breakdown the customer saw, from the order's own
+             | snapshots at the rate it was placed at. Six entries rather than
+             | four because "VAT" on its own no longer answers the question an
+             | admin is usually being asked on the phone — which part of it is
+             | on the goods and which on the delivery.
+             */
             Infolists\Components\Section::make('Totals')
-                ->columns(4)
+                ->columns(3)
                 ->schema([
-                    Infolists\Components\TextEntry::make('subtotal')->money(fn (Order $record): string => $record->currency),
-                    Infolists\Components\TextEntry::make('shipping_fee')->label('Shipping')->money(fn (Order $record): string => $record->currency),
-                    Infolists\Components\TextEntry::make('vat_amount')
-                        ->label('VAT included')
+                    Infolists\Components\TextEntry::make('subtotal_excl_vat')
+                        ->label('Merchandise excl. VAT')
+                        ->money(fn (Order $record): string => $record->currency),
+                    Infolists\Components\TextEntry::make('product_vat_amount')
+                        ->label('VAT on goods')
+                        ->money(fn (Order $record): string => $record->currency),
+                    Infolists\Components\TextEntry::make('subtotal')
+                        ->label('Merchandise incl. VAT')
+                        ->money(fn (Order $record): string => $record->currency),
+                    Infolists\Components\TextEntry::make('shipping_fee')
+                        ->label('Shipping')
+                        ->money(fn (Order $record): string => $record->currency),
+                    Infolists\Components\TextEntry::make('shipping_vat_amount')
+                        ->label('VAT on shipping')
                         ->money(fn (Order $record): string => $record->currency)
-                        ->helperText('Prices are VAT-inclusive; this is the portion, not an addition.'),
+                        ->helperText(fn (Order $record): string => 'Rate applied: '.$record->vatRateLabel()),
+                    Infolists\Components\TextEntry::make('vat_amount')
+                        ->label('VAT included (total)')
+                        ->money(fn (Order $record): string => $record->currency)
+                        ->helperText('Contained in the total below, never added to it.'),
                     Infolists\Components\TextEntry::make('grand_total')
                         ->label('Total')
                         ->money(fn (Order $record): string => $record->currency)
                         ->weight('bold')
                         ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
+                    // A stored breakdown that no longer adds up is worth
+                    // surfacing where somebody will see it, not leaving for a
+                    // customer to find.
+                    Infolists\Components\TextEntry::make('reconciles')
+                        ->label('Breakdown')
+                        ->badge()
+                        ->state(fn (Order $record): string => $record->totalsReconcile() ? 'Reconciles' : 'Does not reconcile')
+                        ->color(fn (Order $record): string => $record->totalsReconcile() ? 'success' : 'danger'),
                 ]),
 
             Infolists\Components\Section::make('Timeline')

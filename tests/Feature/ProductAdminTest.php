@@ -188,7 +188,8 @@ final class ProductAdminTest extends TestCase
                 'sku' => 'KOT-TEST-1',
                 'slug' => 'test-serum',
                 'category_id' => $category->getKey(),
-                'price' => '120.00',
+                'price_excl_vat' => '120.00',
+                'price_incl_vat' => '138.00',
                 'initial_stock' => 12,
                 'low_stock_threshold' => 3,
             ])

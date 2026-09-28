@@ -22,7 +22,19 @@ final class ProductResource extends JsonResource
             'id' => $this->id,
             'slug' => $this->slug,
             'name' => $this->name,
-            'price' => (float) $this->price,
+            /*
+             | `price` is the VAT-EXCLUSIVE figure, because that is what the
+             | Routine Finder renders next to a product and what the shop shows
+             | beside it — the quiz result and the listing must not disagree.
+             |
+             | Both prices are sent so a consumer never has to apply a rate
+             | itself, and `price_vat` names which one `price` is rather than
+             | leaving it to be inferred.
+             */
+            'price' => (float) $this->price_excl_vat,
+            'price_vat' => 'excluded',
+            'price_excl_vat' => (float) $this->price_excl_vat,
+            'price_incl_vat' => (float) $this->price_incl_vat,
             'currency' => config('kotiva.currency.code'),
             'image' => $this->imageUrl(),
             'url' => route('product.show', ['slug' => $this->slug]),

@@ -27,9 +27,49 @@ return [
         'decimals' => 2,
     ],
 
-    // Prices are stored and displayed VAT-inclusive. This rate is only used to
-    // compute the informational VAT portion shown on orders and invoices.
+    /*
+     | Products carry BOTH brochure prices — price_excl_vat and price_incl_vat —
+     | and both are authoritative. This rate is what the storefront labels a VAT
+     | line with, what the VAT portion of an order is derived at, and what an
+     | admin edit is checked against. It never replaces a supplied price.
+     |
+     | The dashboard's VAT field overrides this at runtime; see App\Support\Vat.
+     */
     'vat_rate' => (float) env('KOTIVA_VAT_RATE', 0.15),
+
+    'vat' => [
+        /*
+         | How a delivery fee is treated for VAT — kept separate from the
+         | product rate because it is a separate business decision.
+         |
+         | `inclusive` is the rule this project shipped with: the stored fee
+         | already contains VAT, so its VAT is extracted for the breakdown and
+         | the payable total does not move. `exempt` reports no VAT on delivery.
+         | `exclusive` treats the stored fee as net and adds VAT to it, which is
+         | the only value that changes what a customer pays.
+         |
+         | See App\Support\Vat::SHIPPING_* for the accepted values.
+         */
+        'shipping_mode' => env('KOTIVA_SHIPPING_VAT_MODE', 'inclusive'),
+
+        /*
+         | Which merchandise total a free-shipping threshold is measured
+         | against. The cart now shows VAT-exclusive figures and checkout shows
+         | VAT-inclusive ones, so "the subtotal" is two different numbers and
+         | the threshold has to name the one it means.
+         |
+         | `incl` reproduces the existing rule, under which the seeded 300.00
+         | thresholds were approved.
+         */
+        'free_shipping_basis' => env('KOTIVA_FREE_SHIPPING_BASIS', 'incl'),
+
+        /*
+         | How far the two brochure prices may disagree at the configured rate
+         | before an admin edit or an import is flagged for review. Neither
+         | figure is ever silently corrected — the discrepancy is reported.
+         */
+        'price_tolerance' => env('KOTIVA_VAT_PRICE_TOLERANCE', '0.01'),
+    ],
 
     'order_number' => [
         'prefix' => 'KOT-',

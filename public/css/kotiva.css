@@ -2026,6 +2026,9 @@ html[data-mode="dark"] .nav-theme-btn .icon-sun  { display: block; }
   display: flex;
   align-items: baseline;
   gap: 8px;
+  /* The price now carries an "excl. VAT" qualifier, so on a narrow card the
+     row is allowed to wrap rather than push the volume out of the card. */
+  flex-wrap: wrap;
 }
 .bs-card-price {
   font-family: var(--font-ui);
@@ -2033,6 +2036,18 @@ html[data-mode="dark"] .nav-theme-btn .icon-sun  { display: block; }
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--accent-light);
+}
+/* Same treatment as .product-card-price small on the shop listing, so the two
+   price labels read as one system. Inherits colour from the price rather than
+   setting its own: the rail sits on a dark plinth where the shop's --fg-dim
+   would disappear. */
+.bs-card-price small {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-left: 5px;
+  opacity: 0.72;
 }
 .bs-card-vol {
   font-family: var(--font-ui);

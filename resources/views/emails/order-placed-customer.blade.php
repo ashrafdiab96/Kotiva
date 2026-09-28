@@ -42,7 +42,7 @@ Your order {{ $order->order_no }} is confirmed. Pay {{ $order->currency }} {{ $o
       <tr>
         <td style="padding:12px 0; border-bottom:1px solid {{ $hairline }};">
           <div style="font-family:{{ $display }}; font-size:12px; font-weight:bold; letter-spacing:0.06em; text-transform:uppercase; color:{{ $ink }};">{{ $item->name_snapshot }}</div>
-          <div style="font-size:14px; color:{{ $muted }}; padding-top:4px;">{{ $item->sku_snapshot }} &middot; {{ $order->currency }} {{ $item->unit_price }} &times; {{ $item->qty }}</div>
+          <div style="font-size:14px; color:{{ $muted }}; padding-top:4px;">{{ $item->sku_snapshot }} &middot; {{ $order->currency }} {{ $item->unit_price }} incl. VAT &times; {{ $item->qty }}</div>
         </td>
         <td align="right" valign="top" style="padding:12px 0; border-bottom:1px solid {{ $hairline }}; font-family:{{ $display }}; font-size:13px; font-weight:bold; color:{{ $ink }}; white-space:nowrap;">
           {{ $order->currency }} {{ $item->line_total }}
@@ -53,8 +53,20 @@ Your order {{ $order->order_no }} is confirmed. Pay {{ $order->currency }} {{ $o
 
   <!-- Totals -->
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;">
+    {{-- The same breakdown, in the same order, as the confirmation page and
+         the packing slip. All of it from the order's own snapshots at the rate
+         it was placed at, so a reprint years later still describes the
+         transaction that actually happened. --}}
     <tr>
-      <td style="padding:6px 0; font-size:15px; color:{{ $muted }};">Subtotal</td>
+      <td style="padding:6px 0; font-size:15px; color:{{ $muted }};">Merchandise (excl. VAT)</td>
+      <td align="right" style="padding:6px 0; font-size:15px; color:{{ $ink }};">{{ $order->currency }} {{ $order->subtotal_excl_vat }}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 0; font-size:15px; color:{{ $muted }};">VAT ({{ $order->vatRateLabel() }})</td>
+      <td align="right" style="padding:6px 0; font-size:15px; color:{{ $ink }};">{{ $order->currency }} {{ $order->vat_amount }}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 0; font-size:15px; color:{{ $muted }};">Merchandise (incl. VAT)</td>
       <td align="right" style="padding:6px 0; font-size:15px; color:{{ $ink }};">{{ $order->currency }} {{ $order->subtotal }}</td>
     </tr>
     <tr>
@@ -63,9 +75,15 @@ Your order {{ $order->order_no }} is confirmed. Pay {{ $order->currency }} {{ $o
         {{ bccomp((string) $order->shipping_fee, '0.00', 2) === 0 ? 'Free' : $order->currency.' '.$order->shipping_fee }}
       </td>
     </tr>
+    @if (bccomp((string) $order->discount_total, '0.00', 2) !== 0)
+      <tr>
+        <td style="padding:6px 0; font-size:15px; color:{{ $muted }};">Discount</td>
+        <td align="right" style="padding:6px 0; font-size:15px; color:{{ $ink }};">&minus; {{ $order->currency }} {{ $order->discount_total }}</td>
+      </tr>
+    @endif
     <tr>
       <td colspan="2" style="padding:6px 0 14px; font-size:13px; color:{{ $muted }};">
-        Includes {{ $order->currency }} {{ $order->vat_amount }} VAT.
+        Total includes {{ $order->currency }} {{ $order->vat_amount }} VAT at {{ $order->vatRateLabel() }}.
       </td>
     </tr>
     <tr>

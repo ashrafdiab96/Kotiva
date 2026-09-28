@@ -24,7 +24,7 @@ final class ProductApiController extends Controller
             ->active()
             ->orderBy('id')
             ->get([
-                'id', 'slug', 'name', 'price', 'image',
+                'id', 'slug', 'name', 'price_excl_vat', 'price_incl_vat', 'image',
                 'filter_tags', 'stock_qty', 'category_id',
                 'skin_type', 'concern',
             ]);

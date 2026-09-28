@@ -24,6 +24,11 @@ final class SettingsSeeder extends Seeder
             'cart_ttl_hours' => (int) config('kotiva.cart.ttl_hours'),
             'low_stock_threshold' => (int) config('kotiva.stock.low_stock_threshold'),
             'vat_rate' => (float) config('kotiva.vat_rate'),
+            // Seeded so the Settings page shows the rules the storefront is
+            // actually applying, rather than two empty selects that look
+            // unconfigured on a fresh install.
+            'shipping_vat_mode' => (string) config('kotiva.vat.shipping_mode'),
+            'free_shipping_basis' => (string) config('kotiva.vat.free_shipping_basis'),
             'announcement_bar' => [
                 'enabled' => false,
                 'text' => '',

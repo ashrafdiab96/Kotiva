@@ -25,6 +25,9 @@
     drawerPanel: '.mini-cart-panel',
     drawerBody: '[data-mini-cart-items]',
     drawerSubtotal: '[data-mini-cart-subtotal]',
+    drawerVat: '[data-mini-cart-vat]',
+    drawerVatLabel: '[data-mini-cart-vat-label]',
+    drawerTotal: '[data-mini-cart-total]',
     drawerEmpty: '[data-mini-cart-empty]',
     badge: '[data-cart-badge]'
   };
@@ -150,6 +153,9 @@
 
     var body = el.querySelector(SELECTORS.drawerBody);
     var subtotal = el.querySelector(SELECTORS.drawerSubtotal);
+    var vat = el.querySelector(SELECTORS.drawerVat);
+    var vatLabel = el.querySelector(SELECTORS.drawerVatLabel);
+    var total = el.querySelector(SELECTORS.drawerTotal);
     var empty = el.querySelector(SELECTORS.drawerEmpty);
     var items = payload.items || [];
 
@@ -162,14 +168,20 @@
             '</a>' +
             '<div class="mini-cart-item-body">' +
               '<a class="mini-cart-item-name" href="' + escapeHtml(item.url) + '">' + escapeHtml(item.name) + '</a>' +
-              '<div class="mini-cart-item-meta">' + item.qty + ' &times; ' + escapeHtml(money(payload.currency, item.unit_price)) + '</div>' +
+              '<div class="mini-cart-item-meta">' + item.qty + ' &times; ' + escapeHtml(money(payload.currency, item.unit_price)) + ' <small>excl. VAT</small></div>' +
             '</div>' +
             '<div class="mini-cart-item-total">' + escapeHtml(money(payload.currency, item.line_total)) + '</div>' +
           '</li>';
       }).join('');
     }
 
+    /* Net, VAT and gross all come off the response. The rate LABEL comes off
+       it too, rather than being hardcoded here, so changing the VAT rate in
+       the dashboard does not leave "15%" printed in a cached script. */
     if (subtotal) { subtotal.textContent = money(payload.currency, payload.subtotal); }
+    if (vat) { vat.textContent = money(payload.currency, payload.vat_amount); }
+    if (vatLabel) { vatLabel.textContent = 'VAT (' + (payload.vat_rate_label || '') + ')'; }
+    if (total) { total.textContent = money(payload.currency, payload.total_incl_vat); }
     if (empty) { empty.hidden = items.length > 0; }
     el.classList.toggle('is-empty', items.length === 0);
   }
@@ -331,7 +343,6 @@
     var citySelect = form.querySelector('[data-shipping-city]');
     var feeOut = document.querySelector('[data-shipping-fee]');
     var estimateOut = document.querySelector('[data-shipping-estimate]');
-    var subtotalInput = form.querySelector('input[name="subtotal"]');
     if (!zoneSelect || !citySelect) { return; }
 
     /* The full list is in the DOM already; narrowing hides the groups that do
@@ -369,9 +380,10 @@
         return;
       }
 
-      var subtotal = subtotalInput ? subtotalInput.value : '0.00';
-      var url = '/api/shipping/cities?zone_id=' + encodeURIComponent(zoneId) +
-                '&subtotal=' + encodeURIComponent(subtotal);
+      /* Only the zone is sent. The server prices the quote against its own
+         cart — a subtotal posted from here would let anyone ask the endpoint
+         to confirm free delivery on a basket that does not qualify. */
+      var url = '/api/shipping/cities?zone_id=' + encodeURIComponent(zoneId);
 
       fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
         .then(function (res) { return res.json(); })

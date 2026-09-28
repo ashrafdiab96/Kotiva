@@ -26,12 +26,17 @@
         @foreach ($review->unavailableLines() as $line)
           <p><strong>{{ $line->product->displayName() }}</strong> is no longer available and will be removed.</p>
         @endforeach
+        {{-- Quoted in the currency the shopper was shown — excluding VAT, the
+             figure on the product card and in the cart — with the payable
+             inclusive price beside it so there is no second surprise at the
+             total. Fires when EITHER stored price has moved. --}}
         @foreach ($review->changedLines() as $line)
           <p>
             <strong>{{ $line->product->displayName() }}</strong>
             {{ $line->priceWentUp() ? 'has increased' : 'has decreased' }} from
-            {{ config('kotiva.currency.code') }} {{ $line->previousPrice }} to
-            {{ config('kotiva.currency.code') }} {{ $line->unitPrice }}.
+            {{ config('kotiva.currency.code') }} {{ $line->previousPriceExclVat }} to
+            {{ config('kotiva.currency.code') }} {{ $line->unitPriceExclVat }} excluding VAT
+            ({{ config('kotiva.currency.code') }} {{ $line->unitPrice }} including VAT).
           </p>
         @endforeach
       </div>
@@ -54,7 +59,10 @@
                 <div class="cart-item-body">
                   <a class="cart-item-name" href="{{ route('product.show', ['slug' => $line->product->slug]) }}">{{ $line->product->displayName() }}</a>
                   <div class="cart-item-meta">{{ $line->product->category->name }}@if ($line->product->volume) &middot; {{ $line->product->volume }}@endif</div>
-                  <div class="cart-item-unit">{{ config('kotiva.currency.code') }} {{ $line->unitPrice }} &times; {{ $line->item->qty }}</div>
+                  {{-- Checkout prices VAT-inclusive from here on: this is the
+                       figure the customer pays, and the line totals have to
+                       add up to it. --}}
+                  <div class="cart-item-unit">{{ config('kotiva.currency.code') }} {{ $line->unitPrice }} <small>incl. VAT</small> &times; {{ $line->item->qty }}</div>
                   @if ($line->unavailable)
                     <p class="cart-item-warn">No longer available</p>
                   @endif
@@ -69,17 +77,7 @@
       <aside class="cart-summary" aria-label="Order summary">
         <h2 class="cart-summary-title">Summary</h2>
 
-        <div class="cart-summary-row">
-          <span>Subtotal</span>
-          <span>{{ config('kotiva.currency.code') }} {{ $review->subtotal }}</span>
-        </div>
-
-        <div class="cart-summary-row cart-summary-muted">
-          <span>Shipping</span>
-          <span>Calculated next</span>
-        </div>
-
-        <p class="cart-summary-note">All prices include 15% VAT.</p>
+        @include('checkout._summary', ['totals' => $totals, 'undetermined' => 'Calculated next'])
 
         <a class="btn btn-primary cart-checkout" href="{{ route('checkout.shipping') }}">Continue to Shipping</a>
         <a class="btn btn-outline cart-continue" href="{{ route('cart.index') }}">Back to Cart</a>

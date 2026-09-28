@@ -58,9 +58,14 @@ final class CheckoutController extends Controller
             return redirect()->route('cart.index');
         }
 
+        $review = $this->checkout->review($cart);
+
         return view('checkout.review', [
             'step' => 'review',
-            'review' => $this->checkout->review($cart),
+            'review' => $review,
+            // Merchandise only: no address yet, so delivery is unresolved and
+            // nothing on this step may be presented as the payable total.
+            'totals' => $review->totals,
         ]);
     }
 
@@ -72,12 +77,19 @@ final class CheckoutController extends Controller
             return redirect()->route('cart.index');
         }
 
-        $review = $this->checkout->review($cart);
         $saved = $request->session()->get(self::SESSION_DETAILS, []);
+
+        // Priced with whatever area was chosen last, so returning to this step
+        // shows the delivery fee already agreed rather than blanking it.
+        $review = $this->checkout->reviewWithShipping(
+            $cart,
+            ShippingZone::query()->find($saved['zone_id'] ?? null)
+        );
 
         return view('checkout.shipping', [
             'step' => 'shipping',
             'review' => $review,
+            'totals' => $review->totals,
             'zones' => ShippingZone::query()->active()->orderBy('sort_order')->get(),
 
             /*
@@ -138,9 +150,16 @@ final class CheckoutController extends Controller
         }
 
         $details = CheckoutDetails::fromSession($saved);
-        $review = $this->checkout->review($cart);
         $zone = ShippingZone::query()->find($details->zoneId);
-        $quote = $this->shipping->quote($zone, $review->subtotal);
+
+        /*
+         | The same breakdown the shipping step showed and the same one
+         | place() will charge — built from the cart and the chosen zone, never
+         | carried forward in the session. A total held in the session is a
+         | total that can be stale by the time it is paid.
+         */
+        $review = $this->checkout->reviewWithShipping($cart, $zone);
+        $quote = $this->shipping->quote($zone, $review->totals->freeShippingBasisAmount());
 
         // Issued per render and cleared by the first successful placement, so
         // a double submit (or a back-then-resubmit) cannot create two orders.
@@ -150,12 +169,9 @@ final class CheckoutController extends Controller
         return view('checkout.payment', [
             'step' => 'payment',
             'review' => $review,
+            'totals' => $review->totals,
             'details' => $details,
             'quote' => $quote,
-            'grandTotal' => $this->shipping->grandTotal(
-                $review->subtotal,
-                $quote->available ? $quote->fee : '0.00'
-            ),
             'checkoutToken' => $token,
             'codEnabled' => $this->gateways->isEnabled(PaymentMethod::CashOnDelivery),
         ]);
