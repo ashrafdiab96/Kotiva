@@ -329,6 +329,45 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
   .quiz-why{margin-top:-24px;}
   .result-summary{padding:22px 20px;}
 }
+
+/* ── ADDED 2026-09-29 (Amendment 1): image cards for the Skin Type and
+      Concerns steps. Image and label are one button, every image is the
+      same square crop (public/img/quiz, 480px WebP). ── */
+.quiz-option-media{
+  display:block;aspect-ratio:1/1;overflow:hidden;flex-shrink:0;
+  background:var(--bg-alt);border:1px solid var(--border);
+}
+.quiz-option-media img{
+  display:block;width:100%;height:100%;object-fit:cover;
+  transition:transform .4s;
+}
+.quiz-option:hover .quiz-option-media img{transform:scale(1.04);}
+.quiz-option.selected .quiz-option-media{border-color:var(--bronze);}
+
+/* Skin type — image left, text right */
+.quiz-option--row{
+  flex-direction:row;align-items:center;gap:20px;padding:12px 20px 12px 12px;
+}
+.quiz-option--row .quiz-option-media{width:112px;}
+.quiz-option--row .quiz-option-text{display:flex;flex-direction:column;gap:8px;}
+
+/* Concerns — image tile with the label underneath */
+.quiz-options--tiles{grid-template-columns:repeat(4,1fr);}
+.quiz-option--tile{padding:10px 10px 14px;gap:12px;position:relative;}
+.quiz-option--tile .quiz-option-head{justify-content:center;text-align:center;min-height:2.6em;}
+.quiz-option--tile .quiz-option-title{font-size:11px;line-height:1.3;}
+.quiz-option--tile .quiz-rank{
+  position:absolute;top:16px;left:16px;z-index:1;
+  width:24px;height:24px;font-size:10px;
+  background:var(--bg);
+}
+@media (max-width:860px){
+  .quiz-options--tiles{grid-template-columns:repeat(3,1fr);}
+}
+@media (max-width:680px){
+  .quiz-options--tiles{grid-template-columns:repeat(2,1fr);}
+  .quiz-option--row .quiz-option-media{width:88px;}
+}
 </style>
 @endverbatim
 @endpush
@@ -431,21 +470,33 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
           <h2 class="quiz-question">WHAT IS YOUR<br>SKIN TYPE?</h2>
           <p class="quiz-sub">Select the option that best describes how your skin normally feels by midday.</p>
           <div class="quiz-options">
-            <button class="quiz-option" type="button" aria-pressed="false" data-value="oily">
-              <span class="quiz-option-head"><span class="quiz-option-title">Oily</span></span>
-              <span class="quiz-option-desc">Shiny by midday, enlarged pores, prone to breakouts</span>
+            <button class="quiz-option quiz-option--row" type="button" aria-pressed="false" data-value="oily">
+              <span class="quiz-option-media"><img src="/img/quiz/skin-oily.webp" alt="" width="480" height="480" loading="lazy"></span>
+              <span class="quiz-option-text">
+                <span class="quiz-option-head"><span class="quiz-option-title">Oily</span></span>
+                <span class="quiz-option-desc">Shiny by midday, enlarged pores, prone to breakouts</span>
+              </span>
             </button>
-            <button class="quiz-option" type="button" aria-pressed="false" data-value="dry">
-              <span class="quiz-option-head"><span class="quiz-option-title">Dry</span></span>
-              <span class="quiz-option-desc">Tight, flaky, or rough — especially after cleansing</span>
+            <button class="quiz-option quiz-option--row" type="button" aria-pressed="false" data-value="dry">
+              <span class="quiz-option-media"><img src="/img/quiz/skin-dry.webp" alt="" width="480" height="480" loading="lazy"></span>
+              <span class="quiz-option-text">
+                <span class="quiz-option-head"><span class="quiz-option-title">Dry</span></span>
+                <span class="quiz-option-desc">Tight, flaky, or rough — especially after cleansing</span>
+              </span>
             </button>
-            <button class="quiz-option" type="button" aria-pressed="false" data-value="combination">
-              <span class="quiz-option-head"><span class="quiz-option-title">Combination</span></span>
-              <span class="quiz-option-desc">Oily T-zone but dry or normal cheeks</span>
+            <button class="quiz-option quiz-option--row" type="button" aria-pressed="false" data-value="combination">
+              <span class="quiz-option-media"><img src="/img/quiz/skin-combination.webp" alt="" width="480" height="480" loading="lazy"></span>
+              <span class="quiz-option-text">
+                <span class="quiz-option-head"><span class="quiz-option-title">Combination</span></span>
+                <span class="quiz-option-desc">Oily T-zone but dry or normal cheeks</span>
+              </span>
             </button>
-            <button class="quiz-option" type="button" aria-pressed="false" data-value="balanced">
-              <span class="quiz-option-head"><span class="quiz-option-title">Balanced</span></span>
-              <span class="quiz-option-desc">Comfortable and even, minimal shine</span>
+            <button class="quiz-option quiz-option--row" type="button" aria-pressed="false" data-value="balanced">
+              <span class="quiz-option-media"><img src="/img/quiz/skin-balanced.webp" alt="" width="480" height="480" loading="lazy"></span>
+              <span class="quiz-option-text">
+                <span class="quiz-option-head"><span class="quiz-option-title">Balanced</span></span>
+                <span class="quiz-option-desc">Comfortable and even, minimal shine</span>
+              </span>
             </button>
           </div>
           <div class="quiz-why">
@@ -488,7 +539,7 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
           <div class="quiz-step-label">Step 04 of 07 — Your Concerns</div>
           <h2 class="quiz-question">WHAT WOULD YOU<br>MOST LIKE TO CHANGE?</h2>
           <p class="quiz-sub">Choose up to three, in order of importance. The first one you pick counts most.</p>
-          <div class="quiz-options" id="opts-concerns"></div>
+          <div class="quiz-options quiz-options--tiles" id="opts-concerns"></div>
           <p class="quiz-hint" id="concern-hint"></p>
           <div class="quiz-why">
             <button class="quiz-why-toggle" type="button" data-why>Why we ask this</button>
@@ -629,6 +680,12 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
   var answered = {}, cur = 0;
 
   /* ---- concerns are rendered from the model, filtered by chosen zones ---- */
+  /* Concern ids with a card image in public/img/quiz (concern-<id>.webp).
+     Hair thinning has none yet, so its tile keeps an empty image frame.
+     The tiles are built after layout.js has run its lazy-image fade-in, so
+     they carry .loaded themselves or kotiva.css would leave them at opacity 0. */
+  var CONCERN_IMG = ['acne', 'oil', 'pigmentation', 'hydration', 'barrier', 'scars', 'ageing', 'sun'];
+
   function renderConcerns() {
     var wrap = document.getElementById('opts-concerns');
     if (!wrap) return;
@@ -637,8 +694,11 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
       return o.zones.some(function (z) { return zones.indexOf(z) !== -1; });
     });
     wrap.innerHTML = opts.map(function (o) {
-      return '<button class="quiz-option" type="button" aria-pressed="false" data-value="' + o.id + '">' +
-             '<span class="quiz-option-head"><span class="quiz-rank"></span>' +
+      var img = CONCERN_IMG.indexOf(o.id) !== -1
+        ? '<img class="loaded" src="/img/quiz/concern-' + o.id + '.webp" alt="" width="480" height="480" loading="lazy">' : '';
+      return '<button class="quiz-option quiz-option--tile" type="button" aria-pressed="false" data-value="' + o.id + '">' +
+             '<span class="quiz-rank"></span><span class="quiz-option-media">' + img + '</span>' +
+             '<span class="quiz-option-head">' +
              '<span class="quiz-option-title">' + o.label + '</span></span></button>';
     }).join('');
     state.concerns = state.concerns.filter(function (c) {
