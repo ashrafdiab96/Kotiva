@@ -3,8 +3,8 @@
 @section('meta')
   <title>kotiva™ — Doctor-Approved Skincare</title>
   <meta name="description" content="Doctor-approved skincare, perfected by science and tailored for you. Explore 25 products formulated with clinically proven ingredients across cleansers, serums, SPF, body and hair care." />
-  <link rel="preload" as="image" href="{{ asset('img/hero/IMG_1954.JPG.jpeg') }}" media="(min-width: 768px)" fetchpriority="high" />
-  <link rel="preload" as="image" href="{{ asset('img/hero/IMG_1951.JPG.jpeg') }}" media="(max-width: 767px)" fetchpriority="high" />
+  <link rel="preload" as="image" href="{{ asset('img/hero/1.jpeg') }}" media="(min-width: 768px)" fetchpriority="high" />
+  <link rel="preload" as="image" href="{{ asset('img/hero/3.jpeg') }}" media="(max-width: 767px)" fetchpriority="high" />
   <link rel="canonical" href="{{ config('kotiva.site_origin') }}/" />
   <meta property="og:title" content="kotiva™ — Doctor-Approved Skincare" />
   <meta property="og:description" content="Doctor-approved skincare, perfected by science and tailored for you. Explore 25 products formulated with clinically proven ingredients for every skin type." />
@@ -12,11 +12,11 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="KOTIVA" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/img/hero/IMG_1954.JPG.jpeg" />
+  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/img/hero/1.jpeg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="kotiva™ — Doctor-Approved Skincare" />
   <meta name="twitter:description" content="Doctor-approved skincare, perfected by science and tailored for you. 25 products formulated with clinically proven ingredients, for every skin type." />
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/img/hero/IMG_1954.JPG.jpeg" />
+  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/img/hero/1.jpeg" />
 @endsection
 
 @section('main_attrs')aria-label="Main content"@endsection
@@ -37,6 +37,12 @@
 .hero-banner-dot{ width:10px; height:10px; padding:0; border-radius:50%; border:1px solid rgba(35,31,32,.45); background:rgba(255,255,255,.7); cursor:pointer; transition:background .3s ease, width .3s ease; }
 .hero-banner-dot.is-active{ width:28px; border-radius:5px; background:#231F20; border-color:#231F20; }
 .hero-banner-dot:focus-visible{ outline:2px solid #231F20; outline-offset:3px; }
+.hero-banner-arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:2; display:flex; align-items:center; justify-content:center; width:clamp(36px,3.5vw,52px); height:clamp(36px,3.5vw,52px); padding:0; border-radius:50%; border:1px solid rgba(35,31,32,.2); background:rgba(255,255,255,.75); color:#231F20; cursor:pointer; backdrop-filter:blur(4px); transition:background .3s ease, transform .3s ease; }
+.hero-banner-arrow:hover{ background:#fff; transform:translateY(-50%) scale(1.06); }
+.hero-banner-arrow:focus-visible{ outline:2px solid #231F20; outline-offset:3px; }
+.hero-banner-arrow svg{ width:45%; height:45%; }
+.hero-banner-prev{ left:clamp(10px,2vw,32px); }
+.hero-banner-next{ right:clamp(10px,2vw,32px); }
 .hero-banner-title{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 @media (max-width:767px){
   .hero-banner{ aspect-ratio:2048/3072; }
@@ -57,16 +63,22 @@
   <h1 class="hero-banner-title">kotiva™ — Doctor-Approved Skincare</h1>
   <a class="hero-banner-slide is-active" href="{{ route('shop.index') }}" aria-roledescription="slide" aria-label="1 of 2: 25+ formulas, each built around one job — shop the range">
     <picture>
-      <source media="(max-width: 767px)" srcset="{{ asset('img/hero/IMG_1951.JPG.jpeg') }}" width="2048" height="3072" />
-      <img src="{{ asset('img/hero/IMG_1954.JPG.jpeg') }}" width="5461" height="3072" alt="25+ formulas, each built around one job. Doctor-approved skincare for stress-free routines — three women holding kotiva products." fetchpriority="high" />
+      <source media="(max-width: 767px)" srcset="{{ asset('img/hero/3.jpeg') }}" width="2048" height="3072" />
+      <img src="{{ asset('img/hero/1.jpeg') }}" width="5461" height="3072" alt="25+ formulas, each built around one job. Doctor-approved skincare for stress-free routines — three women holding kotiva products." fetchpriority="high" />
     </picture>
   </a>
   <a class="hero-banner-slide" href="{{ route('routine-finder') }}" aria-roledescription="slide" aria-label="2 of 2: Right-sized for your routine — build your kit in 7 questions" aria-hidden="true" tabindex="-1">
     <picture>
-      <source media="(max-width: 767px)" srcset="{{ asset('img/hero/IMG_1952.JPG.jpeg') }}" width="2048" height="3072" />
-      <img src="{{ asset('img/hero/IMG_1953.JPG.jpeg') }}" width="5461" height="3072" alt="Right-sized for your routine. Build your customized routine kit in 7 questions — a basket of kotiva products." loading="lazy" />
+      <source media="(max-width: 767px)" srcset="{{ asset('img/hero/4.jpeg') }}" width="2048" height="3072" />
+      <img src="{{ asset('img/hero/2.jpeg') }}" width="5461" height="3072" alt="Right-sized for your routine. Build your customized routine kit in 7 questions — a basket of kotiva products." loading="lazy" />
     </picture>
   </a>
+  <button type="button" class="hero-banner-arrow hero-banner-prev" aria-label="Previous slide">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button type="button" class="hero-banner-arrow hero-banner-next" aria-label="Next slide">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
   <div class="hero-banner-dots" role="group" aria-label="Choose slide">
     <button type="button" class="hero-banner-dot is-active" aria-label="Show slide 1" aria-current="true"></button>
     <button type="button" class="hero-banner-dot" aria-label="Show slide 2"></button>
@@ -77,7 +89,7 @@
   var root = document.currentScript.previousElementSibling;
   var slides = root.querySelectorAll('.hero-banner-slide');
   var dots = root.querySelectorAll('.hero-banner-dot');
-  var current = 0, timer = null, INTERVAL = 6000;
+  var current = 0, timer = null, INTERVAL = 5000;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function show(i) {
@@ -96,11 +108,10 @@
   function start() { if (!reduce && !timer) timer = setInterval(function () { show(current + 1); }, INTERVAL); }
   function stop() { clearInterval(timer); timer = null; }
 
-  dots.forEach(function (d, n) { d.addEventListener('click', function () { stop(); show(n); start(); }); });
-  root.addEventListener('mouseenter', stop);
-  root.addEventListener('mouseleave', start);
-  root.addEventListener('focusin', stop);
-  root.addEventListener('focusout', start);
+  function go(i) { stop(); show(i); start(); }
+  dots.forEach(function (d, n) { d.addEventListener('click', function () { go(n); }); });
+  root.querySelector('.hero-banner-prev').addEventListener('click', function () { go(current - 1); });
+  root.querySelector('.hero-banner-next').addEventListener('click', function () { go(current + 1); });
 
   /* Swipe on touch devices */
   var x0 = null;
@@ -109,7 +120,7 @@
     if (x0 === null) return;
     var dx = e.changedTouches[0].clientX - x0;
     x0 = null;
-    if (Math.abs(dx) > 40) { stop(); show(current + (dx < 0 ? 1 : -1)); start(); }
+    if (Math.abs(dx) > 40) go(current + (dx < 0 ? 1 : -1));
   }, { passive: true });
 
   start();
