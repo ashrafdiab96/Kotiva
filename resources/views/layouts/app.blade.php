@@ -59,7 +59,7 @@
     </a>
     <div class="nav-links" role="list">
       <a class="nav-link" href="{{ route('home') }}" role="listitem">Home</a>
-      <a class="nav-link" href="{{ route('shop.index') }}" role="listitem">Shop</a>
+      <a class="nav-link" href="{{ Salla::storeUrl() }}" role="listitem">Shop</a>
       <a class="nav-link" href="{{ route('science') }}" role="listitem">Science</a>
       <a class="nav-link" href="{{ route('journal') }}" role="listitem">Journal</a>
       <a class="nav-link" href="{{ route('about') }}" role="listitem">About</a>
@@ -67,15 +67,12 @@
     </div>
     <div class="nav-right">
       <a class="btn btn-gold btn-sm" href="{{ route('routine-finder') }}">Find My Routine</a>
-      {{-- Cart control. A real link to /cart, so it works with JS off; shop.js
-           upgrades it to open the mini-cart drawer in place. The badge is
-           filled from /cart/summary on load, never rendered server-side, so a
-           cached page can never show a stale count. --}}
-      <a class="nav-cart" href="{{ route('cart.index') }}" data-mini-cart-open aria-label="Open cart">
+      {{-- Cart control. The basket lives on the Salla store, so this is a
+           plain link there — no drawer, no badge (this site holds no cart). --}}
+      <a class="nav-cart" href="{{ Salla::cartUrl() }}" aria-label="Open cart">
         <span class="nav-cart-icon" aria-hidden="true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         </span>
-        <span class="nav-cart-badge is-empty" data-cart-badge aria-live="polite"></span>
       </a>
       <button class="nav-theme-btn" id="theme-toggle" aria-label="Switch to dark mode" title="Toggle light/dark">
         <span class="icon-moon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
@@ -91,7 +88,7 @@
 <!-- Mobile Overlay -->
 <div class="nav-overlay" role="dialog" aria-modal="true" aria-label="Navigation menu">
   <a class="nav-link" href="{{ route('home') }}">Home</a>
-  <a class="nav-link" href="{{ route('shop.index') }}">Shop</a>
+  <a class="nav-link" href="{{ Salla::storeUrl() }}">Shop</a>
   <a class="nav-link" href="{{ route('science') }}">Science</a>
   <a class="nav-link" href="{{ route('journal') }}">Journal</a>
   <a class="nav-link" href="{{ route('about') }}">About</a>
@@ -124,9 +121,9 @@
       </div>
       <div><div class="footer-col-title">Shop</div>
         <nav class="footer-links" aria-label="Shop links">
-          <a href="{{ route('shop.index') }}">All Products</a><a href="{{ route('shop.index', ['filter' => 'face']) }}">Face Care</a>
-          <a href="{{ route('shop.index', ['filter' => 'body']) }}">Body Care</a><a href="{{ route('shop.index', ['filter' => 'serums']) }}">Serums</a>
-          <a href="{{ route('shop.index', ['filter' => 'spf']) }}">SPF</a><a href="{{ route('shop.index', ['filter' => 'hair']) }}">Hair</a>
+          <a href="{{ Salla::storeUrl() }}">All Products</a><a href="{{ Salla::listingUrl('face') }}">Face Care</a>
+          <a href="{{ Salla::listingUrl('body') }}">Body Care</a><a href="{{ Salla::listingUrl('serums') }}">Serums</a>
+          <a href="{{ Salla::listingUrl('spf') }}">SPF</a><a href="{{ Salla::listingUrl('hair') }}">Hair</a>
         </nav>
       </div>
       <div><div class="footer-col-title">Company</div>
@@ -149,51 +146,9 @@
   </div>
 </footer>
 
-<!-- ═══════════════════════════════════════
-     MINI-CART DRAWER
-     Opened by the nav cart control and after an add-to-cart.
-     Starts hidden and empty; shop.js fills it from the server's
-     own totals. aria-modal + focus trap mirror .nav-overlay.
-═══════════════════════════════════════ -->
-<div class="mini-cart is-empty" role="dialog" aria-modal="true" aria-label="Your cart" aria-hidden="true">
-  <div class="mini-cart-scrim" data-mini-cart-close></div>
-  <aside class="mini-cart-panel">
-    <header class="mini-cart-head">
-      <p class="mini-cart-title">Your Cart</p>
-      <button class="mini-cart-close" type="button" data-mini-cart-close aria-label="Close cart">&times;</button>
-    </header>
-
-    <p class="mini-cart-empty" data-mini-cart-empty>Your cart is empty.</p>
-
-    <ul class="mini-cart-items" data-mini-cart-items role="list"></ul>
-
-    <footer class="mini-cart-foot">
-      {{-- Mirrors the cart page: net merchandise, then the VAT, then the
-           inclusive figure. shop.js fills all three from the server's own
-           totals and adds nothing up itself. --}}
-      <div class="mini-cart-subtotal-row">
-        <span>Subtotal <small>excl. VAT</small></span>
-        <span data-mini-cart-subtotal>{{ config('kotiva.currency.code') }} 0.00</span>
-      </div>
-      <div class="mini-cart-subtotal-row mini-cart-vat-row">
-        <span data-mini-cart-vat-label>VAT</span>
-        <span data-mini-cart-vat>{{ config('kotiva.currency.code') }} 0.00</span>
-      </div>
-      <div class="mini-cart-subtotal-row mini-cart-total-row">
-        <span>Total <small>incl. VAT</small></span>
-        <span data-mini-cart-total>{{ config('kotiva.currency.code') }} 0.00</span>
-      </div>
-      <p class="mini-cart-note">Product prices exclude VAT. VAT is included in the total; shipping is added at checkout.</p>
-      <a class="btn btn-outline mini-cart-view" href="{{ route('cart.index') }}">View Cart</a>
-      <a class="btn btn-primary mini-cart-checkout" href="{{ route('checkout.index') }}">Checkout</a>
-    </footer>
-  </aside>
-</div>
-
 @stack('pre_scripts')
 <script src="{{ asset('js/layout.js') }}?v={{ $v }}"></script>
 <script src="{{ asset('js/animations.js') }}?v={{ $v }}"></script>
-<script src="{{ asset('js/shop.js') }}?v={{ $v }}"></script>
 @stack('scripts')
 </body>
 </html>

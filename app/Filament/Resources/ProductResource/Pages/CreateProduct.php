@@ -30,7 +30,10 @@ final class CreateProduct extends CreateRecord
      */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $this->openingStock = max(0, (int) ($this->data['initial_stock'] ?? 0));
+        // No opening movement while Salla owns stock (the field is hidden).
+        $this->openingStock = ProductResource::sallaOwnsCommerce()
+            ? 0
+            : max(0, (int) ($this->data['initial_stock'] ?? 0));
 
         // Always created at zero: the opening quantity arrives as a ledger
         // movement below, so the column and the ledger agree from the very

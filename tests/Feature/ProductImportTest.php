@@ -34,6 +34,7 @@ use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer as XlsxWriter;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Tests\Concerns\EnablesLegacyCommerce;
 use Tests\TestCase;
 
 /**
@@ -47,6 +48,7 @@ use Tests\TestCase;
  */
 final class ProductImportTest extends TestCase
 {
+    use EnablesLegacyCommerce;
     use RefreshDatabase;
 
     private const HEADER = 'sku,name,price,category,stock_qty,benefits,filter_tags,description';

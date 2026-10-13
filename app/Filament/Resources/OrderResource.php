@@ -44,6 +44,14 @@ final class OrderResource extends Resource
 {
     use GatedByRole;
 
+    /**
+     * Salla handoff: this data is owned by Salla now; see GatedByRole.
+     */
+    protected static function ownedBySalla(): bool
+    {
+        return true;
+    }
+
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';

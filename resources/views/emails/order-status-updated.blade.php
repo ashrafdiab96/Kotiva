@@ -9,7 +9,7 @@
     $muted = 'rgba(35,31,32,0.62)';
     $hairline = 'rgba(35,31,32,0.12)';
     $display = "'Futura', 'Century Gothic', 'Trebuchet MS', Arial, sans-serif";
-    $origin = rtrim((string) config('kotiva.site_origin'), '/');
+    $origin = rtrim((string) config('app.url'), '/');
 @endphp
 
 @section('content')

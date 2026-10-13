@@ -24,6 +24,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\EnablesLegacyCommerce;
 use Tests\TestCase;
 
 /**
@@ -38,6 +39,7 @@ use Tests\TestCase;
  */
 final class OrderAdminTest extends TestCase
 {
+    use EnablesLegacyCommerce;
     use RefreshDatabase;
 
     protected function setUp(): void

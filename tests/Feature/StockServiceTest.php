@@ -13,6 +13,7 @@ use App\Services\StockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\EnablesLegacyCommerce;
 use Tests\TestCase;
 
 /**
@@ -29,6 +30,7 @@ use Tests\TestCase;
  */
 final class StockServiceTest extends TestCase
 {
+    use EnablesLegacyCommerce;
     use RefreshDatabase;
 
     private StockService $stock;

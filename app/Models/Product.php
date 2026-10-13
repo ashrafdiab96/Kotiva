@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * A catalog product.
@@ -39,6 +40,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property int $id
  * @property string $sku
+ * @property int|null $salla_product_id
+ * @property string|null $salla_url
+ * @property Carbon|null $salla_synced_at
  * @property string $slug
  * @property string $name
  * @property int $category_id
@@ -86,6 +90,8 @@ final class Product extends Model
         'is_featured', 'is_best_seller', 'is_active',
         'stock_qty', 'low_stock_threshold',
         'meta_title', 'meta_description', 'weight_grams',
+        // Written only by kotiva:salla-links; never exposed in the dashboard form.
+        'salla_product_id', 'salla_url', 'salla_synced_at',
     ];
 
     protected function casts(): array
@@ -107,6 +113,8 @@ final class Product extends Model
             'stock_qty' => 'integer',
             'low_stock_threshold' => 'integer',
             'weight_grams' => 'integer',
+            'salla_product_id' => 'integer',
+            'salla_synced_at' => 'datetime',
         ];
     }
 

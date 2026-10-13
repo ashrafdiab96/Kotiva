@@ -12,10 +12,15 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
- * Every storefront URL resolves, and every URL the static site ever exposed
+ * Every content URL resolves, and every URL the static site ever exposed
  * still resolves. The old site was indexed with .html extensions and both
  * sitemap.xml and llms.txt pointed crawlers at that exact set, so a 404 here
  * is a lost page, not a cosmetic problem.
+ *
+ * Since the Salla handoff the shop and product URLs resolve by redirecting to
+ * the Salla store. These run against the real seeded catalog linked from the
+ * committed storage/app/salla-links.json, so a SKU that drifts between the two
+ * fails here rather than in production.
  */
 final class StorefrontRoutesTest extends TestCase
 {
@@ -28,6 +33,17 @@ final class StorefrontRoutesTest extends TestCase
         // Seeds from the real legacy bundles, so these tests exercise the same
         // parsing path production uses rather than a convenient fixture.
         $this->seed(ProductSeeder::class);
+
+        config([
+            'kotiva.salla.store_url' => 'https://shop.klyvosystems.com',
+            'kotiva.salla.redirect_status' => 302,
+        ]);
+    }
+
+    private function linkCatalogToSalla(): void
+    {
+        $this->artisan('kotiva:salla-links', ['--from' => 'storage/app/salla-links.json'])
+            ->assertSuccessful();
     }
 
     /**
@@ -37,7 +53,6 @@ final class StorefrontRoutesTest extends TestCase
     {
         return [
             ['/'],
-            ['/shop'],
             ['/about'],
             ['/science'],
             ['/journal'],
@@ -63,7 +78,6 @@ final class StorefrontRoutesTest extends TestCase
     {
         return [
             ['/index.html', '/'],
-            ['/shop.html', '/shop'],
             ['/about.html', '/about'],
             ['/science.html', '/science'],
             ['/journal.html', '/journal'],
@@ -85,42 +99,69 @@ final class StorefrontRoutesTest extends TestCase
     }
 
     #[Test]
-    public function every_product_page_returns_200(): void
+    public function the_legacy_shop_page_goes_straight_to_salla(): void
     {
-        $slugs = Product::query()->active()->pluck('slug');
+        $this->get('/shop.html')
+            ->assertStatus(302)
+            ->assertRedirect('https://shop.klyvosystems.com');
+    }
 
-        $this->assertCount(25, $slugs);
+    #[Test]
+    public function the_committed_link_file_links_every_active_product(): void
+    {
+        $this->assertCount(25, Product::query()->active()->get());
 
-        foreach ($slugs as $slug) {
-            $this->get("/product/{$slug}")->assertOk();
+        $this->linkCatalogToSalla();
+
+        $this->artisan('kotiva:salla-links', ['--check' => true])->assertExitCode(0);
+
+        foreach (Product::query()->active()->get() as $product) {
+            $this->assertStringStartsWith('https://shop.klyvosystems.com/', (string) $product->salla_url, $product->sku);
+            $this->assertNotNull($product->salla_product_id, $product->sku);
         }
     }
 
     #[Test]
-    public function every_legacy_product_url_redirects_permanently(): void
+    public function every_product_url_redirects_to_its_salla_page(): void
     {
-        foreach (Product::query()->active()->get(['id', 'slug']) as $product) {
+        $this->linkCatalogToSalla();
+
+        foreach (Product::query()->active()->get() as $product) {
+            $this->get("/product/{$product->slug}")
+                ->assertStatus(302)
+                ->assertRedirect((string) $product->salla_url);
+        }
+    }
+
+    #[Test]
+    public function every_legacy_product_url_goes_to_salla_in_one_hop(): void
+    {
+        $this->linkCatalogToSalla();
+
+        foreach (Product::query()->active()->get() as $product) {
+            // The Location is the Salla page itself, not a Laravel path that
+            // would redirect again.
             $this->get("/product/{$product->slug}.html")
-                ->assertStatus(301)
-                ->assertRedirect("/product/{$product->slug}");
+                ->assertStatus(302)
+                ->assertRedirect((string) $product->salla_url);
 
             // The JS page addressed products by numeric id.
             $this->get("/product.html?id={$product->id}")
-                ->assertStatus(301)
-                ->assertRedirect("/product/{$product->slug}");
+                ->assertStatus(302)
+                ->assertRedirect((string) $product->salla_url);
         }
     }
 
     #[Test]
-    public function an_unknown_legacy_product_id_falls_back_to_the_shop(): void
+    public function an_unknown_legacy_product_id_falls_back_to_the_store(): void
     {
         $this->get('/product.html?id=99999')
-            ->assertStatus(301)
-            ->assertRedirect('/shop');
+            ->assertStatus(302)
+            ->assertRedirect('https://shop.klyvosystems.com');
 
         $this->get('/product.html')
-            ->assertStatus(301)
-            ->assertRedirect('/shop');
+            ->assertStatus(302)
+            ->assertRedirect('https://shop.klyvosystems.com');
     }
 
     #[Test]
@@ -139,30 +180,17 @@ final class StorefrontRoutesTest extends TestCase
     }
 
     #[Test]
-    public function the_sunscreen_filter_alias_redirects_to_the_canonical_tag(): void
+    public function the_sunscreen_filter_alias_lands_on_the_salla_spf_filter(): void
     {
         // The static cards were hand-tagged "sunscreen" while the catalog tags
         // those products "spf". Old links must keep working.
         $this->get('/shop?filter=sunscreen')
-            ->assertStatus(301)
-            ->assertRedirect('/shop?filter=spf');
-
-        $this->get('/shop?filter=spf')->assertOk();
+            ->assertStatus(302)
+            ->assertRedirect('https://shop.klyvosystems.com/?filter=spf');
     }
 
     #[Test]
-    public function the_shop_accepts_every_sort_and_rejects_unknown_ones(): void
-    {
-        foreach (array_keys((array) config('kotiva.shop.sorts')) as $sort) {
-            $this->get("/shop?sort={$sort}")->assertOk();
-        }
-
-        // An unknown sort falls back to the default rather than erroring.
-        $this->get('/shop?sort=drop-table')->assertOk();
-    }
-
-    #[Test]
-    public function the_sitemap_lists_every_page_and_active_product(): void
+    public function the_sitemap_lists_the_content_pages_only(): void
     {
         $response = $this->get('/sitemap.xml');
 
@@ -171,32 +199,24 @@ final class StorefrontRoutesTest extends TestCase
 
         $body = $response->getContent() ?: '';
 
-        $this->assertSame(35, substr_count($body, '<url>'), '10 pages + 25 products');
-        $this->assertStringContainsString('/product/micellar-water</loc>', $body);
-    }
-
-    #[Test]
-    public function a_deactivated_product_leaves_the_sitemap(): void
-    {
-        $product = Product::query()->active()->firstOrFail();
-        $product->update(['is_active' => false]);
-
-        $body = $this->get('/sitemap.xml')->getContent() ?: '';
-
-        $this->assertSame(34, substr_count($body, '<url>'));
-        $this->assertStringNotContainsString("/product/{$product->slug}</loc>", $body);
+        $this->assertSame(9, substr_count($body, '<url>'), '9 content pages; the shop and products are on Salla');
+        $this->assertStringNotContainsString('/product/', $body);
+        $this->assertStringNotContainsString('/shop', $body);
+        $this->assertStringContainsString('/routine-finder</loc>', $body);
     }
 
     #[Test]
     public function the_products_api_returns_what_the_routine_finder_needs(): void
     {
+        $this->linkCatalogToSalla();
+
         $response = $this->getJson('/api/products');
 
         $response->assertOk();
         $response->assertJsonCount(25, 'data');
         $response->assertJsonStructure([
             'data' => [
-                ['id', 'slug', 'name', 'price', 'currency', 'image', 'url', 'filter_tags', 'stock', 'in_stock'],
+                ['id', 'sku', 'slug', 'name', 'image', 'url', 'filter_tags'],
             ],
         ]);
     }

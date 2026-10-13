@@ -20,6 +20,7 @@ use App\Services\StockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\EnablesLegacyCommerce;
 use Tests\TestCase;
 
 /**
@@ -28,6 +29,7 @@ use Tests\TestCase;
  */
 final class OrderStatusServiceTest extends TestCase
 {
+    use EnablesLegacyCommerce;
     use RefreshDatabase;
 
     private OrderStatusService $service;

@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\View;
+use InvalidArgumentException;
 
 /**
- * The static sitemap.xml listed 35 hand-maintained URLs and drifted whenever a
- * product changed. This builds the same document from the catalog, so a
- * deactivated product leaves the sitemap the moment it leaves the shop.
+ * The content pages, and only those.
+ *
+ * Since the Salla handoff, /shop and /product/* are redirects to the Salla
+ * store; listing a redirect in a sitemap tells a crawler the page is
+ * canonical here when it is not. The store publishes its own sitemap.
  */
 final class SitemapController extends Controller
 {
@@ -22,7 +26,6 @@ final class SitemapController extends Controller
      */
     private const PAGE_PRIORITIES = [
         'home' => 1.0,
-        'shop.index' => 0.9,
         'routine-finder' => 0.8,
         'science' => 0.7,
         'ingredients' => 0.7,
@@ -35,33 +38,39 @@ final class SitemapController extends Controller
 
     public function __invoke(): Response
     {
-        $origin = (string) config('kotiva.site_origin');
+        $origin = (string) config('app.url');
 
         $urls = [];
 
         foreach (self::PAGE_PRIORITIES as $routeName => $priority) {
             $urls[] = [
                 'loc' => $origin.$this->pathFor($routeName),
-                'lastmod' => null,
+                'lastmod' => $this->lastModified($routeName),
                 'priority' => $priority,
             ];
         }
 
-        Product::query()
-            ->active()
-            ->orderBy('id')
-            ->get(['slug', 'updated_at'])
-            ->each(function (Product $product) use (&$urls, $origin): void {
-                $urls[] = [
-                    'loc' => $origin.'/product/'.$product->slug,
-                    'lastmod' => $product->updated_at?->toDateString(),
-                    'priority' => 0.7,
-                ];
-            });
-
         $xml = view('sitemap', ['urls' => $urls])->render();
 
         return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+    }
+
+    /**
+     * The date the page's own template last changed — the honest "last
+     * modified" for hand-authored content. Null (and so no <lastmod>) when the
+     * template cannot be located, rather than a guess.
+     */
+    private function lastModified(string $routeName): ?string
+    {
+        try {
+            $path = View::getFinder()->find('pages.'.$routeName);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        $mtime = @filemtime($path);
+
+        return $mtime === false ? null : Carbon::createFromTimestamp($mtime)->toDateString();
     }
 
     private function pathFor(string $routeName): string

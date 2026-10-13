@@ -25,6 +25,13 @@ trait GatedWidget
 
     public static function canView(): bool
     {
+        // Every gated widget reports on Laravel's orders, revenue or stock,
+        // which Salla owns now. Hidden for every role while commerce is off;
+        // the dashboard shows the SallaNotice widget instead.
+        if (! config('kotiva.commerce_enabled', false)) {
+            return false;
+        }
+
         $user = auth()->user();
 
         if (! $user instanceof Admin) {

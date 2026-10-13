@@ -624,3 +624,132 @@ The same run also showed why "the dashboard returns 200" was never enough. The f
 showed every widget as an empty box. Those were Filament's lazy-load placeholders, captured before
 the widgets loaded; once settled, all six rendered with the right figures and 4 charts. The distinction
 was only visible by looking.
+
+## D-35 — Salla handoff: this site becomes content-only
+
+The storefront (listing, product pages, cart, checkout, orders, stock, payments) moved to Salla at
+`shop.klyvosystems.com`. This site keeps the content pages and the Routine Finder. Every commercial
+link resolves through `App\Support\Salla`, which reads `config('kotiva.salla.*')`. No view contains
+the store hostname. Nothing was deleted: the commerce code is unrouted, switched off by
+`kotiva.commerce_enabled=false` and hidden from the dashboard, ready to be removed in its own PR.
+Judgement calls, in brief order:
+
+1. **Filter mapping (client to confirm).** Salla's listing understands ten keys: `all, cleanser,
+   toner, lip-care, spf, body, hand-care, treatment, serums, hair`. Old keys map as `face → cleanser`,
+   `treatments → treatment` and `sunscreen → spf` (it was already an alias of `spf` here), with
+   `body`, `serums`, `spf` and `hair` unchanged. **`face → cleanser` is a guess:** Salla has no "face"
+   key and `cleanser` is the closest. The footer's "Face Care" and the home page's Face category card
+   therefore open the cleanser listing. Please confirm, or name the Salla key it should use. Unknown
+   filters are dropped, not passed through, because Salla would show an empty grid. Routine SKUs are
+   upper-cased, de-duplicated and limited to `[A-Z0-9_-]`, so a query string cannot inject into the
+   redirect target.
+2. **Salla SKU format.** The committed export (`storage/app/salla-links.json`) has exactly
+   `KOT001`…`KOT025`, upper-case with no suffix. It matched all 25 local products 1:1, and every
+   product name matches its Salla URL slug. Ids are strings in the file and cast to int. No data was
+   changed to make them match.
+3. **The link file was git-ignored.** `storage/app/.gitignore` ignores everything, so the export the
+   brief calls "committed" was not tracked. An exception, `!salla-links.json`, now lets it be
+   committed.
+4. **There is no event service provider.** Laravel 12 discovered the three commerce listeners
+   automatically. Discovery is now off (`->withEvents(discover: false)` in `bootstrap/app.php`).
+   These were the only listeners in `app/Listeners`, so nothing else is affected. A future listener
+   needs an explicit `Event::listen()`.
+5. **Stock guard scope.** `reserve()`, `release()` and `fulfil()` throw `LogicException` while
+   commerce is off. The brief wrote "fulfill"; the method is `fulfil`. `adjust()` is not guarded,
+   because the product importer uses it. The dashboard's "Adjust stock" action and opening-stock field
+   are hidden instead. **Follow-up:** the product import can still write prices and `stock_qty`
+   columns. Those values are now unused, but the import should drop those columns when the commerce
+   code goes.
+6. **CSRF exemption for the 410 paths.** Without it, a stale POST from cached JS or a crawler gets
+   419 before it can learn the endpoint is gone. Nothing at those paths changes state.
+7. **`/shop.html` goes straight to Salla.** The brief said to keep the content pages' `.html`
+   redirects unchanged. `/shop.html` is not a content page, and routing it through `/shop` would have
+   been a two-hop chain, so it now redirects in one hop.
+8. **The product API drops more than the brief listed.** `price`, `price_excl_vat`, `price_incl_vat`
+   and `in_stock` went, as asked. `stock`, `price_vat` and `currency` went too: they only described
+   the removed fields, and nothing in the Routine Finder reads them (checked).
+9. **Home rail.** The price, including the price in the card's `aria-label`, renders only when
+   `commerce_enabled` is on, so it is hidden. `animations.js` already tolerates a card with no price
+   element, so `public/js` is unchanged. `css/shop.css` still loads, because the nav cart icon's
+   styles live there.
+10. **Read-only prices, but only on edit.** `price_excl_vat` and `price_incl_vat` are NOT NULL. On an
+    existing product they are disabled ("Managed in Salla") and Filament does not save disabled
+    fields. A new product still asks for both, because a disabled field there would insert nothing
+    and fail. `compare_at_price` is also read-only on edit, since it is a price too.
+    `low_stock_threshold` is always read-only. The Salla tab uses placeholders, not inputs, so the form
+    cannot write `salla_*` even if a request tries to.
+11. **Settings.** Only the cash-on-delivery switch and cart lifetime are hidden, as asked. Their
+    stored values are left untouched on save. The VAT rate stays visible because the product form's
+    price hints use it.
+12. **Admin roles.** Staff worked orders only, so staff now reach the dashboard and nothing else.
+    Commerce resources return 403 for every role through `GatedByRole::ownedBySalla()`. Commerce
+    widgets are hidden through `GatedWidget`. The new `SallaNotice` widget renders eagerly, because a
+    lazy placeholder is exactly the "empty dashboard" it exists to explain.
+13. **robots.txt: the staging block is gone. Operator, please check this.** The file said
+    `Disallow: /` (staging, "go-live gated on client approval", DEC-176). The brief's rules require
+    `/shop` and `/product/` to be crawlable, which cannot hold under `Disallow: /`. The file now
+    allows the site, disallows `/cart`, `/checkout`, `/api/` and `/admin`, and names
+    `https://klyvosystems.com/sitemap.xml`. **Deploying this opens the content site to search
+    engines.** If go-live approval is still pending, hold this file back.
+14. **Canonical origin.** Canonical URLs and the sitemap use `KOTIVA_SITE_ORIGIN`, which is still
+    `https://kotiva.co` in `.env` and `.env.example`. It was not changed here. Production must set it
+    to `https://klyvosystems.com`. `public/llms.txt` was generated with
+    `--origin=https://klyvosystems.com`.
+15. **Sitemap `<lastmod>`** is the page template's file time. That is honest for hand-authored
+    content, but a fresh checkout resets it to the deploy time.
+16. **Routine Finder handoff.** The "Shop These Products" link is built in JS as
+    `SALLA_STORE_URL + '/?routine=' + SKUs`, the same shape `Salla::listingUrl()` produces server-side
+    (`…/?routine=KOT001,KOT005`). Result-step links use each product's `url` from `/api/products` and
+    open in the same tab.
+17. **Tests.** Seven classes that drove the retired storefront over HTTP, or built their fixtures by
+    POSTing to `/cart/items`, are skipped through `Tests\Concerns\SkipsRetiredStorefront`, with their
+    assertions untouched: CartEndpoints, CheckoutFlow, CheckoutAccessibility,
+    DualPriceCheckoutPages, DualPriceOrderIntegrity, OrderMail and DualPriceStorefront. Two
+    rate-limit tests in HardeningTest are skipped the same way. Classes that test the retained
+    commerce code at service or dashboard level run with `Tests\Concerns\EnablesLegacyCommerce`, which
+    switches the flag on and re-registers the three listeners, again with assertions unchanged.
+    StorefrontRoutes, DashboardAccess and AnnouncementBar were updated to the new behaviour.
+18. **Dormant views keep their `route('shop.index'|'product.show'|'cart.*'|'checkout.*')` calls.**
+    `resources/views/{shop,product,cart,checkout}` are no longer rendered by any route, but the brief
+    says nothing is deleted in this PR. The `grep … resources/views` gate therefore still matches in
+    those four folders only. Every rendered view is clean. The kept route names (`shop.index`,
+    `product.show`, `cart.index`, `checkout.index`) resolve to the Salla redirects.
+
+**Pre-existing failures, recorded and not fixed.**
+
+- The brief's `scripts/validate-palette.mjs` does not exist. The palette and visual-regression
+  tooling lives in `legacy/scripts/` and is not part of `npm test`. Run from `legacy/`, it fails
+  before reading any colour (`ENOENT … legacy/docs/colour-migration/alpha-baseline.json`). It was
+  already broken before this change. Its page matrix (`legacy/scripts/lib/pages.mjs`) no longer
+  lists the `shop` and `product` families, as asked. `npm test` (the Routine Finder engine) passes.
+- WSL's own PHP 8.3 lacks `mbstring`, `pdo_*` and `dom`. The gates were run with XAMPP's
+  `php.exe` 8.2.
+
+## D-36 — One origin per site, set only in .env
+
+**Choice.** `KOTIVA_SITE_ORIGIN` / `config('kotiva.site_origin')` is removed. Every canonical URL,
+Open Graph and JSON-LD URL, the sitemap, robots.txt, llms.txt and the email links now read
+`config('app.url')`, which is `APP_URL` (`https://klyvosystems.com`). The store origin stays
+`KOTIVA_SALLA_STORE_URL` / `KOTIVA_SALLA_CART_URL`, read only through `App\Support\Salla`.
+
+**Why remove instead of aliasing.** The two variables named the same thing, and they had already
+drifted: `APP_URL` was a dev address while `KOTIVA_SITE_ORIGIN` still said `https://kotiva.co`
+(item 14 of D-35). Setting one to the other's value would have left two places to keep in step.
+Removing one deletes a config key, an env variable and the risk. `config/app.php` now trims the
+trailing slash so views can append paths as before.
+
+**Static crawl files became routes.** `public/robots.txt` and `public/llms.txt` had the domain
+written in, and a static file cannot read config. Both are now served by `CrawlFilesController`
+(`/robots.txt` from `resources/views/crawl/robots.blade.php`, `/llms.txt` from
+`App\Support\LlmsTxt`, which renders the existing stub). The static files are deleted and must not
+come back, because the web server serves a file in `public/` before Laravel sees the request.
+`kotiva:llms-txt` now prints by default (`--output` still writes a copy).
+
+**Prose mentions.** The privacy policy, the terms and the two email footers named `kotiva.co` in
+text. They now print the host from `APP_URL`.
+
+**Local development.** `APP_URL` in `.env` is now the production origin, as the brief asked.
+Request-time URLs (`url()`, `route()`, `asset()`) still follow the request host, so the local site
+works. Canonical/OG tags and the sitemap point at production, which is the intent.
+
+**Pinned by** `tests/Feature/PublicOriginsTest.php`.

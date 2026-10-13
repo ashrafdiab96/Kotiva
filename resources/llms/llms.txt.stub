@@ -1,0 +1,33 @@
+# KOTIVA
+
+> Doctor-approved skincare, perfected by science and tailored for every skin type. KOTIVA is a
+> clinical skincare range of ~25 products formulated around real dermatological concerns, with each
+> active chosen for evidence of efficacy (cleansers, serums, treatments, SPF, body and hair care).
+
+- Main website: {{MAIN}}
+- Online store: {{STORE}}
+
+## Brand facts
+- KOTIVA is a doctor-approved dermo-cosmetics brand, **manufactured in Poland under EU GMP**. The
+  name derives from *quotidian* (daily) — the brand's central idea is consistent daily skincare over
+  quick fixes.
+- KOTIVA is a brand of **Vitakode LLC** (parent company; Muscat, Oman). Vitakode's sibling brand is
+  **Formul8** ("Beauty At Every Stage", Made in Italy) — a separate aesthetics/injectables line.
+- Go-to-market: launched in Poland, with a **Saudi Arabia launch** as the first GCC market (certified/
+  licensed), expanding across the GCC, then Egypt and the wider Middle East.
+- Positioning: doctor-approved and evidence-based · European manufacturing · trusted by healthcare
+  professionals · daily-routine consistency.
+
+## Pages
+- [Home]({{MAIN}}/): brand overview, bestsellers, the KOTIVA standard.
+- [Shop]({{STORE}}): the full product collection, prices and ordering, on the KOTIVA online store.
+- [Our Science]({{MAIN}}/science): formulation philosophy, ingredient selection, and the clinical rationale behind each active.
+- [Ingredient Glossary]({{MAIN}}/ingredients): a canonical reference of the key active ingredients — what each active is and what it does for skin — cross-linked to the products that use it.
+- [Routine Finder]({{MAIN}}/routine-finder): a short quiz that builds a morning and evening routine from the KOTIVA range by skin type and concern.
+- [Journal]({{MAIN}}/journal): educational articles on ingredients, routines and dermatology.
+- [About]({{MAIN}}/about): the story and standards behind the brand.
+- [Contact & Where to Buy]({{MAIN}}/contact): stockists and how to get in touch.
+
+## Products
+- {{COUNT}} products, each with its page on the KOTIVA online store:
+{{PRODUCTS}}

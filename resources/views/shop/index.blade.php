@@ -4,18 +4,18 @@
   <title>Shop — kotiva™</title>
   <meta name="description" content="Browse the full kotiva™ collection — 25 doctor-approved skincare products formulated with clinically proven ingredients. Filter by concern, skin type or category." />
   <link rel="preload" as="image" href="{{ asset('assets/shop-hero-flatlay-v2.webp') }}" fetchpriority="high" />
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/shop">
+  <link rel="canonical" href="{{ config('app.url') }}/shop">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Shop — kotiva™">
   <meta property="og:description" content="Browse the full kotiva™ collection — 25 doctor-approved skincare products formulated with clinically proven ingredients. Filter by concern, skin type or category.">
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/shop">
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/shop-hero-flatlay-v2.webp">
+  <meta property="og:url" content="{{ config('app.url') }}/shop">
+  <meta property="og:image" content="{{ config('app.url') }}/assets/shop-hero-flatlay-v2.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Shop — kotiva™">
   <meta name="twitter:description" content="Browse the full kotiva™ collection — 25 doctor-approved skincare products formulated with clinically proven ingredients.">
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/shop-hero-flatlay-v2.webp">
+  <meta name="twitter:image" content="{{ config('app.url') }}/assets/shop-hero-flatlay-v2.webp">
 @endsection
 
 @section('content')

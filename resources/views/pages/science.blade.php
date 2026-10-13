@@ -3,18 +3,18 @@
 @section('meta')
   <title>Our Science — kotiva™</title>
   <meta name="description" content="The clinical science behind kotiva™. Ingredient selection, formulation philosophy, and the clinical rationale behind every active.">
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/science">
+  <link rel="canonical" href="{{ config('app.url') }}/science">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Our Science — kotiva™">
   <meta property="og:description" content="The clinical science behind kotiva™. Ingredient selection, formulation philosophy, and the clinical rationale behind every active.">
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/science">
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta property="og:url" content="{{ config('app.url') }}/science">
+  <meta property="og:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Our Science — kotiva™">
   <meta name="twitter:description" content="The clinical science behind kotiva™. Ingredient selection, formulation philosophy, and the rationale behind every active.">
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta name="twitter:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
 @endsection
 
 @push('styles')
@@ -283,7 +283,7 @@
           <h2 class="t-title" style="margin-bottom:20px;">THE MOST<br>VERSATILE<br>ACTIVE IN<br>SKINCARE</h2>
           <p class="t-body" style="margin-bottom:20px;">Niacinamide (Vitamin B3) is clinically proven to reduce pore appearance, even skin tone, calm inflammation, and regulate sebum — making it our most widely deployed active ingredient across the Kotiva range.</p>
           <p class="t-body" style="margin-bottom:32px;">At 1%, we achieve measurable efficacy without the irritation risk that comes with higher concentrations in compromised skin barriers. Precision concentration. Proven results.</p>
-          <a href="{{ route('shop.index') }}" class="btn btn-outline">Shop Products With Niacinamide</a>
+          <a href="{{ Salla::storeUrl() }}" class="btn btn-outline">Shop Products With Niacinamide</a>
         </div>
       </div>
     </div>
@@ -429,7 +429,7 @@
         <h2 class="t-headline" style="text-align:center; margin-bottom:28px;">SHOP THE<br>RANGE</h2>
         <p class="t-body" style="text-align:center; max-width:440px; margin:0 auto 36px;">25 doctor-approved formulations. Every ingredient selected for measurable, clinical performance.</p>
         <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-          <a href="{{ route('shop.index') }}" class="btn btn-primary">Explore Products</a>
+          <a href="{{ Salla::storeUrl() }}" class="btn btn-primary">Explore Products</a>
           <a href="{{ route('routine-finder') }}" class="btn btn-outline">Find My Routine</a>
         </div>
       </div>

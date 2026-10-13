@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Models\Setting;
 use App\Services\Payments\CashOnDeliveryGateway;
 use App\Services\Payments\PaymentGateways;
+use App\Support\Salla;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(PaymentGateways::class, fn ($app): PaymentGateways => new PaymentGateways([
             $app->make(CashOnDeliveryGateway::class),
         ]));
+
+        // Views write {{ Salla::storeUrl() }} rather than the fully qualified
+        // class — every shop link on the site goes through it.
+        AliasLoader::getInstance()->alias('Salla', Salla::class);
     }
 
     /**

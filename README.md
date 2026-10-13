@@ -1,8 +1,14 @@
 # KOTIVA™ — Storefront and Dashboard
 
-The KOTIVA skincare site as a Laravel application: the original storefront pages, now served from
-Blade with their design unchanged, plus a shop (catalog, cart, cash-on-delivery checkout, order
-emails) and a Filament dashboard for running it.
+The KOTIVA brand and content website (`klyvosystems.com`) as a Laravel application: the original
+pages served from Blade with their design unchanged, the Routine Finder, the ingredient glossary,
+and a Filament dashboard for the content.
+
+> **The shop is on Salla** (`shop.klyvosystems.com`). Listing, product pages, cart, checkout,
+> orders, prices and stock all live there. Every "Shop", product and cart link on this site lands on
+> Salla, and the old `/shop`, `/product/*`, `/cart` and `/checkout` URLs redirect there. Laravel's
+> own cart/checkout code is still in the repository but switched off (`KOTIVA_COMMERCE_ENABLED=false`)
+> and is due to be deleted in a separate change. See [Salla storefront](#salla-storefront) and D-35.
 
 - **Storefront:** Laravel 12 + Blade, vanilla JS and CSS. No Vite, no Tailwind, no build step.
 - **Dashboard:** Filament 3 at `/admin`, with its own login and three roles.
@@ -81,7 +87,46 @@ KOTIVA_ADMIN_PASSWORD=...
 A deactivated admin is locked out at once. Roles are enforced on the routes themselves, not just
 hidden from the menu.
 
-## Running the shop day to day
+## Salla storefront
+
+The store URLs come from `.env` and are read only through `App\Support\Salla`; no view contains
+the store hostname.
+
+```
+KOTIVA_SALLA_STORE_URL=https://shop.klyvosystems.com
+KOTIVA_SALLA_CART_URL=https://shop.klyvosystems.com/cart
+KOTIVA_SALLA_API_BASE=https://api.salla.dev/admin/v2
+KOTIVA_SALLA_ACCESS_TOKEN=            # only for API mode below; never commit it
+KOTIVA_SALLA_REDIRECT_STATUS=302      # flip to 301 once the Salla store is confirmed final
+KOTIVA_SALLA_DASHBOARD_URL=           # optional: the "Open Salla" button on the admin dashboard
+KOTIVA_COMMERCE_ENABLED=false         # keep false; Salla owns stock and orders
+```
+
+**Product links.** Each product stores its Salla id and URL (`salla_product_id`, `salla_url`),
+matched by SKU. They are never edited in the dashboard; one command writes them. The standard way to
+refresh them is from the exported link file committed at `storage/app/salla-links.json`, which needs
+no API token:
+
+```bash
+php artisan kotiva:salla-links --from=storage/app/salla-links.json --dry-run   # preview
+php artisan kotiva:salla-links --from=storage/app/salla-links.json             # store
+php artisan kotiva:llms-txt                                                    # preview /llms.txt (served live; no file to commit)
+```
+
+With a Salla Merchant API token (`products.read`) in `.env`, `php artisan kotiva:salla-links` (no
+`--from`) asks the API for each active SKU instead. Add `--sku=KOT001` to sync one product.
+
+**Deploy must run** `php artisan kotiva:salla-links --check`. It makes no API call and exits 1 if
+any active product has no Salla link (such a product's links fall back to the store's home page).
+
+**Admin.** Orders, customers, shipping and stock movements are hidden and refused (403) for every
+role; the dashboard shows where to manage them in Salla. On a product, prices, stock and the
+low-stock threshold are read-only ("Managed in Salla") and the Salla tab shows the link.
+
+## Running the shop day to day (retired)
+
+Kept for reference until the commerce code is deleted; none of this runs while
+`KOTIVA_COMMERCE_ENABLED=false`.
 
 - **Orders** move `pending → confirmed → processing → shipped → delivered`. Only pending or
   confirmed orders can be cancelled; a delivered order can be refunded. The status menu only offers
@@ -148,17 +193,19 @@ provider (Tabby, Moyasar, …) is added without touching the checkout logic:
 
 ## Legacy URLs
 
-Every URL the static site exposed still works, with a **301** to its new home:
+Every URL the static site and the Laravel shop exposed still works:
 
 | Old | New |
 |---|---|
-| `/index.html` | `/` |
-| `/shop.html`, `/about.html`, `/science.html`, `/journal.html`, `/contact.html`, `/ingredients.html`, `/routine-finder.html`, `/privacy-policy.html`, `/terms.html` | the same path without `.html` |
-| `/product/{slug}.html` | `/product/{slug}` |
-| `/product.html?id=N` | `/product/{slug}` for that product, or `/shop` if the id is unknown |
-| `/shop?filter=sunscreen` | `/shop?filter=spf` |
+| `/index.html` | `/` (301) |
+| `/about.html`, `/science.html`, `/journal.html`, `/contact.html`, `/ingredients.html`, `/routine-finder.html`, `/privacy-policy.html`, `/terms.html` | the same path without `.html` (301) |
+| `/shop`, `/shop.html`, `/shop?filter=…`, `/shop?routine=…` | the Salla listing, with the filter mapped to a Salla key (D-35) |
+| `/product/{slug}`, `/product/{slug}.html`, `/product.html?id=N` | that product's Salla page in one hop (store root if unlinked; 404 for an unknown slug) |
+| `/cart`, `/checkout`, `/checkout/*` | the Salla cart |
+| `POST/PATCH/DELETE /cart/items…`, `GET /cart/summary`, `POST /checkout/*`, `GET /api/shipping/cities` | **410 Gone** |
 
-These are covered by `tests/Feature/StorefrontRoutesTest.php`.
+Redirects to Salla use `KOTIVA_SALLA_REDIRECT_STATUS` (302 now, 301 after verification). They are
+covered by `tests/Feature/StorefrontRoutesTest.php` and `tests/Feature/SallaHandoffTest.php`.
 
 ## Quality gates
 
@@ -168,6 +215,8 @@ composer validate
 ./vendor/bin/phpstan analyse          # level 5, Larastan
 php artisan test
 php artisan migrate:fresh --seed
+php artisan kotiva:salla-links --from=storage/app/salla-links.json
+php artisan kotiva:salla-links --check   # deploy gate: exits 1 if an active product is unlinked
 node --check public/js/shop.js
 node --check public/js/layout.js
 npm run test:routine                  # Routine Finder engine

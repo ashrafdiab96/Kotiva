@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\SkipsRetiredStorefront;
 use Tests\TestCase;
 
 /**
@@ -21,6 +22,7 @@ use Tests\TestCase;
 final class DualPriceStorefrontTest extends TestCase
 {
     use RefreshDatabase;
+    use SkipsRetiredStorefront;
 
     private function product(string $excl = '135.00', string $incl = '155.25', array $attributes = []): Product
     {

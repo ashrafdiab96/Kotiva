@@ -13,8 +13,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  * Feeds the Routine Finder.
  *
  * The quiz engine itself is untouched; it previously read the KOTIVA_PRODUCTS
- * bundle from a script tag and now reads the same shape over HTTP, with live
- * stock added so a routine can say when something is sold out.
+ * bundle from a script tag and now reads the same shape over HTTP. Since the
+ * Salla handoff each row carries its SKU and Salla product URL, and no price
+ * or stock — Salla owns both.
  */
 final class ProductApiController extends Controller
 {
@@ -24,8 +25,8 @@ final class ProductApiController extends Controller
             ->active()
             ->orderBy('id')
             ->get([
-                'id', 'slug', 'name', 'price_excl_vat', 'price_incl_vat', 'image',
-                'filter_tags', 'stock_qty', 'category_id',
+                'id', 'sku', 'slug', 'name', 'image', 'salla_url',
+                'filter_tags', 'category_id',
                 'skin_type', 'concern',
             ]);
 

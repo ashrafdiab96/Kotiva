@@ -27,6 +27,14 @@ final class CustomerResource extends Resource
 {
     use GatedByRole;
 
+    /**
+     * Salla handoff: this data is owned by Salla now; see GatedByRole.
+     */
+    protected static function ownedBySalla(): bool
+    {
+        return true;
+    }
+
     protected static ?string $model = Customer::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';

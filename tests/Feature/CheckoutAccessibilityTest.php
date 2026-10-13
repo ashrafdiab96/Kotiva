@@ -16,6 +16,7 @@ use DOMXPath;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\SkipsRetiredStorefront;
 use Tests\TestCase;
 
 /**
@@ -29,6 +30,7 @@ use Tests\TestCase;
 final class CheckoutAccessibilityTest extends TestCase
 {
     use RefreshDatabase;
+    use SkipsRetiredStorefront;
 
     private ?Cart $cart = null;
 

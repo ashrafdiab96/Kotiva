@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
+use LogicException;
 
 /**
  * The single place products.stock_qty is allowed to change.
@@ -32,6 +33,12 @@ use InvalidArgumentException;
  *
  * Adding to a cart RESERVES stock rather than merely counting it, so the last
  * unit cannot be promised to two shoppers who both reach checkout.
+ *
+ * SALLA HANDOFF: the storefront moved to Salla, which now owns stock. The
+ * cart-driven paths (reserve, release, fulfil) refuse to run unless
+ * kotiva.commerce_enabled is on — so a forgotten route, a queued job or a
+ * test cannot move stock here behind Salla's back. adjust() stays available
+ * to the product importer.
  */
 final class StockService
 {
@@ -42,6 +49,7 @@ final class StockService
      */
     public function reserve(Product $product, int $qty, ?CartItem $reference = null): void
     {
+        $this->assertCommerceEnabled();
         $this->assertPositive($qty);
 
         $this->applyDecrement(
@@ -59,6 +67,7 @@ final class StockService
      */
     public function release(Product $product, int $qty, ?Model $reference = null, ?string $note = null): void
     {
+        $this->assertCommerceEnabled();
         $this->assertPositive($qty);
 
         DB::transaction(function () use ($product, $qty, $reference, $note): void {
@@ -113,6 +122,7 @@ final class StockService
      */
     public function fulfil(Product $product, int $qty, Model $order): void
     {
+        $this->assertCommerceEnabled();
         $this->assertPositive($qty);
 
         DB::transaction(function () use ($product, $qty, $order): void {
@@ -233,6 +243,16 @@ final class StockService
             'note' => $note,
             'admin_id' => $adminId,
         ]);
+    }
+
+    /**
+     * @throws LogicException while Salla owns stock
+     */
+    private function assertCommerceEnabled(): void
+    {
+        if (! config('kotiva.commerce_enabled', false)) {
+            throw new LogicException('Laravel commerce is disabled; stock is owned by Salla.');
+        }
     }
 
     private function assertPositive(int $qty): void

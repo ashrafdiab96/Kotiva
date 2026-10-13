@@ -5,18 +5,18 @@
   <meta name="description" content="Doctor-approved skincare, perfected by science and tailored for you. Explore 25 products formulated with clinically proven ingredients across cleansers, serums, SPF, body and hair care." />
   <link rel="preload" as="image" href="{{ asset('img/hero/1.jpeg') }}" media="(min-width: 768px)" fetchpriority="high" />
   <link rel="preload" as="image" href="{{ asset('img/hero/3.jpeg') }}" media="(max-width: 767px)" fetchpriority="high" />
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/" />
+  <link rel="canonical" href="{{ config('app.url') }}/" />
   <meta property="og:title" content="kotiva™ — Doctor-Approved Skincare" />
   <meta property="og:description" content="Doctor-approved skincare, perfected by science and tailored for you. Explore 25 products formulated with clinically proven ingredients for every skin type." />
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/" />
+  <meta property="og:url" content="{{ config('app.url') }}/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="KOTIVA" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/img/hero/1.jpeg" />
+  <meta property="og:image" content="{{ config('app.url') }}/img/hero/1.jpeg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="kotiva™ — Doctor-Approved Skincare" />
   <meta name="twitter:description" content="Doctor-approved skincare, perfected by science and tailored for you. 25 products formulated with clinically proven ingredients, for every skin type." />
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/img/hero/1.jpeg" />
+  <meta name="twitter:image" content="{{ config('app.url') }}/img/hero/1.jpeg" />
 @endsection
 
 @section('main_attrs')aria-label="Main content"@endsection
@@ -61,7 +61,7 @@
 ═══════════════════════════════════════ -->
 <section class="hero-banner" aria-roledescription="carousel" aria-label="Kotiva campaigns">
   <h1 class="hero-banner-title">kotiva™ — Doctor-Approved Skincare</h1>
-  <a class="hero-banner-slide is-active" href="{{ route('shop.index') }}" aria-roledescription="slide" aria-label="1 of 2: 25+ formulas, each built around one job — shop the range">
+  <a class="hero-banner-slide is-active" href="{{ Salla::storeUrl() }}" aria-roledescription="slide" aria-label="1 of 2: 25+ formulas, each built around one job — shop the range">
     <picture>
       <source media="(max-width: 767px)" srcset="{{ asset('img/hero/3.jpeg') }}" width="2048" height="3072" />
       <img src="{{ asset('img/hero/1.jpeg') }}" width="5461" height="3072" alt="25+ formulas, each built around one job. Doctor-approved skincare for stress-free routines — three women holding kotiva products." fetchpriority="high" />
@@ -251,7 +251,7 @@
   </div>
   <div class="category-grid" data-stagger="60">
 
-    <a class="category-card" href="{{ route('shop.index', ['filter' => 'face']) }}" aria-label="Shop Face Care">
+    <a class="category-card" href="{{ Salla::listingUrl('face') }}" aria-label="Shop Face Care">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
         <img src="{{ asset('assets/categories/cat-face-v3.webp') }}" alt="A woman with olive skin resting in warm sunlight, her skin clear and glowing." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
@@ -263,7 +263,7 @@
       <div class="category-card-arrow" aria-hidden="true">→</div>
     </a>
 
-    <a class="category-card" href="{{ route('shop.index', ['filter' => 'body']) }}" aria-label="Shop Body Care">
+    <a class="category-card" href="{{ Salla::listingUrl('body') }}" aria-label="Shop Body Care">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
         <img src="{{ asset('assets/categories/cat-body-v3.webp') }}" alt="A woman smoothing body cream along her arm in soft morning light." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
@@ -275,7 +275,7 @@
       <div class="category-card-arrow" aria-hidden="true">→</div>
     </a>
 
-    <a class="category-card" href="{{ route('shop.index', ['filter' => 'serums']) }}" aria-label="Shop Serums">
+    <a class="category-card" href="{{ Salla::listingUrl('serums') }}" aria-label="Shop Serums">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
         <img src="{{ asset('assets/categories/cat-serums-v3.webp') }}" alt="A golden droplet of serum falling from a glass dropper." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
@@ -287,7 +287,7 @@
       <div class="category-card-arrow" aria-hidden="true">→</div>
     </a>
 
-    <a class="category-card" href="{{ route('shop.index', ['filter' => 'treatment']) }}" aria-label="Shop Treatments">
+    <a class="category-card" href="{{ Salla::listingUrl('treatment') }}" aria-label="Shop Treatments">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
         <img src="{{ asset('assets/categories/cat-treatments-v4.webp') }}" alt="A woman pressing treatment cream into her cheek with her fingertips." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
@@ -299,7 +299,7 @@
       <div class="category-card-arrow" aria-hidden="true">→</div>
     </a>
 
-    <a class="category-card" href="{{ route('shop.index', ['filter' => 'spf']) }}" aria-label="Shop Sunscreen">
+    <a class="category-card" href="{{ Salla::listingUrl('spf') }}" aria-label="Shop Sunscreen">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
         <img src="{{ asset('assets/categories/cat-spf-v3.webp') }}" alt="A woman turning her face toward warm sunlight, skin protected and even." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
@@ -311,7 +311,7 @@
       <div class="category-card-arrow" aria-hidden="true">→</div>
     </a>
 
-    <a class="category-card" href="{{ route('shop.index', ['filter' => 'hair']) }}" aria-label="Shop Hair Care">
+    <a class="category-card" href="{{ Salla::listingUrl('hair') }}" aria-label="Shop Hair Care">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
         <img src="{{ asset('assets/categories/cat-hair-v3.webp') }}" alt="Long healthy hair backlit by sunlight, seen from behind." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
@@ -401,7 +401,7 @@
           <p class="t-eyebrow mb-16">Most Loved</p>
           <h2 class="t-display t-display-md" style="color:var(--fg);">The Essentials</h2>
         </div>
-        <a class="btn btn-outline-light" href="{{ route('shop.index') }}" style="color:rgba(255,255,255,0.78);border-color:rgba(255,255,255,0.40);">View All {{ $catalogCount }} →</a>
+        <a class="btn btn-outline-light" href="{{ Salla::storeUrl() }}" style="color:rgba(255,255,255,0.78);border-color:rgba(255,255,255,0.40);">View All {{ $catalogCount }} →</a>
       </div>
     </div>
     <div class="bs-slider">
@@ -410,15 +410,15 @@
     <div class="bestsellers-scroll" role="region" aria-label="Best sellers">
     <div class="bestsellers-track" data-stagger="70">
       @foreach ($bestSellers as $p)
-      <a class="bs-card" href="{{ route('product.show', ['slug' => $p->slug]) }}" aria-label="{{ $p->displayName() }}, {{ config('kotiva.currency.code') }} {{ number_format((float) $p->price_excl_vat, 2) }} excluding VAT">
+      <a class="bs-card" href="{{ Salla::productUrl($p) }}" aria-label="{{ $p->displayName() }}@if (config('kotiva.commerce_enabled')), {{ config('kotiva.currency.code') }} {{ number_format((float) $p->price_excl_vat, 2) }} excluding VAT @endif">
         <div class="bs-card-img"><img src="{{ $p->heroImageUrl() }}" alt="{{ $p->displayName() }}" width="200" height="200" style="--s:1.0" loading="lazy" /></div>
         <div class="bs-card-body">
           <div class="bs-card-name">{{ $p->displayName() }}</div>
-          {{-- Excluding VAT, labelled the same way as the shop card. The
-               qualifier sits inside .bs-card-price so animations.js's focus
-               ramp (which sets opacity on that element) carries it with the
-               figure rather than leaving the label at a different brightness. --}}
-          <div class="bs-card-meta"><span class="bs-card-price">{{ config('kotiva.currency.code') }} {{ number_format((float) $p->price_excl_vat, 2) }}<small>excl. VAT</small></span><span class="bs-card-vol">{{ $p->volume }}</span></div>
+          {{-- No price: Salla is the price authority and this site shows none.
+               The figure only returns if Laravel commerce is re-enabled, which
+               it is not. Its qualifier sits inside .bs-card-price so
+               animations.js's focus ramp carries both together. --}}
+          <div class="bs-card-meta">@if (config('kotiva.commerce_enabled'))<span class="bs-card-price">{{ config('kotiva.currency.code') }} {{ number_format((float) $p->price_excl_vat, 2) }}<small>excl. VAT</small></span>@endif<span class="bs-card-vol">{{ $p->volume }}</span></div>
           <div class="bs-card-foot"><span class="badge-concern">{{ $p->concern }}</span><span class="bs-card-cta">Discover</span></div>
         </div>
       </a>
@@ -434,7 +434,7 @@
            With the catalog in the database and that gate retired, a literal here could go stale
            the first time a product is deactivated — so it is derived: active products minus the
            ones the rail just showed. -->
-      <a class="bs-end" href="{{ route('shop.index') }}" aria-label="Explore the full KOTIVA range, {{ $catalogCount - $bestSellers->count() }} more products">
+      <a class="bs-end" href="{{ Salla::storeUrl() }}" aria-label="Explore the full KOTIVA range, {{ $catalogCount - $bestSellers->count() }} more products">
         <span class="bs-end-count">{{ $catalogCount - $bestSellers->count() }}</span>
         <span class="bs-end-label">more products<br/>in the full range</span>
         <span class="bs-end-cta">Explore the range →</span>

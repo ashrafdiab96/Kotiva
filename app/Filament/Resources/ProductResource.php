@@ -21,6 +21,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use League\Flysystem\UnableToCheckFileExistence;
 
@@ -39,6 +40,12 @@ use League\Flysystem\UnableToCheckFileExistence;
  *    that every change lands in the append-only ledger the quantity is
  *    reconciled against. Editing the number directly would desynchronise the
  *    two with nothing to reveal it afterwards.
+ *
+ * 3. SALLA HANDOFF. Prices and stock are managed in Salla now. While
+ *    kotiva.commerce_enabled is off, the price, stock and threshold fields are
+ *    read-only on an existing product ("Managed in Salla"), and the Salla tab
+ *    shows the product's link — written only by kotiva:salla-links, never by
+ *    this form.
  */
 final class ProductResource extends Resource
 {
@@ -53,6 +60,8 @@ final class ProductResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    private const MANAGED_IN_SALLA = 'Managed in Salla';
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -70,6 +79,9 @@ final class ProductResource extends Resource
                     Forms\Components\Tabs\Tab::make('Media')->schema(self::mediaFields()),
                     Forms\Components\Tabs\Tab::make('Inventory')->schema(self::inventoryFields()),
                     Forms\Components\Tabs\Tab::make('SEO')->schema(self::seoFields()),
+                    Forms\Components\Tabs\Tab::make('Salla')
+                        ->visible(fn (string $operation): bool => $operation === 'edit')
+                        ->schema(self::sallaFields()),
                 ]),
         ]);
     }
@@ -136,7 +148,10 @@ final class ProductResource extends Resource
                 ->minValue(0)
                 ->live(onBlur: true)
                 ->prefix(config('kotiva.currency.code'))
-                ->helperText('From the VAT-exclusive brochure. This is the price the shop, the home page and the product page display, and what price sorting uses.')
+                ->disabled(fn (string $operation): bool => self::pricesManagedInSalla($operation))
+                ->helperText(fn (string $operation): string => self::pricesManagedInSalla($operation)
+                    ? self::MANAGED_IN_SALLA
+                    : 'From the VAT-exclusive brochure. This is the price the shop, the home page and the product page display, and what price sorting uses.')
                 ->hint(fn (Forms\Get $get): ?string => self::priceHint($get, 'excl'))
                 ->hintColor('warning'),
 
@@ -147,7 +162,10 @@ final class ProductResource extends Resource
                 ->minValue(0)
                 ->live(onBlur: true)
                 ->prefix(config('kotiva.currency.code'))
-                ->helperText('From the VAT-inclusive brochure. This is what the customer is charged at checkout.')
+                ->disabled(fn (string $operation): bool => self::pricesManagedInSalla($operation))
+                ->helperText(fn (string $operation): string => self::pricesManagedInSalla($operation)
+                    ? self::MANAGED_IN_SALLA
+                    : 'From the VAT-inclusive brochure. This is what the customer is charged at checkout.')
                 ->hint(fn (Forms\Get $get): ?string => self::priceHint($get, 'incl'))
                 ->hintColor('warning')
                 // The one hard rule. The two prices may legitimately disagree
@@ -173,7 +191,10 @@ final class ProductResource extends Resource
                 ->numeric()
                 ->minValue(0)
                 ->prefix(config('kotiva.currency.code'))
-                ->helperText('Optional. Shown struck through when higher than the price.'),
+                ->disabled(fn (string $operation): bool => self::pricesManagedInSalla($operation))
+                ->helperText(fn (string $operation): string => self::pricesManagedInSalla($operation)
+                    ? self::MANAGED_IN_SALLA
+                    : 'Optional. Shown struck through when higher than the price.'),
 
             Forms\Components\TextInput::make('volume')->maxLength(255)->helperText('e.g. 200ml'),
             Forms\Components\TextInput::make('skin_type')->maxLength(255),
@@ -361,7 +382,8 @@ final class ProductResource extends Resource
                 ->minValue(0)
                 ->default(0)
                 ->dehydrated(false)
-                ->visible(fn (string $operation): bool => $operation === 'create')
+                // Stock is Salla's: no opening movement is recorded here.
+                ->visible(fn (string $operation): bool => $operation === 'create' && ! self::sallaOwnsCommerce())
                 ->helperText('Recorded as the first stock movement for this product.'),
 
             Forms\Components\TextInput::make('stock_qty')
@@ -369,7 +391,9 @@ final class ProductResource extends Resource
                 ->disabled()
                 ->dehydrated(false)
                 ->visible(fn (string $operation): bool => $operation === 'edit')
-                ->helperText('Changed only through "Adjust stock", so every movement is recorded in the ledger.'),
+                ->helperText(fn (): string => self::sallaOwnsCommerce()
+                    ? self::MANAGED_IN_SALLA
+                    : 'Changed only through "Adjust stock", so every movement is recorded in the ledger.'),
 
             Forms\Components\TextInput::make('low_stock_threshold')
                 ->numeric()
@@ -377,13 +401,65 @@ final class ProductResource extends Resource
                 // The dashboard default, so changing it in Settings governs the
                 // next product rather than only the config file.
                 ->default((int) Setting::get('low_stock_threshold', config('kotiva.stock.low_stock_threshold')))
-                ->helperText('At or below this, the shop shows "Only N left" and an alert is raised.'),
+                ->disabled(fn (): bool => self::sallaOwnsCommerce())
+                ->helperText(fn (): string => self::sallaOwnsCommerce()
+                    ? self::MANAGED_IN_SALLA
+                    : 'At or below this, the shop shows "Only N left" and an alert is raised.'),
 
             Forms\Components\TextInput::make('weight_grams')
                 ->numeric()
                 ->minValue(0)
                 ->suffix('g'),
         ];
+    }
+
+    /**
+     * Read-only. Placeholders rather than inputs, so the form cannot write
+     * these columns even by accident; kotiva:salla-links is their only writer.
+     *
+     * @return array<int, Forms\Components\Component>
+     */
+    private static function sallaFields(): array
+    {
+        return [
+            Forms\Components\Section::make('Salla')
+                ->description('The product\'s page on the Salla store. Synced by SKU with `php artisan kotiva:salla-links`; not editable here.')
+                ->columns(3)
+                ->schema([
+                    Forms\Components\Placeholder::make('salla_product_id')
+                        ->label('Salla product ID')
+                        ->content(fn (?Product $record): string => $record?->salla_product_id !== null ? (string) $record->salla_product_id : 'Not linked'),
+
+                    Forms\Components\Placeholder::make('salla_url')
+                        ->label('Salla URL')
+                        ->content(fn (?Product $record): HtmlString|string => filled($record?->salla_url)
+                            ? new HtmlString('<a href="'.e((string) $record->salla_url).'" target="_blank" rel="noopener" class="text-primary-600 underline dark:text-primary-400">'.e((string) $record->salla_url).'</a>')
+                            : 'Not linked — the site links this product to the store root'),
+
+                    Forms\Components\Placeholder::make('salla_synced_at')
+                        ->label('Last synced')
+                        ->content(fn (?Product $record): string => $record?->salla_synced_at?->format('j M Y, H:i') ?? 'Never'),
+                ]),
+        ];
+    }
+
+    /**
+     * Whether Salla owns prices and stock — true unless Laravel commerce has
+     * been switched back on.
+     */
+    public static function sallaOwnsCommerce(): bool
+    {
+        return ! config('kotiva.commerce_enabled', false);
+    }
+
+    /**
+     * Prices are read-only on an existing product. A NEW product still takes
+     * both brochure prices, because the columns are required and a silent 0
+     * would be worse than asking.
+     */
+    private static function pricesManagedInSalla(string $operation): bool
+    {
+        return self::sallaOwnsCommerce() && $operation === 'edit';
     }
 
     /**

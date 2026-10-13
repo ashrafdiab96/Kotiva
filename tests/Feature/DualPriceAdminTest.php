@@ -23,6 +23,7 @@ use Filament\Forms\Get;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\EnablesLegacyCommerce;
 use Tests\TestCase;
 
 /**
@@ -35,6 +36,7 @@ use Tests\TestCase;
  */
 final class DualPriceAdminTest extends TestCase
 {
+    use EnablesLegacyCommerce;
     use RefreshDatabase;
 
     private function actingAsAdmin(): Admin

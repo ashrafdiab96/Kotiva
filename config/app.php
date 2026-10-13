@@ -50,9 +50,13 @@ return [
     | the Artisan command line tool. You should set this to the root of
     | the application so that it's available within Artisan commands.
     |
+    | KOTIVA: this is also the site's one public origin — canonical URLs, Open
+    | Graph tags, JSON-LD, the sitemap, robots.txt and llms.txt all read it.
+    | Trailing slash trimmed so views can append paths directly.
+    |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => rtrim((string) env('APP_URL', 'http://localhost'), '/'),
 
     /*
     |--------------------------------------------------------------------------

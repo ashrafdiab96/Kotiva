@@ -21,6 +21,7 @@ use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\EnablesLegacyCommerce;
 use Tests\TestCase;
 
 /**
@@ -33,6 +34,7 @@ use Tests\TestCase;
  */
 final class DashboardWidgetsTest extends TestCase
 {
+    use EnablesLegacyCommerce;
     use RefreshDatabase;
 
     private function actingAsAdmin(AdminRole $role = AdminRole::SuperAdmin): Admin
