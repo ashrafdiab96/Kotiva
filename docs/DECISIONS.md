@@ -753,3 +753,31 @@ Request-time URLs (`url()`, `route()`, `asset()`) still follow the request host,
 works. Canonical/OG tags and the sitemap point at production, which is the intent.
 
 **Pinned by** `tests/Feature/PublicOriginsTest.php`.
+
+## D-37 — The importer edits copy only while Salla owns the catalog
+
+**Choice.** While `kotiva.commerce_enabled` is false, `ProductImporter` updates editorial fields on
+products that already exist and nothing else:
+
+- `price_excl_vat`, `price_incl_vat`, `compare_at_price`, `stock_qty` and `low_stock_threshold`
+  are still accepted in the file, so every old sheet parses. They are not cast, not validated and
+  never written. The mapping and preview label them "Ignored — managed in Salla", the check step
+  says how many values will be ignored, and the summary counts them as ignored, not updated.
+- `StockService::adjust()` is never called, so no `product_stock_movements` row is written.
+- A row whose SKU is not in the catalog (including soft-deleted rows) fails validation: create the
+  product in Salla and link it first (`kotiva:salla-links`). The legacy importer only updates
+  editorial fields on existing products. `import()` also throws if such a row reaches it some other
+  way, so nothing is created.
+- A price column is no longer required, because there is nothing to price.
+
+**Rejected alternative: create the product with Salla-owned fields blank or zero.** That would
+leave a product on this site with no Salla page. Its URL would redirect to a missing Salla
+product, `kotiva:salla-links --check` would fail until someone noticed, and the product would show
+a price that is not the one Salla charges. Creating products is a Salla job; this site takes the
+copy once the product exists there.
+
+**With commerce enabled** the importer behaves exactly as in D-32. `ProductImportTest` and
+`DualPriceImportExportTest` run under `EnablesLegacyCommerce`. The latter was added to it here
+because it pins pricing rules that only apply in that mode.
+
+**Pinned by** `tests/Feature/ProductImportSallaModeTest.php`.

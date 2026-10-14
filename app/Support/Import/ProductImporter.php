@@ -13,6 +13,7 @@ use App\Support\Money;
 use App\Support\Vat;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LogicException;
 
 /**
  * Product import from CSV/XLSX (§7.2).
@@ -36,6 +37,13 @@ use Illuminate\Support\Str;
  *   so the ledger still explains every unit.
  * - Categories are matched by slug, exactly as ProductSeeder creates them, so
  *   "Face Care" in a sheet finds the seeded category instead of cloning it.
+ *
+ * SALLA HANDOFF: while kotiva.commerce_enabled is off, Salla owns price and
+ * stock, and this importer only edits the editorial copy of products that
+ * already exist (D-37). The Salla-owned columns are still accepted, so every
+ * old sheet parses, but they are reported as ignored and never written; no
+ * stock movement is made; and a row for an unknown SKU is refused, because a
+ * product created here would have no Salla page to sell it.
  */
 final class ProductImporter
 {
@@ -82,6 +90,21 @@ final class ProductImporter
         'meta_title' => ['Meta title', 'string', false],
         'meta_description' => ['Meta description', 'text', false],
     ];
+
+    /**
+     * Fields Salla owns once the storefront has moved there. Written by the
+     * importer only while kotiva.commerce_enabled is on.
+     */
+    private const SALLA_OWNED_FIELDS = [
+        'price_excl_vat',
+        'price_incl_vat',
+        'compare_at_price',
+        'stock_qty',
+        'low_stock_threshold',
+    ];
+
+    /** The label suffix the mapping and preview show on a Salla-owned column. */
+    public const IGNORED_LABEL = 'Ignored — managed in Salla';
 
     /**
      * Header spellings people actually use, normalised, mapped to a field.
@@ -149,6 +172,43 @@ final class ProductImporter
     /* ── mapping ─────────────────────────────────────────────── */
 
     /**
+     * Whether Salla currently owns price and stock. Read on every call rather
+     * than once, so a long-lived worker follows the flag it is running under.
+     */
+    public static function sallaOwnsCommerce(): bool
+    {
+        return ! config('kotiva.commerce_enabled', false);
+    }
+
+    /**
+     * Fields that are read from the file but never written in this mode.
+     *
+     * @return list<string>
+     */
+    public static function ignoredFields(): array
+    {
+        return self::sallaOwnsCommerce() ? self::SALLA_OWNED_FIELDS : [];
+    }
+
+    /**
+     * FIELDS with each ignored column relabelled, for the mapping and preview.
+     * The column stays mappable — so the admin sees where an old sheet's price
+     * went — but its label says it will not be imported.
+     *
+     * @return array<string, array{0: string, 1: string, 2: bool}>
+     */
+    public static function displayFields(): array
+    {
+        $fields = self::FIELDS;
+
+        foreach (self::ignoredFields() as $field) {
+            $fields[$field][0] .= ' ('.self::IGNORED_LABEL.')';
+        }
+
+        return $fields;
+    }
+
+    /**
      * Best-guess column for each field, by header name.
      *
      * @param  list<string>  $headers
@@ -197,7 +257,9 @@ final class ProductImporter
 
         // Either price column satisfies the requirement; the other is derived
         // at the configured rate. Neither means the file cannot price anything.
-        if ($this->priceColumnsMissing($mapping)) {
+        // While Salla owns prices the importer prices nothing, so a sheet of
+        // copy edits alone is complete.
+        if (! self::sallaOwnsCommerce() && $this->priceColumnsMissing($mapping)) {
             $missing[] = 'Price excl. VAT or Price incl. VAT';
         }
 
@@ -224,16 +286,31 @@ final class ProductImporter
 
         // Catalog-sized, so preloading beats a query per row.
         $slugOwners = Product::withTrashed()->pluck('sku', 'slug')->all();
+        $sallaMode = self::sallaOwnsCommerce();
+        $knownSkus = $sallaMode ? array_flip(Product::withTrashed()->pluck('sku')->all()) : [];
 
         $valid = [];
         $errors = [];
+        $ignored = [];
         $seenSkus = [];
         $seenSlugs = [];
 
         foreach ($data->rows as $line => $cells) {
-            [$row, $messages] = $this->parseRow($cells, $mapping);
+            [$row, $messages, $ignoredHere] = $this->parseRow($cells, $mapping);
 
             $sku = $row['sku'] ?? null;
+
+            /*
+             | D-37: no new products while Salla owns the catalog. A product
+             | created here would have no Salla page, so its URL would redirect
+             | nowhere and `kotiva:salla-links --check` would fail. The admin
+             | creates it in Salla, links it, and then this sheet can carry its
+             | copy.
+             */
+            if ($sallaMode && is_string($sku) && ! isset($knownSkus[$sku])) {
+                $messages[] = 'SKU '.$sku.' is not in the catalog. Create the product in Salla and link it first (kotiva:salla-links); '
+                    .'while commerce is managed in Salla this importer only updates editorial fields on existing products.';
+            }
 
             if (is_string($sku)) {
                 if (isset($seenSkus[$sku])) {
@@ -259,27 +336,44 @@ final class ProductImporter
 
             if ($messages === []) {
                 $valid[$line] = $row;
+
+                if ($ignoredHere !== []) {
+                    $ignored[$line] = $ignoredHere;
+                }
             } else {
                 $errors[$line] = $messages;
             }
         }
 
-        return new ImportReport($valid, $errors, $this->warnings);
+        return new ImportReport($valid, $errors, $this->warnings, $ignored);
     }
 
     /**
      * @param  list<string>  $cells
      * @param  array<string, int|null>  $mapping
-     * @return array{0: array<string, mixed>, 1: list<string>}
+     * @return array{0: array<string, mixed>, 1: list<string>, 2: list<string>}
      */
     private function parseRow(array $cells, array $mapping): array
     {
         $row = [];
         $messages = [];
+        $ignored = [];
+        $ignoredFields = self::ignoredFields();
 
         foreach (self::FIELDS as $field => [$label, $type, $required]) {
             $index = $mapping[$field] ?? null;
             $cell = $index === null ? '' : self::unguard($cells[$index] ?? '');
+
+            // A Salla-owned value is noted and dropped before it is cast: an
+            // old sheet's price that would not parse is no reason to refuse
+            // copy edits on the same row, since the price is never used.
+            if (in_array($field, $ignoredFields, true)) {
+                if (trim($cell) !== '') {
+                    $ignored[] = $field;
+                }
+
+                continue;
+            }
 
             // Long text keeps its exact whitespace: `science` is rendered by
             // ScienceRenderer, whose output is checked byte for byte, so an
@@ -306,9 +400,11 @@ final class ProductImporter
             $row[$field] = $value;
         }
 
-        $messages = array_merge($messages, $this->resolvePrices($row));
+        if (! self::sallaOwnsCommerce()) {
+            $messages = array_merge($messages, $this->resolvePrices($row));
+        }
 
-        return [$row, $messages];
+        return [$row, $messages, $ignored];
     }
 
     /**
@@ -507,19 +603,42 @@ final class ProductImporter
             $updated = 0;
             $unchanged = 0;
             $stockAdjusted = 0;
+            $ignored = 0;
+            $sallaMode = self::sallaOwnsCommerce();
 
             $categories = [];
             $usedSlugs = array_fill_keys(Product::withTrashed()->pluck('slug')->all(), true);
             $nextSort = (int) Product::withTrashed()->max('sort_order') + 1;
             $defaultThreshold = (int) Setting::get('low_stock_threshold', config('kotiva.stock.low_stock_threshold'));
 
-            foreach ($report->valid as $row) {
+            foreach ($report->valid as $line => $row) {
+                /*
+                 | Stripped here as well as in validate(), so a report built by
+                 | any other route still cannot write a Salla-owned column.
+                 | Whatever was dropped is counted as ignored, never updated.
+                 */
+                if ($sallaMode) {
+                    $ignoredHere = array_unique(array_merge(
+                        $report->ignored[$line] ?? [],
+                        array_keys(array_intersect_key($row, array_flip(self::SALLA_OWNED_FIELDS))),
+                    ));
+                    $ignored += count($ignoredHere);
+                    $row = array_diff_key($row, array_flip(self::SALLA_OWNED_FIELDS));
+                }
+
                 $categoryId = $categories[$row['category']] ??= $this->categoryId((string) $row['category']);
 
                 $attributes = array_diff_key($row, array_flip(['sku', 'category', 'stock_qty']));
                 $attributes['category_id'] = $categoryId;
 
                 $product = Product::withTrashed()->where('sku', $row['sku'])->first();
+
+                if (! $product instanceof Product && $sallaMode) {
+                    // validate() already refuses these rows (D-37); reaching
+                    // here means a report was assembled some other way.
+                    // Throwing rolls back the whole import.
+                    throw new LogicException('Laravel commerce is disabled; new products are created in Salla, not by the importer (SKU '.$row['sku'].').');
+                }
 
                 if ($product instanceof Product) {
                     $wasTrashed = $product->trashed();
@@ -555,6 +674,8 @@ final class ProductImporter
                     $created++;
                 }
 
+                // In Salla mode stock_qty was stripped above, so no movement is
+                // ever written: Salla's count is the one that sells.
                 if (array_key_exists('stock_qty', $row)) {
                     $delta = (int) $row['stock_qty'] - $product->stock_qty;
 
@@ -573,6 +694,7 @@ final class ProductImporter
                 unchanged: $unchanged,
                 stockAdjusted: $stockAdjusted,
                 skipped: count($report->errors),
+                ignored: $ignored,
             );
         });
     }

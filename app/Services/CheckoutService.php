@@ -21,6 +21,7 @@ use App\Support\Money;
 use App\Support\OrderNumber;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LogicException;
 
 /**
  * Turns a cart into an order.
@@ -90,6 +91,7 @@ final class CheckoutService
      * Place the order.
      *
      * @throws CheckoutException
+     * @throws LogicException while Salla owns checkout
      */
     public function place(
         Cart $cart,
@@ -98,6 +100,8 @@ final class CheckoutService
         ?string $ipAddress = null,
         ?string $userAgent = null,
     ): Order {
+        $this->assertCommerceEnabled();
+
         if (! $gateway->isEnabled()) {
             throw CheckoutException::paymentUnavailable();
         }
@@ -264,6 +268,21 @@ final class CheckoutService
         OrderPlaced::dispatch($order);
 
         return $order;
+    }
+
+    /**
+     * SALLA HANDOFF: checkout moved to Salla. The routes that reached place()
+     * now redirect or answer 410, but the service is the last line — a
+     * forgotten controller, a queued job or a tinker session must not be able
+     * to create an order, take stock or email a customer behind Salla's back.
+     *
+     * @throws LogicException while Salla owns checkout
+     */
+    private function assertCommerceEnabled(): void
+    {
+        if (! config('kotiva.commerce_enabled', false)) {
+            throw new LogicException('Laravel commerce is disabled; checkout is owned by Salla.');
+        }
     }
 
     /**

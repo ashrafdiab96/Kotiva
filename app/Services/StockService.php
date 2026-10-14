@@ -37,8 +37,8 @@ use LogicException;
  * SALLA HANDOFF: the storefront moved to Salla, which now owns stock. The
  * cart-driven paths (reserve, release, fulfil) refuse to run unless
  * kotiva.commerce_enabled is on — so a forgotten route, a queued job or a
- * test cannot move stock here behind Salla's back. adjust() stays available
- * to the product importer.
+ * test cannot move stock here behind Salla's back. adjust() is not guarded,
+ * but the product importer only calls it while commerce is enabled (D-37).
  */
 final class StockService
 {

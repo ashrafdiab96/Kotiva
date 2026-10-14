@@ -218,6 +218,47 @@ final class SallaLinksCommandTest extends TestCase
     }
 
     #[Test]
+    public function an_active_product_missing_from_the_file_fails_the_run(): void
+    {
+        $this->product('KOT001');
+        $kot002 = $this->product('KOT002');
+        $file = $this->linkFile([
+            ['sku' => 'KOT001', 'salla_product_id' => '1713901761', 'salla_path' => '/micellar-water/p1713901761'],
+        ]);
+
+        // A dry run reports the same failure: it is the rehearsal for the
+        // real run and must not pass where the real run would not.
+        foreach ([[], ['--dry-run' => true]] as $extra) {
+            $this->artisan('kotiva:salla-links', ['--from' => $file] + $extra)
+                ->expectsOutputToContain('no row in file')
+                ->expectsOutputToContain('1 active product(s) missing from the link file')
+                ->assertExitCode(1);
+        }
+
+        @unlink($file);
+
+        // The rows that were present are still stored; only the verdict changes.
+        $this->assertSame('/micellar-water/p1713901761', Product::query()->where('sku', 'KOT001')->value('salla_path'));
+        $this->assertNull($kot002->fresh()->salla_path);
+    }
+
+    #[Test]
+    public function an_inactive_product_may_be_missing_from_the_file(): void
+    {
+        $this->product('KOT001');
+        $this->product('KOT002', active: false);
+        $file = $this->linkFile([
+            ['sku' => 'KOT001', 'salla_product_id' => '1713901761', 'salla_path' => '/micellar-water/p1713901761'],
+        ]);
+
+        $this->artisan('kotiva:salla-links', ['--from' => $file])
+            ->doesntExpectOutputToContain('no row in file')
+            ->assertExitCode(0);
+
+        @unlink($file);
+    }
+
+    #[Test]
     public function a_legacy_full_url_on_the_store_is_stored_as_its_path(): void
     {
         $product = $this->product('KOT001');

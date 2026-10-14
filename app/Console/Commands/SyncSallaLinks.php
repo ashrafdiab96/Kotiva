@@ -26,7 +26,9 @@ use Throwable;
  *                  {sku, salla_product_id, salla_path} rows — the committed
  *                  storage/app/salla-links.json — and needs no API token.
  *                  A legacy full salla_url is accepted when it is on the
- *                  configured store; its origin is stripped.
+ *                  configured store; its origin is stripped. Every active
+ *                  product (within --sku) must have a row: one that is
+ *                  missing fails the run, --dry-run included.
  *   (no option)    Asks the Salla Merchant API for each SKU. Needs
  *                  KOTIVA_SALLA_ACCESS_TOKEN with products.read.
  *   --check        Touches nothing. Lists active products with no valid Salla
@@ -205,10 +207,20 @@ final class SyncSallaLinks extends Command
             $this->addRow($product->sku, $product->name, (string) $id, $url, $status);
         }
 
-        // The other direction: catalog products the file says nothing about.
+        /*
+         | The other direction: active catalog products the file says nothing
+         | about. Each one fails the run. A file that silently drops a product
+         | would leave that product with no "Buy" link (or a stale one), which
+         | `--check` catches only after deploy. Inactive products are not
+         | sold, so they are allowed to be absent.
+         */
+        $missing = 0;
+
         foreach ($products as $sku => $product) {
             if (($only === null || $sku === $only) && ! isset($seenSkus[$sku]) && $product->is_active) {
                 $this->addRow($product->sku, $product->name, null, null, 'no row in file');
+                $missing++;
+                $failed = true;
             }
         }
 
@@ -218,6 +230,10 @@ final class SyncSallaLinks extends Command
         }
 
         $this->printTable();
+
+        if ($missing > 0) {
+            $this->error($missing.' active product(s) missing from the link file.');
+        }
 
         if ($dryRun) {
             $this->comment('Dry run: nothing was stored.');

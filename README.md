@@ -102,7 +102,7 @@ KOTIVA_SALLA_DASHBOARD_URL=           # optional: the "Open Salla" button on the
 KOTIVA_COMMERCE_ENABLED=false         # keep false; Salla owns stock and orders
 ```
 
-**Product links.** Each product stores its Salla id and URL (`salla_product_id`, `salla_url`),
+**Product links.** Each product stores its Salla id and path (`salla_product_id`, `salla_path`),
 matched by SKU. They are never edited in the dashboard; one command writes them. The standard way to
 refresh them is from the exported link file committed at `storage/app/salla-links.json`, which needs
 no API token:
@@ -112,6 +112,13 @@ php artisan kotiva:salla-links --from=storage/app/salla-links.json --dry-run   #
 php artisan kotiva:salla-links --from=storage/app/salla-links.json             # store
 php artisan kotiva:llms-txt                                                    # preview /llms.txt (served live; no file to commit)
 ```
+
+Only the relative product path is stored (`/micellar-water/p1713901761`), never a full URL.
+`KOTIVA_SALLA_STORE_URL` owns the origin, and `App\Support\Salla::productUrl()` is the only place
+the two are joined, so moving the store to another domain is a one-line `.env` change. With
+`--from`, every active product (within `--sku`) must have a row in the file. A missing one is listed
+as `no row in file` and fails the run with exit code 1, including with `--dry-run`. Inactive
+products may be left out.
 
 With a Salla Merchant API token (`products.read`) in `.env`, `php artisan kotiva:salla-links` (no
 `--from`) asks the API for each active SKU instead. Add `--sku=KOT001` to sync one product.
@@ -146,6 +153,13 @@ Kept for reference until the commerce code is deleted; none of this runs while
 
 **Products → Import / export → Import from Excel/CSV** takes a `.csv` or `.xlsx` file.
 **Download import template** gives you every column with one example row.
+
+**While Salla owns the store** (`KOTIVA_COMMERCE_ENABLED=false`) the import only updates
+editorial fields on products that already exist (D-37). The price, compare-at price, stock and
+low-stock-threshold columns are still read, so old sheets work. They are labelled
+"Ignored — managed in Salla", counted as ignored and never written. A row for an unknown SKU is
+refused: create the product in Salla and link it first. The rules below describe the importer with
+commerce enabled.
 
 1. **Upload.** The first sheet of the file is read. The header row is matched to fields
    automatically, and each column can be reassigned.
