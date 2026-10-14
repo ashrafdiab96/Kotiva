@@ -4,18 +4,18 @@
   <title>About — kotiva™</title>
   <meta name="description" content="The story behind kotiva™ — doctor-approved skincare perfected by science and built for visible results.">
   <link rel="preload" as="image" href="{{ asset('assets/about-hero-portrait-v2.webp') }}" fetchpriority="high">
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/about">
+  <link rel="canonical" href="{{ config('app.url') }}/about">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="About — kotiva™">
   <meta property="og:description" content="The story behind kotiva™ — doctor-approved skincare perfected by science and built for visible results.">
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/about">
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/about-hero-portrait-v2.webp">
+  <meta property="og:url" content="{{ config('app.url') }}/about">
+  <meta property="og:image" content="{{ config('app.url') }}/assets/about-hero-portrait-v2.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="About — kotiva™">
   <meta name="twitter:description" content="The story behind kotiva™ — doctor-approved skincare perfected by science and built for visible results.">
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/about-hero-portrait-v2.webp">
+  <meta name="twitter:image" content="{{ config('app.url') }}/assets/about-hero-portrait-v2.webp">
 @endsection
 
 @push('styles')
@@ -300,7 +300,7 @@
           <h1 class="t-display reveal reveal-delay-1" style="margin-bottom:28px;">THE<br>KOTIVA<br>STANDARD</h1>
           <p class="t-script reveal reveal-delay-2" style="margin-bottom:28px;">Doctor approved skincare tailored for you.</p>
           <p class="t-body reveal reveal-delay-3" style="margin-bottom:40px;">Kotiva was built on a single conviction: that everyone deserves skincare that actually works. Clinical performance. Elegant design. Real, visible results.</p>
-          <a href="{{ route('shop.index') }}" class="btn btn-primary reveal reveal-delay-4">Explore the Range</a>
+          <a href="{{ Salla::storeUrl() }}" class="btn btn-primary reveal reveal-delay-4">Explore the Range</a>
         </div>
       </div>
     </div>
@@ -516,7 +516,7 @@
         <div class="about-cta-text">Ready to start<br>your Kotiva routine?</div>
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
           <a href="{{ route('routine-finder') }}" class="btn btn-outline-dark">Find My Routine</a>
-          <a href="{{ route('shop.index') }}" class="btn" style="background:var(--black);color:var(--off-white);">Explore Products</a>
+          <a href="{{ Salla::storeUrl() }}" class="btn" style="background:var(--black);color:var(--off-white);">Explore Products</a>
         </div>
       </div>
     </div>

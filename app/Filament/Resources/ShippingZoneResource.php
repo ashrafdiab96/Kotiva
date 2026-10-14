@@ -26,6 +26,14 @@ final class ShippingZoneResource extends Resource
 {
     use GatedByRole;
 
+    /**
+     * Salla handoff: this data is owned by Salla now; see GatedByRole.
+     */
+    protected static function ownedBySalla(): bool
+    {
+        return true;
+    }
+
     protected static ?string $model = ShippingZone::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map';

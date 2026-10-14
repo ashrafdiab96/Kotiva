@@ -3,18 +3,18 @@
 @section('meta')
   <title>Routine Finder — kotiva™</title>
   <meta name="description" content="Find your perfect kotiva™ skincare routine. Answer a few questions about your skin type and concerns.">
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/routine-finder">
+  <link rel="canonical" href="{{ config('app.url') }}/routine-finder">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Routine Finder — kotiva™">
   <meta property="og:description" content="Find your perfect kotiva™ skincare routine. Answer a few questions about your skin type and concerns.">
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/routine-finder">
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta property="og:url" content="{{ config('app.url') }}/routine-finder">
+  <meta property="og:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Routine Finder — kotiva™">
   <meta name="twitter:description" content="Find your perfect kotiva™ skincare routine. Answer a few questions about your skin type and concerns.">
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta name="twitter:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
 @endsection
 
 @push('styles')
@@ -373,6 +373,13 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
 @endpush
 
 @push('pre_scripts')
+{{-- The Salla store root, injected once. Every product link the quiz builds
+     comes from /api/products (each row carries its own Salla URL); this is
+     only the fallback and the base for the "Shop These Products" handoff. --}}
+<script>window.SALLA_STORE_URL = @json(Salla::storeUrl());</script>
+@endpush
+
+@push('pre_scripts')
 @verbatim
 <script>
 /* The quiz engine and its model are untouched; only the product lookup moved.
@@ -383,8 +390,8 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
 
    The fetch is async, and that is safe: KOTIVA.getById is only ever called
    from build(), which cannot run until the visitor has answered seven
-   questions. slugOf() already falls back to /shop when a lookup misses, so a
-   slow or failed request degrades to the shop link rather than a dead one. */
+   questions. productOf() misses fall back to the Salla store root, so a slow
+   or failed request degrades to the store rather than a dead link. */
 (function () {
   'use strict';
   var byId = {};
@@ -399,7 +406,7 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
       window.KOTIVA.products = rows;
       rows.forEach(function (p) { byId[p.id] = p; });
     })
-    .catch(function () { /* result links fall back to /shop */ });
+    .catch(function () { /* result links fall back to the Salla store */ });
 })();
 </script>
 @endverbatim
@@ -653,8 +660,8 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
       <div id="result-notes"></div>
 
       <div class="result-actions">
-        <a href="{{ route('shop.index') }}" class="btn btn-primary" id="shop-routine-cta">Shop These Products</a>
-        <a href="{{ route('shop.index') }}" class="btn btn-outline">View Full Range</a>
+        <a href="{{ Salla::storeUrl() }}" class="btn btn-primary" id="shop-routine-cta">Shop These Products</a>
+        <a href="{{ Salla::storeUrl() }}" class="btn btn-outline">View Full Range</a>
       </div>
       <div style="text-align:center; margin-top:28px;">
         <button class="result-retake" onclick="retakeQuiz()">← Retake the Quiz</button>
@@ -797,9 +804,9 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
   }
-  function slugOf(id) {
-    var p = (window.KOTIVA && KOTIVA.getById) ? KOTIVA.getById(id) : null;
-    return p && p.slug ? p.slug : null;
+  var SALLA_STORE_URL = window.SALLA_STORE_URL;
+  function productOf(id) {
+    return (window.KOTIVA && KOTIVA.getById) ? KOTIVA.getById(id) : null;
   }
   var STEP_LABEL = {
     'makeup-removal': 'Remove', 'cleanser': 'Cleanse', 'toner': 'Tone',
@@ -814,9 +821,9 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
     return '<div class="result-time-block"><div class="result-time-label">' +
       '<div class="result-time-icon">' + icon + '</div>' + esc(title) + '</div>' +
       '<div class="result-steps">' + list.map(function (s, i) {
-        var slug = slugOf(s.id);
-        var href = slug ? '/product/' + slug : '/shop';
-        return '<a class="result-step" href="' + href + '">' +
+        var product = productOf(s.id);
+        var href = (product && product.url) || SALLA_STORE_URL;
+        return '<a class="result-step" href="' + esc(href) + '">' +
           '<div class="result-step-num">' + ('0' + (i + 1)).slice(-2) + '</div><div>' +
           '<div class="result-step-label">' + esc(STEP_LABEL[s.step] || s.step) + '</div>' +
           '<div class="result-step-product">' + esc(s.name) + '</div>' +
@@ -879,18 +886,20 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
     });
     document.getElementById('result-notes').innerHTML = notes.join('');
 
-    /* carry the recommendation through to the shop (K25 / S2-4).
-       Slugs, not ids: the shop's cards are matched on their own href, so the
-       handoff needs no product data loaded on that page. */
-    var slugs = [];
+    /* carry the recommendation through to the Salla store (K25 / S2-4).
+       SKUs, not ids or slugs: they are the one key this site and Salla share,
+       so the store's listing can pick the routine out with no product data
+       from here. Same shape as App\Support\Salla::listingUrl(). */
+    var skus = [];
     [r.am, r.pm, r.anytime].forEach(function (half) {
       half.forEach(function (s) {
-        var sl = slugOf(s.id);
-        if (sl && slugs.indexOf(sl) === -1) slugs.push(sl);
+        var product = productOf(s.id);
+        var sku = product && product.sku ? String(product.sku).toUpperCase() : null;
+        if (sku && skus.indexOf(sku) === -1) skus.push(sku);
       });
     });
     var cta = document.getElementById('shop-routine-cta');
-    if (cta && slugs.length) cta.setAttribute('href', '/shop?routine=' + slugs.join(','));
+    if (cta && skus.length) cta.setAttribute('href', SALLA_STORE_URL + '/?routine=' + skus.map(function (s) { return encodeURIComponent(s); }).join(','));
 
     document.getElementById('quiz-section').style.display = 'none';
     var sec = document.getElementById('result-section');

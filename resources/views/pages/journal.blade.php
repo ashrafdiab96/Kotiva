@@ -3,18 +3,18 @@
 @section('meta')
   <title>Journal — kotiva™</title>
   <meta name="description" content="The Kotiva Journal — skin science decoded. Educational content on ingredients, routines, and dermatology insights.">
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/journal">
+  <link rel="canonical" href="{{ config('app.url') }}/journal">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Journal — kotiva™">
   <meta property="og:description" content="The Kotiva Journal — skin science decoded. Educational content on ingredients, routines, and dermatology insights.">
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/journal">
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta property="og:url" content="{{ config('app.url') }}/journal">
+  <meta property="og:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Journal — kotiva™">
   <meta name="twitter:description" content="The Kotiva Journal — skin science decoded. Educational content on ingredients, routines, and dermatology.">
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta name="twitter:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
 @endsection
 
 @push('styles')

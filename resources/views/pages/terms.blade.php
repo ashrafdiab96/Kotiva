@@ -4,18 +4,18 @@
   <title>Terms & Conditions (Draft) — kotiva™</title>
   <meta name="description" content="The terms and conditions governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
   <meta name="robots" content="noindex, follow">
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/terms">
+  <link rel="canonical" href="{{ config('app.url') }}/terms">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Terms & Conditions (Draft) — kotiva™">
   <meta property="og:description" content="The terms and conditions governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/terms">
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta property="og:url" content="{{ config('app.url') }}/terms">
+  <meta property="og:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Terms & Conditions (Draft) — kotiva™">
   <meta name="twitter:description" content="The terms and conditions governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta name="twitter:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
 @endsection
 
 @push('styles')
@@ -94,7 +94,7 @@
 
         <h2>1. Acceptance of Terms</h2>
         <p>These Terms & Conditions ("Terms") govern your use of this website
-        (kotiva.co / kotiva.co, the "Site"), operated by <strong>Vitakode LLC</strong>,
+        ({{ parse_url(config('app.url'), PHP_URL_HOST) }}, the "Site"), operated by <strong>Vitakode LLC</strong>,
         a company registered in Muscat, Sultanate of Oman ("kotiva™", "we", "us", or "our"). By
         accessing or using the Site, you agree to be bound by these Terms.</p>
 

@@ -161,6 +161,16 @@ final class ImportProducts extends Page
             $this->validCount = count($report->valid);
             $this->errorCount = count($report->errors);
             $this->errorLines = $report->errorLines();
+
+            // Said before the import, not only after it: a sheet full of new
+            // prices that will not be applied is something to know up front.
+            if (($ignored = $report->ignoredCount()) > 0) {
+                Notification::make()
+                    ->info()
+                    ->title($ignored.' price/stock value'.($ignored === 1 ? '' : 's').' will be ignored')
+                    ->body(ProductImporter::IGNORED_LABEL.'. Only editorial fields on existing products are imported.')
+                    ->send();
+            }
         }
     }
 
@@ -239,11 +249,15 @@ final class ImportProducts extends Page
     }
 
     /**
+     * The field list the mapping and preview are drawn from. While Salla owns
+     * price and stock those columns are still listed — an old sheet's price
+     * column should visibly land somewhere — but labelled as ignored (D-37).
+     *
      * @return array<string, array{0: string, 1: string, 2: bool}>
      */
     public function getFields(): array
     {
-        return ProductImporter::FIELDS;
+        return ProductImporter::displayFields();
     }
 
     /**

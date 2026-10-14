@@ -24,6 +24,7 @@ use App\Services\StockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\SkipsRetiredStorefront;
 use Tests\TestCase;
 
 /**
@@ -36,6 +37,7 @@ use Tests\TestCase;
 final class OrderMailTest extends TestCase
 {
     use RefreshDatabase;
+    use SkipsRetiredStorefront;
 
     protected function setUp(): void
     {

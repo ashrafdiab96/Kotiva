@@ -3,39 +3,26 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\ProductApiController;
-use App\Http\Controllers\Api\ShippingCityApiController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CrawlFilesController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ShopController;
+use App\Http\Controllers\SallaRedirectController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Storefront routes
+| Content pages
 |--------------------------------------------------------------------------
 |
-| Paths are chosen so public/js/layout.js's markCurrentNav() keeps working
-| unchanged: it strips a trailing "/index.html" and any ".html", compares
-| pathnames, then falls back to a section match on /^\/product\// and
-| /\/ingredients$/. Extensionless /shop, /product/{slug} and /ingredients all
-| satisfy that, so neither regex in markCurrentNav() needed editing.
+| This is the brand/content website. The storefront — listing, product
+| pages, cart, checkout, orders, stock — lives on Salla, and every commercial
+| path below hands off there through App\Support\Salla.
 |
 */
 
 Route::get('/', [PageController::class, 'home'])->name('home');
-
-Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-
-// Constrained so it cannot swallow "/product/<slug>.html" — without this the
-// legacy redirect below is unreachable and the 25 indexed .html URLs 404.
-Route::get('/product/{slug}', [ProductController::class, 'show'])
-    ->where('slug', '[a-z0-9-]+')
-    ->name('product.show');
 
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/science', [PageController::class, 'science'])->name('science');
@@ -48,52 +35,59 @@ Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 
 /*
 |--------------------------------------------------------------------------
-| Cart
+| Storefront → Salla
 |--------------------------------------------------------------------------
 |
-| Mutations are rate-limited (§8): adding to a cart reserves real stock, so an
-| unthrottled endpoint is a way to hold the whole catalog hostage from a script.
+| Every page a shopper could have bookmarked or a search engine indexed
+| redirects to its Salla equivalent with the configured status — 302 while
+| the store is verified, 301 once the operator flips
+| KOTIVA_SALLA_REDIRECT_STATUS. The route names are kept so any route() call
+| that survives still resolves to a working link.
+|
+| /product/{slug} is constrained so it cannot swallow "/product/<slug>.html",
+| which has its own direct redirect further down.
 |
 */
 
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::get('/cart/summary', [CartController::class, 'summary'])->name('cart.summary');
+Route::get('/shop', [SallaRedirectController::class, 'shop'])->name('shop.index');
 
-Route::middleware('throttle:60,1')->group(function (): void {
-    Route::post('/cart/items', [CartController::class, 'store'])->name('cart.items.store');
-    Route::patch('/cart/items/{item}', [CartController::class, 'update'])->name('cart.items.update');
-    Route::delete('/cart/items/{item}', [CartController::class, 'destroy'])->name('cart.items.destroy');
-});
+Route::get('/product/{slug}', [SallaRedirectController::class, 'product'])
+    ->where('slug', '[a-z0-9-]+')
+    ->name('product.show');
+
+Route::get('/cart', [SallaRedirectController::class, 'cart'])->name('cart.index');
+
+Route::get('/checkout', [SallaRedirectController::class, 'cart'])->name('checkout.index');
+Route::get('/checkout/{step}', [SallaRedirectController::class, 'cart'])->where('step', '.*');
 
 /*
 |--------------------------------------------------------------------------
-| Checkout
+| Retired commerce endpoints → 410 Gone
 |--------------------------------------------------------------------------
 |
-| Placement is throttled harder than the rest: it writes an order, fulfils
-| stock and sends mail, so it is the most expensive thing an unattended script
-| could repeat.
+| 2026-10-13 (Salla handoff): the cart and checkout mutations are removed
+| from the router. They used to be:
+|
+|   GET    /cart/summary              CartController@summary
+|   POST   /cart/items                CartController@store
+|   PATCH  /cart/items/{item}         CartController@update
+|   DELETE /cart/items/{item}         CartController@destroy
+|   POST   /checkout/shipping         CheckoutController@storeShipping
+|   POST   /checkout/payment          CheckoutController@placeOrder
+|   GET    /api/shipping/cities       ShippingCityApiController@index
+|
+| The controllers stay on disk until the commerce code is deleted in its own
+| PR. A stale tab, cached JS or a crawler gets a definitive 410 rather than a
+| redirect it would try to POST through.
 |
 */
 
-Route::prefix('checkout')->name('checkout.')->group(function (): void {
-    Route::get('/', [CheckoutController::class, 'index'])->name('index');
-    Route::get('/review', [CheckoutController::class, 'review'])->name('review');
-
-    Route::get('/shipping', [CheckoutController::class, 'shipping'])->name('shipping');
-    Route::post('/shipping', [CheckoutController::class, 'storeShipping'])
-        ->middleware('throttle:30,1')
-        ->name('shipping.store');
-
-    Route::get('/payment', [CheckoutController::class, 'payment'])->name('payment');
-    Route::post('/payment', [CheckoutController::class, 'placeOrder'])
-        ->middleware('throttle:10,1')
-        ->name('payment.store');
-
-    Route::get('/confirmation/{order_no}', [CheckoutController::class, 'confirmation'])
-        ->where('order_no', '[A-Z0-9-]+')
-        ->name('confirmation');
-});
+Route::get('/cart/summary', [SallaRedirectController::class, 'gone']);
+Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/cart/items/{item?}', [SallaRedirectController::class, 'gone'])
+    ->where('item', '.*');
+Route::match(['POST', 'PUT', 'PATCH', 'DELETE'], '/checkout/{step?}', [SallaRedirectController::class, 'gone'])
+    ->where('step', '.*');
+Route::get('/api/shipping/cities', [SallaRedirectController::class, 'gone']);
 
 /*
 |--------------------------------------------------------------------------
@@ -111,10 +105,15 @@ Route::middleware('throttle:10,1')->group(function (): void {
     Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsletter.store');
 });
 
+// Kept: the Routine Finder reads the catalog (now with SKUs and Salla URLs).
 Route::get('/api/products', [ProductApiController::class, 'index'])->name('api.products');
-Route::get('/api/shipping/cities', [ShippingCityApiController::class, 'index'])->name('api.shipping.cities');
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+
+// Rendered from config so no origin is written into a static file. Do not
+// recreate public/robots.txt or public/llms.txt — they would shadow these.
+Route::get('/robots.txt', [CrawlFilesController::class, 'robots'])->name('robots');
+Route::get('/llms.txt', [CrawlFilesController::class, 'llms'])->name('llms');
 
 /*
 |--------------------------------------------------------------------------
@@ -129,7 +128,6 @@ Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 $legacyPages = [
     '/index.html' => '/',
-    '/shop.html' => '/shop',
     '/about.html' => '/about',
     '/science.html' => '/science',
     '/journal.html' => '/journal',
@@ -144,9 +142,13 @@ foreach ($legacyPages as $from => $to) {
     Route::permanentRedirect($from, $to);
 }
 
-// The 25 pre-rendered pages: /product/<slug>.html -> /product/<slug>.
-Route::get('/product/{slug}.html', fn (string $slug) => redirect()->route('product.show', ['slug' => $slug], 301))
+// /shop.html goes straight to the Salla listing rather than hopping via /shop.
+Route::get('/shop.html', [SallaRedirectController::class, 'shop']);
+
+// The 25 pre-rendered pages: /product/<slug>.html — straight to the product on
+// Salla in one hop, never chained through /product/{slug}.
+Route::get('/product/{slug}.html', [SallaRedirectController::class, 'product'])
     ->where('slug', '[a-z0-9-]+');
 
 // The JS page that addressed products by numeric id: /product.html?id=N.
-Route::get('/product.html', [ProductController::class, 'legacyRedirect']);
+Route::get('/product.html', [SallaRedirectController::class, 'legacyProduct']);

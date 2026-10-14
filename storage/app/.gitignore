@@ -2,3 +2,6 @@
 !private/
 !public/
 !.gitignore
+# The exported Salla product links, committed so `kotiva:salla-links --from`
+# needs no API token. See README "Salla storefront links".
+!salla-links.json

@@ -131,11 +131,17 @@ final class ManageSettings extends Page
                 Forms\Components\Section::make('Checkout')
                     ->columns(3)
                     ->schema([
+                        // COD and the cart lifetime only mean something to
+                        // Laravel's own checkout, which Salla replaced; they
+                        // are hidden (and left untouched on save) while
+                        // kotiva.commerce_enabled is off.
                         Forms\Components\Toggle::make('cod_enabled')
+                            ->visible(fn (): bool => (bool) config('kotiva.commerce_enabled'))
                             ->label('Cash on delivery')
                             ->helperText('The only payment method. Turning it off leaves checkout with nothing to offer.'),
 
                         Forms\Components\TextInput::make('cart_ttl_hours')
+                            ->visible(fn (): bool => (bool) config('kotiva.commerce_enabled'))
                             ->label('Cart lifetime')
                             ->numeric()
                             ->minValue(1)
@@ -218,8 +224,16 @@ final class ManageSettings extends Page
         Setting::put('store_email', $data['store_email']);
         Setting::put('low_stock_alert_email', $data['low_stock_alert_email']);
         Setting::put('admin_notification_emails', $notificationEmails);
-        Setting::put('cod_enabled', (bool) $data['cod_enabled']);
-        Setting::put('cart_ttl_hours', (int) $data['cart_ttl_hours']);
+        // Absent from the state while the fields are hidden (Salla handoff);
+        // the stored values are then left exactly as they were.
+        if (array_key_exists('cod_enabled', $data)) {
+            Setting::put('cod_enabled', (bool) $data['cod_enabled']);
+        }
+
+        if (array_key_exists('cart_ttl_hours', $data)) {
+            Setting::put('cart_ttl_hours', (int) $data['cart_ttl_hours']);
+        }
+
         Setting::put('low_stock_threshold', (int) $data['low_stock_threshold']);
         // Percentage back to a rate.
         Setting::put('vat_rate', round(((float) $data['vat_rate_percent']) / 100, 6));

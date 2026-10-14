@@ -13,6 +13,7 @@ use App\Support\Import\SpreadsheetData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Tests\Concerns\EnablesLegacyCommerce;
 use Tests\TestCase;
 
 /**
@@ -30,6 +31,10 @@ use Tests\TestCase;
  */
 final class DualPriceImportExportTest extends TestCase
 {
+    // Pins the importer's pricing rules, which apply only while Laravel owns
+    // prices; with commerce off those columns are ignored (D-37,
+    // ProductImportSallaModeTest).
+    use EnablesLegacyCommerce;
     use RefreshDatabase;
 
     private function report(string $csv): ImportReport

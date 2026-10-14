@@ -17,12 +17,24 @@ final readonly class ImportReport
      * @param  array<int, array<string, mixed>>  $valid  line => parsed row
      * @param  array<int, list<string>>  $errors  line => messages
      * @param  list<string>  $warnings  accepted rows worth a second look
+     * @param  array<int, list<string>>  $ignored  line => Salla-owned fields read but not imported
      */
     public function __construct(
         public array $valid,
         public array $errors,
         public array $warnings = [],
+        public array $ignored = [],
     ) {}
+
+    /**
+     * Salla-owned values on valid rows that will be dropped rather than
+     * written (D-37), so the summary can say so instead of implying the
+     * prices and stock in the sheet were applied.
+     */
+    public function ignoredCount(): int
+    {
+        return array_sum(array_map('count', array_intersect_key($this->ignored, $this->valid)));
+    }
 
     public function hasErrors(): bool
     {

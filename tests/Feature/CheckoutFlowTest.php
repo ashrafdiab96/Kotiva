@@ -29,6 +29,7 @@ use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Concerns\SkipsRetiredStorefront;
 use Tests\TestCase;
 
 /**
@@ -41,6 +42,7 @@ use Tests\TestCase;
 final class CheckoutFlowTest extends TestCase
 {
     use RefreshDatabase;
+    use SkipsRetiredStorefront;
 
     private ?Cart $actingCart = null;
 

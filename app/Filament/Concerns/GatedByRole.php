@@ -30,6 +30,22 @@ trait GatedByRole
         return 'canManageCatalog';
     }
 
+    /**
+     * True for a resource whose data Salla now owns (orders, customers,
+     * shipping, stock movements). While kotiva.commerce_enabled is off such a
+     * resource is hidden from the navigation AND refused for every role, so a
+     * bookmarked URL answers 403 rather than showing stale Laravel records.
+     */
+    protected static function ownedBySalla(): bool
+    {
+        return false;
+    }
+
+    protected static function blockedBySalla(): bool
+    {
+        return static::ownedBySalla() && ! config('kotiva.commerce_enabled', false);
+    }
+
     protected static function currentAdmin(): ?Admin
     {
         $user = auth()->user();
@@ -39,6 +55,10 @@ trait GatedByRole
 
     protected static function adminCan(string $capability): bool
     {
+        if (static::blockedBySalla()) {
+            return false;
+        }
+
         $admin = self::currentAdmin();
 
         if (! $admin instanceof Admin || ! method_exists($admin, $capability)) {
@@ -56,6 +76,11 @@ trait GatedByRole
     public static function canViewAny(): bool
     {
         return self::adminCan(static::requiredCapability());
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::canViewAny();
     }
 
     public static function canView(Model $record): bool

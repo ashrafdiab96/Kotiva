@@ -22,7 +22,7 @@
     $hairline = 'rgba(35,31,32,0.12)';
     $display = "'Futura', 'Century Gothic', 'Trebuchet MS', Arial, sans-serif";
     $body = "Georgia, 'Times New Roman', serif";
-    $origin = rtrim((string) config('kotiva.site_origin'), '/');
+    $origin = rtrim((string) config('app.url'), '/');
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -74,7 +74,7 @@
               </div>
               <div style="font-family:{{ $body }}; font-size:13px; color:{{ $muted }}; padding-top:10px; line-height:1.7;">
                 Questions? Reply to this email or visit
-                <a href="{{ $origin }}/contact" style="color:{{ $accent }}; text-decoration:none;">kotiva.co/contact</a>.
+                <a href="{{ $origin }}/contact" style="color:{{ $accent }}; text-decoration:none;">{{ parse_url($origin, PHP_URL_HOST) }}/contact</a>.
               </div>
               @yield('footer')
             </td>

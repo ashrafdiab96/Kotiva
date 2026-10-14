@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @php
-    $origin = config('kotiva.site_origin');
+    $origin = config('app.url');
     $pageUrl = $origin.'/product/'.$product->slug;
     $absImg = $origin.'/'.ltrim((string) $product->imagePath(), '/');
     $title = $product->name.' — kotiva™';

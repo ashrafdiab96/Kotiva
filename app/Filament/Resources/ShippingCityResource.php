@@ -25,6 +25,14 @@ final class ShippingCityResource extends Resource
 {
     use GatedByRole;
 
+    /**
+     * Salla handoff: this data is owned by Salla now; see GatedByRole.
+     */
+    protected static function ownedBySalla(): bool
+    {
+        return true;
+    }
+
     protected static ?string $model = ShippingCity::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';

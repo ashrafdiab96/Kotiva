@@ -29,9 +29,21 @@ final class HardeningTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * The /cart and /checkout mutations these throttled now answer 410 Gone
+     * (see SallaHandoffTest). The assertions are kept as written and deleted
+     * with the commerce code.
+     */
+    private function skipRetiredStorefrontThrottle(): void
+    {
+        $this->markTestSkipped('Salla handoff: the /cart and /checkout mutations it throttled now answer 410 Gone (see SallaHandoffTest). Delete with the commerce code.');
+    }
+
     #[Test]
     public function adding_to_the_cart_is_rate_limited(): void
     {
+        $this->skipRetiredStorefrontThrottle();
+
         // 60 a minute. Most of these fail validation (no such product) —
         // that is fine: a rejected request still counts, which is the point.
         for ($i = 0; $i < 60; $i++) {
@@ -48,6 +60,8 @@ final class HardeningTest extends TestCase
     #[Test]
     public function placing_an_order_is_rate_limited_harder(): void
     {
+        $this->skipRetiredStorefrontThrottle();
+
         // 10 a minute. Without a checkout session each attempt is turned away,
         // but still counted.
         for ($i = 0; $i < 10; $i++) {

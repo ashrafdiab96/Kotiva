@@ -13,7 +13,7 @@
     $warn = '#EC7725';
     $out = '#D7282F';
     $display = "'Futura', 'Century Gothic', 'Trebuchet MS', Arial, sans-serif";
-    $origin = rtrim((string) config('kotiva.site_origin'), '/');
+    $origin = rtrim((string) config('app.url'), '/');
     $isOut = $remaining <= 0;
 @endphp
 

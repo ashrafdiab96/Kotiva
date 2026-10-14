@@ -1,8 +1,9 @@
 /* Page families and viewport/mode matrix shared by the colour-migration audit scripts. */
 export const PAGE_FAMILIES = [
   { id: 'home', path: '/index.html' },
-  { id: 'shop', path: '/shop.html' },
-  { id: 'product', path: '/product/micellar-water.html' },
+  // 'shop' and 'product' removed 2026-10-13 (Salla handoff): both pages now
+  // redirect to the Salla store, so there is nothing here to compare against
+  // the baseline. See docs/DECISIONS.md D-35.
   { id: 'about', path: '/about.html' },
   { id: 'science', path: '/science.html' },
   { id: 'routine-finder', path: '/routine-finder.html' },

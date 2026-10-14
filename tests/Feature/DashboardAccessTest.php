@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Enums\AdminRole;
 use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -55,7 +56,7 @@ final class DashboardAccessTest extends TestCase
     }
 
     #[Test]
-    public function a_super_admin_reaches_everything(): void
+    public function a_super_admin_reaches_everything_this_site_still_manages(): void
     {
         $this->actingAs($this->admin(AdminRole::SuperAdmin), 'admin');
 
@@ -63,11 +64,6 @@ final class DashboardAccessTest extends TestCase
             '/admin',
             '/admin/categories',
             '/admin/products',
-            '/admin/orders',
-            '/admin/customers',
-            '/admin/product-stock-movements',
-            '/admin/shipping-zones',
-            '/admin/shipping-cities',
             '/admin/contact-messages',
             '/admin/newsletter-subscribers',
             '/admin/admins',
@@ -78,16 +74,45 @@ final class DashboardAccessTest extends TestCase
         }
     }
 
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function everyRole(): array
+    {
+        return array_combine(
+            array_map(fn (AdminRole $r): string => $r->value, AdminRole::cases()),
+            array_map(fn (AdminRole $r): array => [$r->value], AdminRole::cases()),
+        );
+    }
+
     #[Test]
-    public function a_manager_runs_the_shop_but_cannot_touch_admin_accounts(): void
+    #[DataProvider('everyRole')]
+    public function the_commerce_resources_salla_owns_are_refused_to_every_role(string $role): void
+    {
+        // Salla handoff: orders, customers, shipping and stock movements are
+        // managed in Salla. Hidden from the navigation is not enough — a
+        // bookmarked URL must be refused too, for every role. One login per
+        // test: Filament logs the session out if the user changes mid-test.
+        $this->actingAs($this->admin(AdminRole::from($role)), 'admin');
+
+        foreach ([
+            '/admin/orders',
+            '/admin/customers',
+            '/admin/product-stock-movements',
+            '/admin/shipping-zones',
+            '/admin/shipping-cities',
+        ] as $path) {
+            $this->assertSame(403, $this->get($path)->status(), "{$role} must not reach {$path}");
+        }
+    }
+
+    #[Test]
+    public function a_manager_runs_the_catalog_but_cannot_touch_admin_accounts(): void
     {
         $this->actingAs($this->admin(AdminRole::Manager), 'admin');
 
         $this->get('/admin/categories')->assertOk();
         $this->get('/admin/products')->assertOk();
-        $this->get('/admin/orders')->assertOk();
-        $this->get('/admin/customers')->assertOk();
-        $this->get('/admin/shipping-zones')->assertOk();
 
         // Admin accounts and settings are the two things that can quietly
         // break the whole shop.
@@ -95,16 +120,19 @@ final class DashboardAccessTest extends TestCase
     }
 
     #[Test]
-    public function staff_see_orders_only(): void
+    public function staff_reach_the_dashboard_and_nothing_else(): void
     {
         $this->actingAs($this->admin(AdminRole::Staff), 'admin');
 
-        $this->get('/admin/orders')->assertOk();
+        // Staff worked orders, and orders are Salla's now; the dashboard with
+        // its pointer to Salla is what remains.
+        $this->get('/admin')->assertOk();
 
         // Typing the URL must be refused, not merely hidden from the nav.
-        // Every non-order resource is listed: a gate that covers only the
-        // obvious ones leaves the rest open to exactly the same URL guess.
+        // Every resource is listed: a gate that covers only the obvious ones
+        // leaves the rest open to exactly the same URL guess.
         foreach ([
+            '/admin/orders',
             '/admin/categories',
             '/admin/products',
             '/admin/product-stock-movements',
@@ -134,7 +162,7 @@ final class DashboardAccessTest extends TestCase
         $this->actingAs($this->admin(AdminRole::SuperAdmin), 'admin');
 
         $this->get('/')->assertOk();
-        $this->get('/shop')->assertOk();
+        $this->get('/shop')->assertRedirect(config('kotiva.salla.store_url'));
     }
 
     #[Test]

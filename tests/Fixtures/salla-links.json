@@ -1,0 +1,30 @@
+[
+  {
+    "kot": "KOT001",
+    "name": "micellar water",
+    "sku": "KOT001",
+    "salla_product_id": "1713901761",
+    "salla_path": "/micellar-water/p1713901761"
+  },
+  {
+    "kot": "KOT002",
+    "name": "acne cleansing gel",
+    "sku": "kot002",
+    "salla_product_id": "172729302",
+    "salla_path": "/acne-cleansing-gel/p172729302"
+  },
+  {
+    "kot": "KOT099",
+    "name": "a product this site does not have",
+    "sku": "KOT099",
+    "salla_product_id": "999999999",
+    "salla_path": "/ghost/p999999999"
+  },
+  {
+    "kot": "KOT003",
+    "name": "hyaluronic facial cleanser",
+    "sku": "KOT003",
+    "salla_product_id": "1571237842",
+    "salla_url": "https://another-store.example.test/hyaluronic-facial-cleanser/p1571237842"
+  }
+]

@@ -10,7 +10,7 @@ Ingredient breakdowns, routine guides and clinical updates — no filler.
     $ink = '#231F20';
     $muted = 'rgba(35,31,32,0.62)';
     $display = "'Futura', 'Century Gothic', 'Trebuchet MS', Arial, sans-serif";
-    $origin = rtrim((string) config('kotiva.site_origin'), '/');
+    $origin = rtrim((string) config('app.url'), '/');
 @endphp
 
 @section('content')
@@ -37,6 +37,6 @@ Ingredient breakdowns, routine guides and clinical updates — no filler.
 
 @section('footer')
   <div style="font-family:{{ $display }}; font-size:9px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:{{ $muted }}; padding-top:12px;">
-    You are receiving this because {{ $subscriber->email }} signed up at kotiva.co.
+    You are receiving this because {{ $subscriber->email }} signed up at {{ parse_url($origin, PHP_URL_HOST) }}.
   </div>
 @endsection

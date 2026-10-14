@@ -46,6 +46,10 @@ final class EditProduct extends EditRecord
     private function adjustStockAction(): Actions\Action
     {
         return Actions\Action::make('adjustStock')
+            // Salla handoff: stock is managed in Salla, so the add/remove form
+            // is gone while commerce is off. The movement history below stays
+            // visible, read-only.
+            ->visible(fn (): bool => ! ProductResource::sallaOwnsCommerce())
             ->label('Adjust stock')
             ->icon('heroicon-o-arrows-up-down')
             ->color('primary')

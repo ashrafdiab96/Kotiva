@@ -3,18 +3,18 @@
 @section('meta')
   <title>Contact & Where to Buy — kotiva™</title>
   <meta name="description" content="Find kotiva™ stockists across the MENA region, get in touch with our support team, or ask a question about any product in the 25-piece collection.">
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/contact">
+  <link rel="canonical" href="{{ config('app.url') }}/contact">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Contact & Where to Buy — kotiva™">
   <meta property="og:description" content="Find kotiva™ stockists across the MENA region, get in touch with our support team, or ask a question about any product.">
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/contact">
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta property="og:url" content="{{ config('app.url') }}/contact">
+  <meta property="og:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Contact & Where to Buy — kotiva™">
   <meta name="twitter:description" content="Find kotiva™ stockists across the MENA region or get in touch with our support team.">
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta name="twitter:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
 @endsection
 
 @push('styles')

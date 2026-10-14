@@ -104,7 +104,7 @@ final class AnnouncementBarTest extends TestCase
     {
         $this->enable('Free delivery over SAR 300');
 
-        foreach (['/', '/shop', '/about', '/contact'] as $path) {
+        foreach (['/', '/science', '/about', '/contact'] as $path) {
             $this->get($path)->assertSee('kotiva-announce', escape: false);
         }
     }

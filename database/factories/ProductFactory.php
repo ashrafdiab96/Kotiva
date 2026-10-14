@@ -63,6 +63,22 @@ final class ProductFactory extends Factory
     }
 
     /**
+     * A product already linked to its Salla storefront page.
+     */
+    public function linkedToSalla(?int $sallaId = null): self
+    {
+        return $this->state(function (array $attributes) use ($sallaId): array {
+            $id = $sallaId ?? $this->faker->unique()->numberBetween(100_000_000, 1_999_999_999);
+
+            return [
+                'salla_product_id' => $id,
+                'salla_path' => '/'.Str::slug((string) ($attributes['name'] ?? 'product')).'/p'.$id,
+                'salla_synced_at' => now(),
+            ];
+        });
+    }
+
+    /**
      * A product priced from an explicit VAT-exclusive figure, with the
      * inclusive price derived at the configured rate.
      */

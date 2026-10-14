@@ -15,6 +15,8 @@ final readonly class ImportResult
         public int $unchanged = 0,
         public int $stockAdjusted = 0,
         public int $skipped = 0,
+        /** Salla-owned values present in the file and deliberately not written (D-37). */
+        public int $ignored = 0,
     ) {}
 
     public function describe(): string
@@ -33,6 +35,10 @@ final readonly class ImportResult
 
         if ($this->stockAdjusted > 0) {
             $parts[] = $this->stockAdjusted.' stock level'.($this->stockAdjusted === 1 ? '' : 's').' changed';
+        }
+
+        if ($this->ignored > 0) {
+            $parts[] = $this->ignored.' price/stock value'.($this->ignored === 1 ? '' : 's').' ignored (managed in Salla)';
         }
 
         if ($this->skipped > 0) {

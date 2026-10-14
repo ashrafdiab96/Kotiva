@@ -4,18 +4,18 @@
   <title>Privacy Policy (Draft) — kotiva™</title>
   <meta name="description" content="How kotiva™ (Vitakode LLC) collects, uses, and protects your personal data. Draft template pending legal review.">
   <meta name="robots" content="noindex, follow">
-  <link rel="canonical" href="{{ config('kotiva.site_origin') }}/privacy-policy">
+  <link rel="canonical" href="{{ config('app.url') }}/privacy-policy">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Privacy Policy (Draft) — kotiva™">
   <meta property="og:description" content="How kotiva™ (Vitakode LLC) collects, uses, and protects your personal data. Draft template pending legal review.">
-  <meta property="og:url" content="{{ config('kotiva.site_origin') }}/privacy-policy">
-  <meta property="og:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta property="og:url" content="{{ config('app.url') }}/privacy-policy">
+  <meta property="og:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Privacy Policy (Draft) — kotiva™">
   <meta name="twitter:description" content="How kotiva™ (Vitakode LLC) collects, uses, and protects your personal data. Draft template pending legal review.">
-  <meta name="twitter:image" content="{{ config('kotiva.site_origin') }}/assets/hero-warm-skincare.webp">
+  <meta name="twitter:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
 @endsection
 
 @push('styles')
@@ -93,7 +93,7 @@
         <p class="legal-meta">Last updated: 5 July 2026 (draft)</p>
 
         <h2>1. Who We Are</h2>
-        <p>This website (kotiva.co / kotiva.co, the "Site") is operated by <strong>Vitakode
+        <p>This website ({{ parse_url(config('app.url'), PHP_URL_HOST) }}, the "Site") is operated by <strong>Vitakode
         LLC</strong>, a company registered in Muscat, Sultanate of Oman ("kotiva™", "we", "us", or "our").
         We are the data controller responsible for your personal data collected through this Site.</p>
 

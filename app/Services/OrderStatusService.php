@@ -15,6 +15,7 @@ use App\Models\OrderStatusHistory;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LogicException;
 
 /**
  * The only way an order's status may change.
@@ -32,6 +33,7 @@ final class OrderStatusService
      * Move an order to a new status.
      *
      * @throws InvalidOrderTransition
+     * @throws LogicException while Salla owns orders
      */
     public function transition(
         Order $order,
@@ -39,6 +41,8 @@ final class OrderStatusService
         ?string $note = null,
         ?int $adminId = null,
     ): Order {
+        $this->assertCommerceEnabled();
+
         $from = $order->status;
 
         if (! $from->canTransitionTo($to)) {
@@ -87,9 +91,13 @@ final class OrderStatusService
     /**
      * Cash collected. Separate from the order status on purpose: a COD order is
      * shipped while still unpaid, so "delivered" must not imply "paid".
+     *
+     * @throws LogicException while Salla owns orders
      */
     public function markPaid(Order $order, ?int $adminId = null, ?string $note = null): Order
     {
+        $this->assertCommerceEnabled();
+
         if ($order->payment_status === PaymentStatus::Paid) {
             return $order;
         }
@@ -110,6 +118,22 @@ final class OrderStatusService
         ]);
 
         return $order->fresh();
+    }
+
+    /**
+     * SALLA HANDOFF: orders are now placed, paid and fulfilled in Salla. Every
+     * MUTATION here refuses to run while commerce is off, so a legacy order
+     * cannot change status, release stock or email a customer from a
+     * dashboard action that was missed when the screens were hidden. The
+     * read-only helpers below stay open: they change nothing.
+     *
+     * @throws LogicException while Salla owns orders
+     */
+    private function assertCommerceEnabled(): void
+    {
+        if (! config('kotiva.commerce_enabled', false)) {
+            throw new LogicException('Laravel commerce is disabled; orders are owned by Salla.');
+        }
     }
 
     /**

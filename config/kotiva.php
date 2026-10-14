@@ -16,10 +16,38 @@ declare(strict_types=1);
 
 return [
 
-    // Canonical origin used for canonical URLs, Open Graph tags, JSON-LD and
-    // the sitemap. The legacy generators took this from KOTIVA_SITE_ORIGIN and
-    // the whole static site was audited for a single origin — keep that rule.
-    'site_origin' => rtrim((string) env('KOTIVA_SITE_ORIGIN', 'https://kotiva.co'), '/'),
+    // The site's canonical origin is config('app.url') (APP_URL). It used to be
+    // duplicated here as KOTIVA_SITE_ORIGIN; see docs/DECISIONS.md.
+
+    /*
+     | The storefront lives on Salla (§0 of the Salla handoff). This site is the
+     | brand/content website only, and every shop, product, cart and checkout
+     | link resolves through App\Support\Salla, never a literal in a view.
+     |
+     | access_token is read ONLY by the kotiva:salla-links command. The public
+     | site works with it empty, and it must never reach a view, JS or a log.
+     |
+     | redirect_status is 302 while the store is being verified; the operator
+     | flips it to 301 once Salla is confirmed final.
+     */
+    'salla' => [
+        'store_url' => rtrim((string) env('KOTIVA_SALLA_STORE_URL', 'https://shop.klyvosystems.com'), '/'),
+        'cart_url' => rtrim((string) env('KOTIVA_SALLA_CART_URL', 'https://shop.klyvosystems.com/cart'), '/'),
+        'api_base' => rtrim((string) env('KOTIVA_SALLA_API_BASE', 'https://api.salla.dev/admin/v2'), '/'),
+        'access_token' => (string) env('KOTIVA_SALLA_ACCESS_TOKEN', ''),
+        'redirect_status' => (int) env('KOTIVA_SALLA_REDIRECT_STATUS', 302),
+        // Optional: where the dashboard notice sends admins for orders/stock.
+        'dashboard_url' => (string) env('KOTIVA_SALLA_DASHBOARD_URL', ''),
+    ],
+
+    /*
+     | Laravel's own cart, checkout and stock engine. Off: Salla owns stock and
+     | orders, and StockService refuses to reserve, release or fulfil while
+     | this is false — so a forgotten route, a queued job or a test cannot
+     | move stock behind Salla's back. The code stays until a later PR deletes
+     | it; this switch is not a supported way to run two storefronts.
+     */
+    'commerce_enabled' => (bool) env('KOTIVA_COMMERCE_ENABLED', false),
 
     'currency' => [
         'code' => 'SAR',
