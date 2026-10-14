@@ -96,18 +96,55 @@ final class Salla
 
     /**
      * The product's own Salla page, or the store root until it is linked.
+     *
+     * Products store only the path (products.salla_path); the store origin
+     * comes from config. This is the only place the two are joined, so moving
+     * the store is an .env change and nothing else.
      */
     public static function productUrl(Product $product): string
     {
-        return self::urlOrStore($product->salla_url);
+        $path = $product->salla_path;
+
+        return self::isStorePath($path)
+            ? rtrim(self::storeUrl(), '/').$path
+            : self::storeUrl();
     }
 
     /**
-     * A stored Salla URL, falling back to the store root when there is none.
+     * Whether a stored value is a usable store path: absolute ("/…"), not
+     * protocol-relative ("//host"), and free of whitespace and control
+     * characters — so a bad row cannot point a link at another host.
      */
-    public static function urlOrStore(?string $sallaUrl): string
+    public static function isStorePath(?string $path): bool
     {
-        return is_string($sallaUrl) && $sallaUrl !== '' ? $sallaUrl : self::storeUrl();
+        return is_string($path)
+            && str_starts_with($path, '/')
+            && ! str_starts_with($path, '//')
+            && preg_match('/[\s\x00-\x1F\x7F\\\\]/', $path) !== 1;
+    }
+
+    /**
+     * The path of a full URL on the configured store, or null when the URL is
+     * on another origin. A path prefix on the store URL (a store served from
+     * "https://host/shop") is stripped too, so productUrl() reassembles it.
+     */
+    public static function pathFromStoreUrl(string $url): ?string
+    {
+        if (! self::isStoreUrl($url)) {
+            return null;
+        }
+
+        $prefix = rtrim((string) parse_url(self::storeUrl(), PHP_URL_PATH), '/');
+        $path = (string) parse_url($url, PHP_URL_PATH);
+        $query = parse_url($url, PHP_URL_QUERY);
+
+        if ($prefix !== '') {
+            $path = substr($path, strlen($prefix));
+        }
+
+        $path = ($path === '' ? '/' : $path).(is_string($query) && $query !== '' ? '?'.$query : '');
+
+        return self::isStorePath($path) ? $path : null;
     }
 
     /**

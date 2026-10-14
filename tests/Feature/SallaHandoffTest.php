@@ -48,15 +48,16 @@ final class SallaHandoffTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const STORE = 'https://shop.klyvosystems.com';
+    private function store(): string
+    {
+        return (string) config('kotiva.salla.store_url');
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
 
         config([
-            'kotiva.salla.store_url' => self::STORE,
-            'kotiva.salla.cart_url' => self::STORE.'/cart',
             'kotiva.salla.redirect_status' => 302,
             'kotiva.commerce_enabled' => false,
         ]);
@@ -72,7 +73,7 @@ final class SallaHandoffTest extends TestCase
 
         return ($linked ? $factory->state([
             'salla_product_id' => 1713901761,
-            'salla_url' => self::STORE.'/micellar-water/p1713901761',
+            'salla_path' => '/micellar-water/p1713901761',
             'salla_synced_at' => now(),
         ]) : $factory)->create();
     }
@@ -89,25 +90,25 @@ final class SallaHandoffTest extends TestCase
     public static function shopUrls(): array
     {
         return [
-            'bare' => ['/shop', self::STORE],
-            'salla filter' => ['/shop?filter=spf', self::STORE.'/?filter=spf'],
-            'legacy face' => ['/shop?filter=face', self::STORE.'/?filter=cleanser'],
-            'legacy treatments' => ['/shop?filter=treatments', self::STORE.'/?filter=treatment'],
-            'legacy sunscreen' => ['/shop?filter=sunscreen', self::STORE.'/?filter=spf'],
-            'unknown filter dropped' => ['/shop?filter=nonsense', self::STORE],
-            'routine upper-cased' => ['/shop?routine=kot001,KOT005', self::STORE.'/?routine=KOT001,KOT005'],
-            'routine de-duplicated' => ['/shop?routine=KOT001,kot001,,KOT002', self::STORE.'/?routine=KOT001,KOT002'],
-            'routine junk dropped' => ['/shop?routine=KOT001,<script>,KOT 2', self::STORE.'/?routine=KOT001'],
-            'filter and routine' => ['/shop?filter=hair&routine=KOT023', self::STORE.'/?filter=hair&routine=KOT023'],
-            'legacy shop.html' => ['/shop.html', self::STORE],
+            'bare' => ['/shop', ''],
+            'salla filter' => ['/shop?filter=spf', '/?filter=spf'],
+            'legacy face' => ['/shop?filter=face', '/?filter=cleanser'],
+            'legacy treatments' => ['/shop?filter=treatments', '/?filter=treatment'],
+            'legacy sunscreen' => ['/shop?filter=sunscreen', '/?filter=spf'],
+            'unknown filter dropped' => ['/shop?filter=nonsense', ''],
+            'routine upper-cased' => ['/shop?routine=kot001,KOT005', '/?routine=KOT001,KOT005'],
+            'routine de-duplicated' => ['/shop?routine=KOT001,kot001,,KOT002', '/?routine=KOT001,KOT002'],
+            'routine junk dropped' => ['/shop?routine=KOT001,<script>,KOT 2', '/?routine=KOT001'],
+            'filter and routine' => ['/shop?filter=hair&routine=KOT023', '/?filter=hair&routine=KOT023'],
+            'legacy shop.html' => ['/shop.html', ''],
         ];
     }
 
     #[Test]
     #[DataProvider('shopUrls')]
-    public function the_shop_redirects_to_the_salla_listing(string $from, string $to): void
+    public function the_shop_redirects_to_the_salla_listing(string $from, string $suffix): void
     {
-        $this->get($from)->assertStatus(302)->assertRedirect($to);
+        $this->get($from)->assertStatus(302)->assertRedirect($this->store().$suffix);
     }
 
     #[Test]
@@ -124,7 +125,7 @@ final class SallaHandoffTest extends TestCase
     #[Test]
     public function an_array_query_cannot_break_the_shop_redirect(): void
     {
-        $this->get('/shop?filter[]=spf&routine[]=KOT001')->assertStatus(302)->assertRedirect(self::STORE);
+        $this->get('/shop?filter[]=spf&routine[]=KOT001')->assertStatus(302)->assertRedirect($this->store());
     }
 
     /*
@@ -140,7 +141,7 @@ final class SallaHandoffTest extends TestCase
 
         $this->get('/product/micellar-water')
             ->assertStatus(302)
-            ->assertRedirect(self::STORE.'/micellar-water/p1713901761');
+            ->assertRedirect($this->store().'/micellar-water/p1713901761');
     }
 
     #[Test]
@@ -148,7 +149,7 @@ final class SallaHandoffTest extends TestCase
     {
         $this->micellar(linked: false);
 
-        $this->get('/product/micellar-water')->assertStatus(302)->assertRedirect(self::STORE);
+        $this->get('/product/micellar-water')->assertStatus(302)->assertRedirect($this->store());
     }
 
     #[Test]
@@ -169,7 +170,7 @@ final class SallaHandoffTest extends TestCase
             $response->assertStatus(302);
             // The Location header is the Salla page itself — not a Laravel
             // path that would redirect a second time.
-            $this->assertSame(self::STORE.'/micellar-water/p1713901761', $response->headers->get('Location'), $legacy);
+            $this->assertSame($this->store().'/micellar-water/p1713901761', $response->headers->get('Location'), $legacy);
         }
     }
 
@@ -191,7 +192,7 @@ final class SallaHandoffTest extends TestCase
     #[DataProvider('basketPages')]
     public function cart_and_checkout_pages_redirect_to_the_salla_cart(string $path): void
     {
-        $this->get($path)->assertStatus(302)->assertRedirect(self::STORE.'/cart');
+        $this->get($path)->assertStatus(302)->assertRedirect((string) config('kotiva.salla.cart_url'));
     }
 
     /**
@@ -290,8 +291,8 @@ final class SallaHandoffTest extends TestCase
         $rows = collect($this->getJson('/api/products')->assertOk()->json('data'))->keyBy('id');
 
         $this->assertSame('KOT001', $rows[$linked->id]['sku']);
-        $this->assertSame($linked->salla_url, $rows[$linked->id]['url']);
-        $this->assertSame(self::STORE, $rows[$unlinked->id]['url']);
+        $this->assertSame(Salla::productUrl($linked), $rows[$linked->id]['url']);
+        $this->assertSame($this->store(), $rows[$unlinked->id]['url']);
 
         foreach ($rows as $row) {
             foreach (['price', 'price_excl_vat', 'price_incl_vat', 'price_vat', 'in_stock', 'stock'] as $key) {
@@ -311,9 +312,9 @@ final class SallaHandoffTest extends TestCase
     {
         $html = (string) $this->get('/about')->assertOk()->getContent();
 
-        $this->assertStringContainsString('class="nav-cart" href="'.self::STORE.'/cart"', $html);
-        $this->assertStringContainsString('href="'.self::STORE.'/?filter=cleanser">Face Care', $html);
-        $this->assertStringContainsString('href="'.self::STORE.'/?filter=spf">SPF', $html);
+        $this->assertStringContainsString('class="nav-cart" href="'.$this->store().'/cart"', $html);
+        $this->assertStringContainsString('href="'.$this->store().'/?filter=cleanser">Face Care', $html);
+        $this->assertStringContainsString('href="'.$this->store().'/?filter=spf">SPF', $html);
 
         foreach (['data-cart-badge', 'data-mini-cart', 'mini-cart', 'js/shop.js', 'cart/summary', 'href="/shop', 'href="'.url('/shop')] as $gone) {
             $this->assertStringNotContainsString($gone, $html, "{$gone} should be gone from the layout");
@@ -328,11 +329,11 @@ final class SallaHandoffTest extends TestCase
 
         $html = (string) $this->get('/')->assertOk()->getContent();
 
-        $this->assertStringContainsString('class="bs-card" href="'.$product->salla_url.'"', $html);
+        $this->assertStringContainsString('class="bs-card" href="'.Salla::productUrl($product).'"', $html);
         $this->assertStringNotContainsString('bs-card-price', $html);
         $this->assertStringNotContainsString('135.00', $html);
         $this->assertStringNotContainsString('excluding VAT', $html);
-        $this->assertStringContainsString('href="'.self::STORE.'/?filter=treatment"', $html);
+        $this->assertStringContainsString('href="'.$this->store().'/?filter=treatment"', $html);
         $this->assertStringNotContainsString(url('/product/'), $html);
         $this->assertStringNotContainsString(url('/shop'), $html);
     }
@@ -345,9 +346,9 @@ final class SallaHandoffTest extends TestCase
 
         $html = (string) $this->get('/ingredients')->assertOk()->getContent();
 
-        $this->assertStringContainsString('href="'.self::STORE.'/micellar-water/p1713901761"', $html);
+        $this->assertStringContainsString('href="'.$this->store().'/micellar-water/p1713901761"', $html);
         // Unlinked: the store root, never a dead Laravel product page.
-        $this->assertStringContainsString('class="ig-prod" href="'.self::STORE.'"', $html);
+        $this->assertStringContainsString('class="ig-prod" href="'.$this->store().'"', $html);
         $this->assertStringNotContainsString(url('/product/'), $html);
     }
 
@@ -356,7 +357,7 @@ final class SallaHandoffTest extends TestCase
     {
         $html = (string) $this->get('/routine-finder')->assertOk()->getContent();
 
-        $this->assertStringContainsString('window.SALLA_STORE_URL = '.json_encode(self::STORE), $html);
+        $this->assertStringContainsString('window.SALLA_STORE_URL = '.json_encode($this->store()), $html);
         $this->assertStringContainsString("SALLA_STORE_URL + '/?routine='", $html);
         $this->assertStringContainsString('id="shop-routine-cta"', $html);
         $this->assertStringNotContainsString("'/product/' + slug", $html);
@@ -370,7 +371,7 @@ final class SallaHandoffTest extends TestCase
             $html = (string) $this->get($path)->assertOk()->getContent();
 
             $this->assertStringNotContainsString('href="'.url('/shop').'"', $html, $path);
-            $this->assertStringContainsString('href="'.self::STORE.'" class="btn', $html, $path);
+            $this->assertStringContainsString('href="'.$this->store().'" class="btn', $html, $path);
         }
     }
 
@@ -380,7 +381,7 @@ final class SallaHandoffTest extends TestCase
         $offenders = [];
 
         foreach (Finder::create()->files()->in(resource_path('views'))->name('*.blade.php') as $file) {
-            if (str_contains($file->getContents(), 'shop.klyvosystems.com')) {
+            if (str_contains($file->getContents(), (string) parse_url($this->store(), PHP_URL_HOST))) {
                 $offenders[] = $file->getRelativePathname();
             }
         }
@@ -406,20 +407,42 @@ final class SallaHandoffTest extends TestCase
     #[Test]
     public function the_helper_only_accepts_urls_on_the_store(): void
     {
-        $this->assertTrue(Salla::isStoreUrl(self::STORE.'/micellar-water/p1'));
-        $this->assertTrue(Salla::isStoreUrl('https://SHOP.klyvosystems.com/x'));
-        $this->assertFalse(Salla::isStoreUrl('https://shop.klyvosystems.com.evil.test/x'));
-        $this->assertFalse(Salla::isStoreUrl('http://shop.klyvosystems.com/x'));
-        $this->assertFalse(Salla::isStoreUrl('https://klyvosystems.com/product/x'));
+        $host = (string) parse_url($this->store(), PHP_URL_HOST);
+        $siteHost = (string) parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        $this->assertTrue(Salla::isStoreUrl($this->store().'/micellar-water/p1'));
+        $this->assertTrue(Salla::isStoreUrl('https://'.strtoupper($host).'/x'));
+        $this->assertFalse(Salla::isStoreUrl('https://'.$host.'.evil.test/x'));
+        $this->assertFalse(Salla::isStoreUrl('http://'.$host.'/x'));
+        $this->assertFalse(Salla::isStoreUrl('https://'.$siteHost.'/product/x'));
         $this->assertFalse(Salla::isStoreUrl('/micellar-water/p1'));
         $this->assertFalse(Salla::isStoreUrl('javascript:alert(1)'));
+    }
+
+    #[Test]
+    public function product_urls_join_the_configured_origin_to_the_stored_path(): void
+    {
+        $product = $this->micellar();
+
+        $this->assertSame('/micellar-water/p1713901761', $product->salla_path);
+        $this->assertSame($this->store().'/micellar-water/p1713901761', Salla::productUrl($product));
+
+        // Moving the store is an .env change: the stored path follows it.
+        config(['kotiva.salla.store_url' => 'https://moved-store.example.test']);
+        $this->assertSame('https://moved-store.example.test/micellar-water/p1713901761', Salla::productUrl($product));
+
+        // A value that is not an absolute path never becomes a link elsewhere.
+        foreach (['//evil.test/x', 'https://evil.test/x', 'micellar-water/p1', " /x\n", ''] as $bad) {
+            $product->salla_path = $bad;
+            $this->assertSame('https://moved-store.example.test', Salla::productUrl($product), var_export($bad, true));
+        }
     }
 
     #[Test]
     public function every_salla_filter_key_passes_through(): void
     {
         foreach (Salla::FILTERS as $key) {
-            $this->assertSame(self::STORE.'/?filter='.$key, Salla::listingUrl($key));
+            $this->assertSame($this->store().'/?filter='.$key, Salla::listingUrl($key));
         }
     }
 
@@ -438,7 +461,7 @@ final class SallaHandoffTest extends TestCase
 
         $this->assertStringNotContainsString('/product/', $body);
         $this->assertStringNotContainsString('/shop', $body);
-        $this->assertStringNotContainsString('klyvosystems.com/cart', $body);
+        $this->assertStringNotContainsString('/cart', $body);
         $this->assertMatchesRegularExpression('#<loc>[^<]+/about</loc><lastmod>\d{4}-\d{2}-\d{2}</lastmod>#', $body);
     }
 
@@ -463,15 +486,15 @@ final class SallaHandoffTest extends TestCase
         $out = storage_path('framework/testing/llms-test.txt');
         @mkdir(dirname($out), 0777, true);
 
-        $this->artisan('kotiva:llms-txt', ['--origin' => 'https://klyvosystems.com', '--output' => 'storage/framework/testing/llms-test.txt'])
+        $this->artisan('kotiva:llms-txt', ['--origin' => config('app.url'), '--output' => 'storage/framework/testing/llms-test.txt'])
             ->assertSuccessful();
 
         $text = (string) file_get_contents($out);
         @unlink($out);
 
-        $this->assertStringContainsString('Main website: https://klyvosystems.com', $text);
-        $this->assertStringContainsString('Online store: '.self::STORE, $text);
-        $this->assertStringContainsString('[Kotiva Micellar Water]('.$product->salla_url.')', $text);
+        $this->assertStringContainsString('Main website: '.config('app.url'), $text);
+        $this->assertStringContainsString('Online store: '.$this->store(), $text);
+        $this->assertStringContainsString('[Kotiva Micellar Water]('.Salla::productUrl($product).')', $text);
         $this->assertStringNotContainsString('/product/', $text);
         $this->assertStringNotContainsString('.html', $text);
     }
@@ -508,7 +531,7 @@ final class SallaHandoffTest extends TestCase
             ->assertOk()
             ->assertSee('Salla product ID')
             ->assertSee('1713901761')
-            ->assertSee($product->salla_url)
+            ->assertSee(Salla::productUrl($product))
             ->assertSee('Managed in Salla');
     }
 
@@ -529,7 +552,7 @@ final class SallaHandoffTest extends TestCase
                 'price_excl_vat' => '1.00',
                 'price_incl_vat' => '1.15',
                 'low_stock_threshold' => 99,
-                'salla_url' => 'https://evil.test/x',
+                'salla_path' => '//evil.test/x',
                 'salla_product_id' => 1,
             ])
             ->call('save')
@@ -540,7 +563,7 @@ final class SallaHandoffTest extends TestCase
         $this->assertSame('135.00', (string) $fresh->price_excl_vat);
         $this->assertSame('155.25', (string) $fresh->price_incl_vat);
         $this->assertSame(5, $fresh->low_stock_threshold);
-        $this->assertSame(self::STORE.'/micellar-water/p1713901761', $fresh->salla_url);
+        $this->assertSame('/micellar-water/p1713901761', $fresh->salla_path);
         $this->assertSame(1713901761, $fresh->salla_product_id);
     }
 
@@ -572,7 +595,7 @@ final class SallaHandoffTest extends TestCase
         $this->get('/admin')
             ->assertOk()
             ->assertSee('Store, orders and stock are managed in Salla')
-            ->assertSee('shop.klyvosystems.com');
+            ->assertSee((string) parse_url($this->store(), PHP_URL_HOST));
     }
 
     #[Test]

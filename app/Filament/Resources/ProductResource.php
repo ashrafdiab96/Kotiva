@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Services\ProductImageService;
 use App\Support\Money;
+use App\Support\Salla;
 use App\Support\Vat;
 use Closure;
 use Filament\Forms;
@@ -430,10 +431,12 @@ final class ProductResource extends Resource
                         ->label('Salla product ID')
                         ->content(fn (?Product $record): string => $record?->salla_product_id !== null ? (string) $record->salla_product_id : 'Not linked'),
 
-                    Forms\Components\Placeholder::make('salla_url')
+                    // Only the path is stored; the URL is composed from the
+                    // configured store origin, exactly as the site links it.
+                    Forms\Components\Placeholder::make('salla_link')
                         ->label('Salla URL')
-                        ->content(fn (?Product $record): HtmlString|string => filled($record?->salla_url)
-                            ? new HtmlString('<a href="'.e((string) $record->salla_url).'" target="_blank" rel="noopener" class="text-primary-600 underline dark:text-primary-400">'.e((string) $record->salla_url).'</a>')
+                        ->content(fn (?Product $record): HtmlString|string => $record instanceof Product && Salla::isStorePath($record->salla_path)
+                            ? new HtmlString('<a href="'.e(Salla::productUrl($record)).'" target="_blank" rel="noopener" class="text-primary-600 underline dark:text-primary-400">'.e(Salla::productUrl($record)).'</a>')
                             : 'Not linked — the site links this product to the store root'),
 
                     Forms\Components\Placeholder::make('salla_synced_at')

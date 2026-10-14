@@ -53,7 +53,7 @@ final class LlmsTxt
         return [
             'text' => $text,
             'count' => $products->count(),
-            'unlinked' => $products->filter(fn (Product $p): bool => blank($p->salla_url))->count(),
+            'unlinked' => $products->filter(fn (Product $p): bool => ! Salla::isStorePath($p->salla_path))->count(),
         ];
     }
 }

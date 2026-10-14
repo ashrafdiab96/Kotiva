@@ -41,7 +41,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $sku
  * @property int|null $salla_product_id
- * @property string|null $salla_url
+ * @property string|null $salla_path Path on the Salla store, e.g. /micellar-water/p1713901761; joined to the store origin only by Salla::productUrl()
  * @property Carbon|null $salla_synced_at
  * @property string $slug
  * @property string $name
@@ -91,7 +91,7 @@ final class Product extends Model
         'stock_qty', 'low_stock_threshold',
         'meta_title', 'meta_description', 'weight_grams',
         // Written only by kotiva:salla-links; never exposed in the dashboard form.
-        'salla_product_id', 'salla_url', 'salla_synced_at',
+        'salla_product_id', 'salla_path', 'salla_synced_at',
     ];
 
     protected function casts(): array

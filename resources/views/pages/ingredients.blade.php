@@ -62,7 +62,7 @@
     <p class="ig-summary">{{ $entry['summary'] }}</p>
     <div class="ig-found">
       <span class="ig-found-label">Found in</span>
-      <div class="ig-found-list">@foreach ($entry['products'] as $p)<a class="ig-prod" href="{{ $p['salla_url'] }}">{{ $p['name'] }}</a>@endforeach</div>
+      <div class="ig-found-list">@foreach ($entry['products'] as $p)<a class="ig-prod" href="{{ $p['url'] }}">{{ $p['name'] }}</a>@endforeach</div>
     </div>
   </article>
 @endforeach

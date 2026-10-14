@@ -36,11 +36,6 @@ final class PublicOriginsTest extends TestCase
 
         $this->seed(ProductSeeder::class);
 
-        // Per-product Salla URLs are data (storage/app/salla-links.json), not
-        // code. Clearing them makes every product link fall back to the store
-        // root, so anything left that names a real host was written by hand.
-        Product::query()->update(['salla_url' => null]);
-
         config([
             'app.url' => self::SITE,
             'kotiva.salla.store_url' => self::STORE,
@@ -48,6 +43,10 @@ final class PublicOriginsTest extends TestCase
             'kotiva.salla.redirect_status' => 302,
             'kotiva.commerce_enabled' => false,
         ]);
+
+        // The committed link file holds paths only, so the real catalog links
+        // must come out on the configured test store.
+        $this->artisan('kotiva:salla-links', ['--from' => 'storage/app/salla-links.json'])->assertSuccessful();
 
         // Request-relative links (asset(), url(), route()) follow the request
         // host, which the test client fixed from APP_URL at boot. Serve the
@@ -63,6 +62,11 @@ final class PublicOriginsTest extends TestCase
         $this->assertNoHardCodedHost($html, 'home page');
         $this->assertStringContainsString('<link rel="canonical" href="'.self::SITE.'/"', $html);
         $this->assertStringContainsString('href="'.self::STORE, $html);
+
+        // A bestseller card: the stored path, on the configured store.
+        $micellar = Product::query()->where('sku', 'KOT001')->firstOrFail();
+        $this->assertSame('/micellar-water/p1713901761', $micellar->salla_path);
+        $this->assertStringContainsString('href="'.self::STORE.'/micellar-water/p1713901761"', $html);
     }
 
     #[Test]

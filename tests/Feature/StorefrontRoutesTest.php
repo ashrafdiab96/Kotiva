@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Product;
+use App\Support\Salla;
 use Database\Seeders\ProductSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -35,9 +36,13 @@ final class StorefrontRoutesTest extends TestCase
         $this->seed(ProductSeeder::class);
 
         config([
-            'kotiva.salla.store_url' => 'https://shop.klyvosystems.com',
             'kotiva.salla.redirect_status' => 302,
         ]);
+    }
+
+    private function store(): string
+    {
+        return (string) config('kotiva.salla.store_url');
     }
 
     private function linkCatalogToSalla(): void
@@ -103,7 +108,7 @@ final class StorefrontRoutesTest extends TestCase
     {
         $this->get('/shop.html')
             ->assertStatus(302)
-            ->assertRedirect('https://shop.klyvosystems.com');
+            ->assertRedirect($this->store());
     }
 
     #[Test]
@@ -116,7 +121,8 @@ final class StorefrontRoutesTest extends TestCase
         $this->artisan('kotiva:salla-links', ['--check' => true])->assertExitCode(0);
 
         foreach (Product::query()->active()->get() as $product) {
-            $this->assertStringStartsWith('https://shop.klyvosystems.com/', (string) $product->salla_url, $product->sku);
+            $this->assertTrue(Salla::isStorePath($product->salla_path), $product->sku);
+            $this->assertStringStartsWith($this->store().'/', Salla::productUrl($product), $product->sku);
             $this->assertNotNull($product->salla_product_id, $product->sku);
         }
     }
@@ -129,7 +135,7 @@ final class StorefrontRoutesTest extends TestCase
         foreach (Product::query()->active()->get() as $product) {
             $this->get("/product/{$product->slug}")
                 ->assertStatus(302)
-                ->assertRedirect((string) $product->salla_url);
+                ->assertRedirect(Salla::productUrl($product));
         }
     }
 
@@ -143,12 +149,12 @@ final class StorefrontRoutesTest extends TestCase
             // would redirect again.
             $this->get("/product/{$product->slug}.html")
                 ->assertStatus(302)
-                ->assertRedirect((string) $product->salla_url);
+                ->assertRedirect(Salla::productUrl($product));
 
             // The JS page addressed products by numeric id.
             $this->get("/product.html?id={$product->id}")
                 ->assertStatus(302)
-                ->assertRedirect((string) $product->salla_url);
+                ->assertRedirect(Salla::productUrl($product));
         }
     }
 
@@ -157,11 +163,11 @@ final class StorefrontRoutesTest extends TestCase
     {
         $this->get('/product.html?id=99999')
             ->assertStatus(302)
-            ->assertRedirect('https://shop.klyvosystems.com');
+            ->assertRedirect($this->store());
 
         $this->get('/product.html')
             ->assertStatus(302)
-            ->assertRedirect('https://shop.klyvosystems.com');
+            ->assertRedirect($this->store());
     }
 
     #[Test]
@@ -186,7 +192,7 @@ final class StorefrontRoutesTest extends TestCase
         // those products "spf". Old links must keep working.
         $this->get('/shop?filter=sunscreen')
             ->assertStatus(302)
-            ->assertRedirect('https://shop.klyvosystems.com/?filter=spf');
+            ->assertRedirect($this->store().'/?filter=spf');
     }
 
     #[Test]

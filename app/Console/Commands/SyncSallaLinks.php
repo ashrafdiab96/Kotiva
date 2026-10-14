@@ -23,12 +23,17 @@ use Throwable;
  * Three modes:
  *
  *   --from=<file>  The standard way. Reads an exported JSON list of
- *                  {sku, salla_product_id, salla_url} rows — the committed
+ *                  {sku, salla_product_id, salla_path} rows — the committed
  *                  storage/app/salla-links.json — and needs no API token.
+ *                  A legacy full salla_url is accepted when it is on the
+ *                  configured store; its origin is stripped.
  *   (no option)    Asks the Salla Merchant API for each SKU. Needs
  *                  KOTIVA_SALLA_ACCESS_TOKEN with products.read.
- *   --check        Touches nothing. Lists active products with no Salla link
- *                  and exits 1 if there are any; deploy runs this.
+ *   --check        Touches nothing. Lists active products with no valid Salla
+ *                  path and exits 1 if there are any; deploy runs this.
+ *
+ * Only the path is stored ("/micellar-water/p1713901761"). The store origin
+ * lives in .env and is joined to it by Salla::productUrl() alone.
  *
  * The token is read from config and sent in one header; it is never printed,
  * logged or stored. The log carries SKU and status only — never a response
@@ -59,6 +64,8 @@ final class SyncSallaLinks extends Command
     private const STATUS_INVALID = 'invalid';
 
     private const STATUS_UNLINKED = 'unlinked';
+
+    private const BAD_PATH = 'salla_path must be an absolute path starting with "/"';
 
     /** Pause between API calls, so a 25-product sync stays well inside Salla's rate limit. */
     private const API_PAUSE_MS = 250;
@@ -95,7 +102,7 @@ final class SyncSallaLinks extends Command
     private function check(): int
     {
         $unlinked = $this->scopedProducts(activeOnly: true)
-            ->filter(fn (Product $p): bool => blank($p->salla_url));
+            ->filter(fn (Product $p): bool => ! Salla::isStorePath($p->salla_path));
 
         if ($unlinked->isEmpty()) {
             $this->info('Every active product is linked to Salla.');
@@ -104,7 +111,11 @@ final class SyncSallaLinks extends Command
         }
 
         foreach ($unlinked as $product) {
-            $this->addRow($product->sku, $product->name, null, null, self::STATUS_UNLINKED);
+            $status = blank($product->salla_path)
+                ? self::STATUS_UNLINKED
+                : self::STATUS_INVALID.': '.self::BAD_PATH;
+
+            $this->addRow($product->sku, $product->name, null, $product->salla_path, $status);
         }
 
         $this->printTable();
@@ -137,7 +148,7 @@ final class SyncSallaLinks extends Command
         foreach ($rows as $index => $row) {
             $sku = is_array($row) && is_string($row['sku'] ?? null) ? strtoupper(trim($row['sku'])) : '';
             $rawId = is_array($row) ? ($row['salla_product_id'] ?? null) : null;
-            $url = is_array($row) && is_string($row['salla_url'] ?? null) ? trim($row['salla_url']) : '';
+            [$path, $url, $pathProblem] = $this->rowPath($row);
             $name = is_array($row) && is_string($row['name'] ?? null) ? $row['name'] : '';
 
             if ($only !== null && $sku !== $only) {
@@ -160,12 +171,14 @@ final class SyncSallaLinks extends Command
                 continue;
             }
 
-            if (! Salla::isStoreUrl($url)) {
-                $this->addRow($sku, $name, (string) $id, $url, self::STATUS_INVALID.': url not on '.Salla::storeUrl());
+            if ($path === null) {
+                $this->addRow($sku, $name, (string) $id, $url, self::STATUS_INVALID.': '.$pathProblem);
                 $failed = true;
 
                 continue;
             }
+
+            $url = $path;
 
             if (isset($seenSkus[$sku]) || isset($seenIds[$id])) {
                 $this->addRow($sku, $name, (string) $id, $url, self::STATUS_INVALID.': duplicate row');
@@ -187,7 +200,7 @@ final class SyncSallaLinks extends Command
                 continue;
             }
 
-            $status = $this->store($product, $id, $url, $dryRun);
+            $status = $this->store($product, $id, $path, $dryRun);
             $failed = $failed || $status !== self::STATUS_LINKED && $status !== self::STATUS_WOULD_LINK;
             $this->addRow($product->sku, $product->name, (string) $id, $url, $status);
         }
@@ -211,6 +224,34 @@ final class SyncSallaLinks extends Command
         }
 
         return $failed ? self::FAILURE : self::SUCCESS;
+    }
+
+    /**
+     * The row's store path, from salla_path or (legacy) a full salla_url on
+     * the configured store: [path or null, value to display, problem].
+     *
+     * @return array{0: string|null, 1: string, 2: string}
+     */
+    private function rowPath(mixed $row): array
+    {
+        $rawPath = is_array($row) ? ($row['salla_path'] ?? null) : null;
+        $rawUrl = is_array($row) ? ($row['salla_url'] ?? null) : null;
+
+        if (is_string($rawPath)) {
+            $path = trim($rawPath);
+
+            return Salla::isStorePath($path) ? [$path, $path, ''] : [null, $path, self::BAD_PATH];
+        }
+
+        if (is_string($rawUrl)) {
+            $url = trim($rawUrl);
+
+            // Another origin is refused, never re-homed onto ours: the "Buy"
+            // button would land on a store this site does not use.
+            return [Salla::pathFromStoreUrl($url), $url, 'url not on '.Salla::storeUrl()];
+        }
+
+        return [null, '', 'no salla_path'];
     }
 
     /**
@@ -284,13 +325,18 @@ final class SyncSallaLinks extends Command
             [$status, $id, $url] = $this->lookup($product, $token);
 
             if ($status === self::STATUS_LINKED && $id !== null && $url !== null) {
-                if (! Salla::isStoreUrl($url)) {
-                    // Salla's own canonical URL wins; the warning is for a
-                    // human to notice the store domain changed.
-                    $this->warn("{$product->sku}: Salla URL is not on ".Salla::storeUrl().'; storing it anyway.');
-                }
+                $path = Salla::pathFromStoreUrl($url);
 
-                $status = $this->store($product, $id, $url, $dryRun);
+                if ($path === null) {
+                    // Only the path is stored, so a page on another origin
+                    // would be silently re-homed onto the configured store.
+                    // Refuse it; a changed store domain belongs in .env.
+                    $this->logStatus($product->sku, self::STATUS_INVALID);
+                    $status = self::STATUS_INVALID.': url not on '.Salla::storeUrl();
+                } else {
+                    $url = $path;
+                    $status = $this->store($product, $id, $path, $dryRun);
+                }
             }
 
             $failed = $failed || ! in_array($status, [self::STATUS_LINKED, self::STATUS_WOULD_LINK], true);
@@ -388,7 +434,7 @@ final class SyncSallaLinks extends Command
     /**
      * Write one link, refusing to steal a Salla id another product holds.
      */
-    private function store(Product $product, int $id, string $url, bool $dryRun): string
+    private function store(Product $product, int $id, string $path, bool $dryRun): string
     {
         $holder = Product::query()
             ->withTrashed()
@@ -408,7 +454,7 @@ final class SyncSallaLinks extends Command
 
         $product->forceFill([
             'salla_product_id' => $id,
-            'salla_url' => $url,
+            'salla_path' => $path,
             'salla_synced_at' => now(),
         ])->save();
 
@@ -472,14 +518,14 @@ final class SyncSallaLinks extends Command
         return str_starts_with($path, '/') || preg_match('/^[A-Za-z]:[\\\\\/]/', $path) === 1;
     }
 
-    private function addRow(string $sku, string $name, ?string $id, ?string $url, string $status): void
+    private function addRow(string $sku, string $name, ?string $id, ?string $link, string $status): void
     {
-        $this->rows[] = [$sku, $name, $id ?? '—', $url ?? '—', $status];
+        $this->rows[] = [$sku, $name, $id ?? '—', $link === null || $link === '' ? '—' : $link, $status];
     }
 
     private function printTable(): void
     {
-        $this->table(['SKU', 'Name', 'Salla ID', 'Salla URL', 'Status'], $this->rows);
+        $this->table(['SKU', 'Name', 'Salla ID', 'Salla path', 'Status'], $this->rows);
     }
 
     private function logStatus(string $sku, string $status): void

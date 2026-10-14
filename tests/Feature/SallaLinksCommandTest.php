@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Product;
+use App\Support\Salla;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -23,7 +24,10 @@ final class SallaLinksCommandTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const STORE = 'https://shop.klyvosystems.com';
+    private function store(): string
+    {
+        return (string) config('kotiva.salla.store_url');
+    }
 
     private const API = 'https://api.salla.dev/admin/v2';
 
@@ -34,7 +38,6 @@ final class SallaLinksCommandTest extends TestCase
         parent::setUp();
 
         config([
-            'kotiva.salla.store_url' => self::STORE,
             'kotiva.salla.api_base' => self::API,
             'kotiva.salla.access_token' => '',
         ]);
@@ -107,18 +110,19 @@ final class SallaLinksCommandTest extends TestCase
 
         $kot001->refresh();
         $this->assertSame(1713901761, $kot001->salla_product_id, 'id cast to int');
-        $this->assertSame(self::STORE.'/micellar-water/p1713901761', $kot001->salla_url);
+        $this->assertSame('/micellar-water/p1713901761', $kot001->salla_path);
+        $this->assertSame($this->store().'/micellar-water/p1713901761', Salla::productUrl($kot001));
         $this->assertNotNull($kot001->salla_synced_at);
 
         // Lower-case SKU in the file still matches.
         $this->assertSame(172729302, $kot002->fresh()->salla_product_id);
 
         // URL on another host: reported, not stored.
-        $this->assertNull($kot003->fresh()->salla_url);
+        $this->assertNull($kot003->fresh()->salla_path);
         $this->assertNull($kot003->fresh()->salla_product_id);
 
         // No row for it: reported, untouched.
-        $this->assertNull($kot004->fresh()->salla_url);
+        $this->assertNull($kot004->fresh()->salla_path);
 
         // The row with no matching product created nothing.
         $this->assertSame(0, Product::query()->where('sku', 'KOT099')->count());
@@ -137,7 +141,7 @@ final class SallaLinksCommandTest extends TestCase
 
         $this->assertSame(1713901761, Product::query()->where('sku', 'KOT001')->value('salla_product_id'));
         // --sku limits the run to that one product.
-        $this->assertNull(Product::query()->where('sku', 'KOT002')->value('salla_url'));
+        $this->assertNull(Product::query()->where('sku', 'KOT002')->value('salla_path'));
     }
 
     #[Test]
@@ -150,7 +154,7 @@ final class SallaLinksCommandTest extends TestCase
             ->expectsOutputToContain('Dry run: nothing was stored.');
 
         $product->refresh();
-        $this->assertNull($product->salla_url);
+        $this->assertNull($product->salla_path);
         $this->assertNull($product->salla_product_id);
         $this->assertNull($product->salla_synced_at);
     }
@@ -165,7 +169,7 @@ final class SallaLinksCommandTest extends TestCase
             ->expectsOutputToContain('id already linked to KOT050')
             ->assertExitCode(1);
 
-        $this->assertNull($kot001->fresh()->salla_url);
+        $this->assertNull($kot001->fresh()->salla_path);
     }
 
     #[Test]
@@ -191,7 +195,7 @@ final class SallaLinksCommandTest extends TestCase
         $product = $this->product('KOT001');
         $file = tempnam(sys_get_temp_dir(), 'salla');
         file_put_contents($file, (string) json_encode([
-            ['sku' => 'KOT001', 'salla_product_id' => 'abc', 'salla_url' => self::STORE.'/x/p1'],
+            ['sku' => 'KOT001', 'salla_product_id' => 'abc', 'salla_path' => '/x/p1'],
         ]));
 
         $this->artisan('kotiva:salla-links', ['--from' => $file])
@@ -199,7 +203,82 @@ final class SallaLinksCommandTest extends TestCase
             ->assertExitCode(1);
 
         @unlink($file);
-        $this->assertNull($product->fresh()->salla_url);
+        $this->assertNull($product->fresh()->salla_path);
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     */
+    private function linkFile(array $rows): string
+    {
+        $file = (string) tempnam(sys_get_temp_dir(), 'salla');
+        file_put_contents($file, (string) json_encode($rows));
+
+        return $file;
+    }
+
+    #[Test]
+    public function a_legacy_full_url_on_the_store_is_stored_as_its_path(): void
+    {
+        $product = $this->product('KOT001');
+        $file = $this->linkFile([
+            ['sku' => 'KOT001', 'salla_product_id' => '1713901761', 'salla_url' => $this->store().'/micellar-water/p1713901761'],
+        ]);
+
+        $this->artisan('kotiva:salla-links', ['--from' => $file])->assertExitCode(0);
+        @unlink($file);
+
+        $this->assertSame('/micellar-water/p1713901761', $product->fresh()->salla_path);
+    }
+
+    #[Test]
+    public function a_row_on_a_different_origin_is_rejected(): void
+    {
+        $product = $this->product('KOT001');
+        $host = (string) parse_url($this->store(), PHP_URL_HOST);
+
+        foreach ([
+            'other host' => 'https://another-store.example.test/micellar-water/p1713901761',
+            'look-alike host' => 'https://'.$host.'.evil.test/micellar-water/p1713901761',
+            'plain http' => 'http://'.$host.'/micellar-water/p1713901761',
+        ] as $case => $url) {
+            $file = $this->linkFile([['sku' => 'KOT001', 'salla_product_id' => '1713901761', 'salla_url' => $url]]);
+
+            $this->artisan('kotiva:salla-links', ['--from' => $file])
+                ->expectsOutputToContain('invalid: url not on '.$this->store())
+                ->assertExitCode(1);
+
+            @unlink($file);
+            $this->assertNull($product->fresh()->salla_path, $case);
+            $this->assertNull($product->fresh()->salla_product_id, $case);
+        }
+    }
+
+    #[Test]
+    public function a_salla_path_that_is_not_an_absolute_path_is_rejected(): void
+    {
+        $product = $this->product('KOT001');
+
+        foreach (['', 'micellar-water/p1', '//evil.test/p1', 'https://evil.test/p1', '/a b/p1'] as $bad) {
+            $file = $this->linkFile([['sku' => 'KOT001', 'salla_product_id' => '1713901761', 'salla_path' => $bad]]);
+
+            $this->artisan('kotiva:salla-links', ['--from' => $file])
+                ->expectsOutputToContain('salla_path must be an absolute path')
+                ->assertExitCode(1);
+
+            @unlink($file);
+            $this->assertNull($product->fresh()->salla_path, var_export($bad, true));
+        }
+    }
+
+    #[Test]
+    public function check_rejects_a_stored_path_that_is_not_absolute(): void
+    {
+        Product::factory()->create(['sku' => 'KOT001', 'salla_product_id' => 1, 'salla_path' => 'micellar-water/p1']);
+
+        $this->artisan('kotiva:salla-links', ['--check' => true])
+            ->expectsOutputToContain('salla_path must be an absolute path')
+            ->assertExitCode(1);
     }
 
     /*
@@ -240,7 +319,7 @@ final class SallaLinksCommandTest extends TestCase
         $product = $this->product('KOT001');
 
         Http::fake([
-            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1713901761, 'kot001', self::STORE.'/micellar-water/p1713901761')),
+            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1713901761, 'kot001', $this->store().'/micellar-water/p1713901761')),
         ]);
 
         $this->artisan('kotiva:salla-links')
@@ -250,12 +329,30 @@ final class SallaLinksCommandTest extends TestCase
 
         $product->refresh();
         $this->assertSame(1713901761, $product->salla_product_id);
-        $this->assertSame(self::STORE.'/micellar-water/p1713901761', $product->salla_url);
+        $this->assertSame('/micellar-water/p1713901761', $product->salla_path, 'origin stripped before storing');
         $this->assertNotNull($product->salla_synced_at);
 
         Http::assertSent(fn (Request $request): bool => $request->url() === self::API.'/products/sku/KOT001'
             && $request->hasHeader('Authorization', 'Bearer test-token-value')
             && $request->hasHeader('Accept', 'application/json'));
+    }
+
+    #[Test]
+    public function api_mode_refuses_a_customer_url_on_a_different_origin(): void
+    {
+        config(['kotiva.salla.access_token' => 'test-token-value']);
+        $product = $this->product('KOT001');
+
+        Http::fake([
+            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1713901761, 'KOT001', 'https://another-store.example.test/micellar-water/p1713901761')),
+        ]);
+
+        $this->artisan('kotiva:salla-links')
+            ->expectsOutputToContain('invalid: url not on '.$this->store())
+            ->assertExitCode(1);
+
+        $this->assertNull($product->fresh()->salla_path);
+        $this->assertNull($product->fresh()->salla_product_id);
     }
 
     #[Test]
@@ -265,14 +362,14 @@ final class SallaLinksCommandTest extends TestCase
         $product = $this->product('KOT001');
 
         Http::fake([
-            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(5, 'KOT001-B', self::STORE.'/other/p5')),
+            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(5, 'KOT001-B', $this->store().'/other/p5')),
         ]);
 
         $this->artisan('kotiva:salla-links')
             ->expectsOutputToContain('mismatch')
             ->assertExitCode(1);
 
-        $this->assertNull($product->fresh()->salla_url);
+        $this->assertNull($product->fresh()->salla_path);
     }
 
     #[Test]
@@ -289,7 +386,7 @@ final class SallaLinksCommandTest extends TestCase
             ->expectsOutputToContain('not found')
             ->assertExitCode(1);
 
-        $this->assertNull($product->fresh()->salla_url);
+        $this->assertNull($product->fresh()->salla_path);
         // A 404 is an answer, not a failure: it is not retried.
         Http::assertSentCount(1);
     }
@@ -303,7 +400,7 @@ final class SallaLinksCommandTest extends TestCase
         Http::fake([
             self::API.'/products/sku/KOT001' => Http::sequence()
                 ->push(['status' => 429], 429, ['Retry-After' => '2'])
-                ->push($this->sallaProduct(1713901761, 'KOT001', self::STORE.'/micellar-water/p1713901761')),
+                ->push($this->sallaProduct(1713901761, 'KOT001', $this->store().'/micellar-water/p1713901761')),
         ]);
 
         $this->artisan('kotiva:salla-links')->assertExitCode(0);
@@ -328,7 +425,7 @@ final class SallaLinksCommandTest extends TestCase
             ->assertExitCode(1);
 
         Http::assertSentCount(3);
-        $this->assertNull($product->fresh()->salla_url);
+        $this->assertNull($product->fresh()->salla_path);
     }
 
     #[Test]
@@ -338,14 +435,14 @@ final class SallaLinksCommandTest extends TestCase
         $product = $this->product('KOT001');
 
         Http::fake([
-            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1713901761, 'KOT001', self::STORE.'/micellar-water/p1713901761')),
+            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1713901761, 'KOT001', $this->store().'/micellar-water/p1713901761')),
         ]);
 
         $this->artisan('kotiva:salla-links', ['--dry-run' => true])
             ->expectsOutputToContain('would link')
             ->assertExitCode(0);
 
-        $this->assertNull($product->fresh()->salla_url);
+        $this->assertNull($product->fresh()->salla_path);
     }
 
     #[Test]
@@ -356,8 +453,8 @@ final class SallaLinksCommandTest extends TestCase
         $this->product('KOT002');
 
         Http::fake([
-            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1, 'KOT001', self::STORE.'/a/p1')),
-            self::API.'/products/sku/KOT002' => Http::response($this->sallaProduct(2, 'KOT002', self::STORE.'/b/p2')),
+            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1, 'KOT001', $this->store().'/a/p1')),
+            self::API.'/products/sku/KOT002' => Http::response($this->sallaProduct(2, 'KOT002', $this->store().'/b/p2')),
         ]);
 
         $this->artisan('kotiva:salla-links')->assertExitCode(0);
@@ -372,7 +469,7 @@ final class SallaLinksCommandTest extends TestCase
         $this->product('KOT001');
 
         Http::fake([
-            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1713901761, 'KOT001', self::STORE.'/micellar-water/p1713901761')),
+            self::API.'/products/sku/KOT001' => Http::response($this->sallaProduct(1713901761, 'KOT001', $this->store().'/micellar-water/p1713901761')),
         ]);
 
         $log = Log::spy();

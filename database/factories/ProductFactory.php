@@ -72,7 +72,7 @@ final class ProductFactory extends Factory
 
             return [
                 'salla_product_id' => $id,
-                'salla_url' => config('kotiva.salla.store_url').'/'.Str::slug((string) ($attributes['name'] ?? 'product')).'/p'.$id,
+                'salla_path' => '/'.Str::slug((string) ($attributes['name'] ?? 'product')).'/p'.$id,
                 'salla_synced_at' => now(),
             ];
         });

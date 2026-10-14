@@ -36,7 +36,7 @@ final class IngredientGlossary
     /**
      * @return list<array{
      *     slug: string, name: string, also: string, category: string,
-     *     summary: string, products: list<array{slug: string, name: string, salla_url: string}>
+     *     summary: string, products: list<array{slug: string, name: string, url: string}>
      * }>
      */
     public function entries(): array
@@ -44,7 +44,7 @@ final class IngredientGlossary
         $products = Product::query()
             ->active()
             ->orderBy('id')
-            ->get(['id', 'slug', 'name', 'ingredients', 'salla_url']);
+            ->get(['id', 'slug', 'name', 'ingredients', 'salla_path']);
 
         $out = [];
 
@@ -68,7 +68,7 @@ final class IngredientGlossary
                     'slug' => $p->slug,
                     'name' => $p->displayName(),
                     // The product page is on Salla; the store root until linked.
-                    'salla_url' => Salla::productUrl($p),
+                    'url' => Salla::productUrl($p),
                 ])
                 ->values();
 
