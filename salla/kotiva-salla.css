@@ -1,0 +1,2864 @@
+/* =========================================================
+   KOTIVA FONTS — same family mapping as the Laravel site
+   ========================================================= */
+@font-face {
+  font-family: 'FuturaNow';
+  src: url('https://klyvosystems.com/fonts/FuturaNowVar-Roman.woff2?v=sub01') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manus';
+  src: url('https://klyvosystems.com/fonts/Manus.woff2?v=sub01') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MyriadPro';
+  src: url('https://klyvosystems.com/fonts/MyriadPro-Regular.woff2?v=sub01') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('https://klyvosystems.com/fonts/Montserrat-VariableFont_wght_25.woff2?v=sub01') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* =========================================================
+   KOTIVA — SALLA HEADER + FOOTER
+   ========================================================= */
+
+/* 1. Hide Enaya native header/footer.
+   These are Salla's documented selectors. */
+header.store-header {
+  display: none !important;
+}
+
+footer.store-footer {
+  display: none !important;
+}
+
+/* KOTIVA TOKENS */
+:root {
+  --kotiva-black: #231F20;
+  --kotiva-white: #FFFFFF;
+  --kotiva-blue: #005DBA;
+  --kotiva-blue-light: #8AB7E9;
+  --kotiva-purple: #6A3277;
+  --kotiva-red: #D7282F;
+
+  --kotiva-border: rgba(35,31,32,.12);
+  --kotiva-muted: rgba(35,31,32,.72);
+  --kotiva-footer-bg: rgba(138,183,233,.18);
+
+  --kotiva-nav-height: 72px;
+  --kotiva-max-width: 1380px;
+  --kotiva-padding: clamp(24px, 4vw, 80px);
+}
+
+/* Space for fixed header */
+body.kotiva-salla-ready {
+  padding-top: var(--kotiva-nav-height) !important;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+#kotiva-salla-header {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: var(--kotiva-nav-height);
+
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--kotiva-border);
+  box-shadow: 0 2px 20px rgba(35,31,32,.06);
+
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+#kotiva-salla-header *,
+#kotiva-salla-footer * {
+  box-sizing: border-box;
+}
+
+.kotiva-nav-inner {
+  width: 100%;
+  max-width: var(--kotiva-max-width);
+  height: 100%;
+
+  margin: 0 auto;
+  padding: 0 var(--kotiva-padding);
+
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.kotiva-nav-logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.kotiva-nav-logo img {
+  display: block;
+  width: auto;
+  height: 28px;
+}
+
+.kotiva-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  flex: 1;
+}
+
+.kotiva-nav-link {
+  color: rgba(35,31,32,.72);
+  text-decoration: none;
+
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+
+  transition: color .3s ease;
+  white-space: nowrap;
+}
+
+.kotiva-nav-link:hover {
+  color: var(--kotiva-blue);
+}
+
+.kotiva-nav-right {
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.kotiva-routine-button {
+  min-height: 40px;
+  padding: 10px 24px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 100px;
+
+  background: var(--kotiva-blue-light);
+  color: var(--kotiva-black);
+
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+
+  text-decoration: none;
+
+  transition: .3s ease;
+}
+
+.kotiva-routine-button:hover {
+  background: var(--kotiva-blue);
+  color: #FFFFFF;
+}
+
+/* Native Salla cart component */
+.kotiva-cart {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--kotiva-black);
+}
+
+/* Hamburger */
+.kotiva-menu-button {
+  display: none;
+
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+  margin: 0;
+
+  border: 0;
+  background: transparent;
+
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 5px;
+
+  cursor: pointer;
+}
+
+.kotiva-menu-button span {
+  display: block;
+
+  width: 22px;
+  height: 1.5px;
+
+  background: var(--kotiva-black);
+
+  transition: .3s ease;
+}
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+#kotiva-mobile-menu {
+  position: fixed;
+  z-index: 999;
+
+  inset: var(--kotiva-nav-height) 0 0 0;
+
+  background: #FFFFFF;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 32px;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateY(-10px);
+
+  transition:
+    opacity .3s ease,
+    transform .3s ease,
+    visibility .3s ease;
+}
+
+#kotiva-mobile-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transform: translateY(0);
+}
+
+#kotiva-mobile-menu a {
+  color: var(--kotiva-black);
+  text-decoration: none;
+
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+#kotiva-mobile-menu a:hover {
+  color: var(--kotiva-blue);
+}
+
+body.kotiva-menu-open {
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+#kotiva-salla-footer {
+  background: var(--kotiva-footer-bg);
+  border-top: 1px solid var(--kotiva-border);
+
+  color: var(--kotiva-black);
+
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.kotiva-footer-container {
+  max-width: var(--kotiva-max-width);
+  margin: 0 auto;
+  padding: 0 var(--kotiva-padding);
+}
+
+.kotiva-footer-main {
+  display: grid;
+
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+
+  gap: clamp(32px, 4vw, 64px);
+
+  padding:
+    clamp(60px, 8vw, 96px)
+    0
+    clamp(48px, 6vw, 72px);
+}
+
+.kotiva-footer-logo {
+  display: block;
+
+  width: auto;
+  height: 28px;
+
+  margin-bottom: 16px;
+}
+
+.kotiva-footer-tagline {
+  margin: 0;
+
+  max-width: 260px;
+
+  color: var(--kotiva-muted);
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.kotiva-footer-title {
+  margin-bottom: 20px;
+
+  color: var(--kotiva-black);
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.kotiva-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kotiva-footer-links a {
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  color: var(--kotiva-muted);
+  text-decoration: none;
+
+  font-size: 13px;
+
+  transition: color .3s ease;
+}
+
+.kotiva-footer-links a:hover {
+  color: var(--kotiva-blue);
+}
+
+/* Social */
+.kotiva-social {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 24px;
+}
+
+.kotiva-social-icon {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--kotiva-border);
+  border-radius: 50%;
+
+  color: var(--kotiva-muted);
+
+  opacity: .5;
+}
+
+.kotiva-social-soon {
+  display: block;
+
+  margin-top: 10px;
+
+  color: var(--kotiva-muted);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.kotiva-footer-bottom {
+  padding: 24px 0;
+
+  border-top: 1px solid var(--kotiva-border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  color: var(--kotiva-muted);
+
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1024px) {
+
+  .kotiva-nav-links {
+    display: none;
+  }
+
+  .kotiva-menu-button {
+    display: flex;
+  }
+
+  .kotiva-footer-main {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .kotiva-routine-button {
+    display: none;
+  }
+
+  .kotiva-footer-main {
+    grid-template-columns: 1fr;
+  }
+
+  .kotiva-footer-main > div:first-child {
+    text-align: center;
+  }
+
+  .kotiva-footer-tagline {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .kotiva-footer-logo {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .kotiva-social {
+    justify-content: center;
+  }
+
+  .kotiva-footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ===== KOTIVA SALLA FIXES ===== */
+
+/* Force our custom Laravel-style areas to LTR */
+#kotiva-salla-header,
+#kotiva-salla-footer,
+#kotiva-mobile-menu {
+    direction: ltr !important;
+    text-align: left !important;
+}
+
+.kotiva-nav-inner,
+.kotiva-nav-links,
+.kotiva-nav-right {
+    direction: ltr !important;
+    flex-direction: row !important;
+}
+
+.kotiva-nav-right {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+
+/* Footer must stay exactly:
+   BRAND | SHOP | COMPANY | SUPPORT */
+.kotiva-footer-main {
+    direction: ltr !important;
+}
+
+.kotiva-footer-main > div,
+.kotiva-footer-links {
+    direction: ltr !important;
+    text-align: left !important;
+}
+
+.kotiva-footer-bottom {
+    direction: ltr !important;
+    flex-direction: row !important;
+}
+
+/* Our cart button */
+.kotiva-cart-button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(35,31,32,.15);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #231F20;
+    background: transparent;
+    text-decoration: none;
+
+    flex-shrink: 0;
+}
+
+.kotiva-cart-button:hover {
+    border-color: #005DBA;
+    color: #005DBA;
+}
+
+/* Remove theme/native scroll-to-top if Enaya shows it */
+.scroll-to-top,
+.back-to-top,
+[data-scroll-to-top] {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .kotiva-footer-bottom {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+}
+
+/* =========================================================
+   KOTIVA SALLA — LISTING + PDP V2
+   ========================================================= */
+
+:root {
+  --kv-black: #231F20;
+  --kv-blue: #005DBA;
+  --kv-light-blue: #8AB7E9;
+  --kv-purple: #6A3277;
+  --kv-red: #D7282F;
+  --kv-card: #EDF4FB;
+  --kv-border: rgba(35,31,32,.12);
+  --kv-muted: rgba(35,31,32,.58);
+}
+
+/* =========================================================
+   LISTING HERO
+   ========================================================= */
+
+#kv-shop-hero {
+  position: relative;
+  min-height: 470px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(106,50,119,.88), rgba(106,50,119,.58)),
+    url("https://klyvosystems.com/assets/shop-hero-flatlay-v2.webp") center / cover no-repeat;
+}
+
+#kv-shop-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(60,26,67,.24), transparent 50%);
+  pointer-events: none;
+}
+
+.kv-shop-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1210px, calc(100% - 80px));
+  margin: 0 auto;
+  color: #fff;
+}
+
+.kv-shop-eyebrow {
+  margin: 0 0 20px;
+  font: 700 11px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.kv-shop-title {
+  margin: 0;
+  max-width: 820px;
+  font: 900 clamp(56px, 6vw, 86px)/.94 "Montserrat", Arial, sans-serif;
+  letter-spacing: -.035em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.kv-shop-description {
+  margin: 15px 0 0;
+  font: 500 15px/1.6 "Montserrat", Arial, sans-serif;
+  color: #fff;
+}
+
+/* =========================================================
+   LISTING FILTERS
+   ========================================================= */
+
+#kv-shop-controls {
+  position: relative;
+  z-index: 3;
+  padding: 18px 28px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--kv-border);
+}
+
+.kv-shop-controls-inner {
+  width: min(1210px, 100%);
+  margin: 0 auto;
+}
+
+.kv-filter-row,
+.kv-sort-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.kv-sort-row { margin-top: 13px; }
+
+.kv-sort-label {
+  margin-right: 4px;
+  font: 700 10px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--kv-muted);
+}
+
+.kv-filter,
+.kv-sort {
+  min-height: 40px;
+  padding: 9px 19px;
+  border: 1px solid rgba(35,31,32,.15);
+  border-radius: 999px;
+  background: #fff;
+  color: rgba(35,31,32,.72);
+  font: 600 9px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.kv-filter.active,
+.kv-sort.active {
+  background: var(--kv-blue);
+  border-color: var(--kv-blue);
+  color: #fff;
+}
+
+.kv-hide-native-heading,
+.kv-hide-load-more {
+  display: none !important;
+}
+
+/* =========================================================
+   LISTING GRID
+   ========================================================= */
+
+.kv-products-section {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.kv-product-grid {
+  width: min(1210px, calc(100% - 80px)) !important;
+  margin: 58px auto 105px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  padding: 0 !important;
+  background: rgba(35,31,32,.12) !important;
+  align-items: stretch !important;
+}
+
+.kv-product-grid > .kv-product-card,
+.kv-product-grid .kv-product-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+.kv-product-card .s-product-card-entry {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.kv-product-card .s-product-card-image,
+.kv-product-card .s-product-card-image-full {
+  width: 100% !important;
+  aspect-ratio: 1 / 1.06 !important;
+  height: auto !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+
+.kv-product-card .s-product-card-image > a,
+.kv-product-card .s-product-card-image-full > a {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.kv-product-card .s-product-card-image img,
+.kv-product-card .s-product-card-image-full img {
+  width: 70% !important;
+  height: 76% !important;
+  margin: auto !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+.kv-product-card .s-product-card-wishlist-btn {
+  display: none !important;
+}
+
+.kv-product-card .s-product-card-content {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 22px 22px 20px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--kv-card) !important;
+}
+
+.kv-product-card .s-product-card-content-main {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.kv-product-card .s-product-card-content-title {
+  min-height: 0 !important;
+  margin: 0 0 5px !important;
+  font: 800 13px/1.28 "Montserrat", Arial, sans-serif !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+  color: var(--kv-black) !important;
+}
+
+.kv-product-card .s-product-card-content-title a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+.kv-card-subtitle {
+  margin: 0 0 12px !important;
+  font: 400 10px/1.45 "Montserrat", Arial, sans-serif;
+  color: rgba(35,31,32,.55);
+}
+
+.kv-product-card .s-product-card-content-sub {
+  display: flex !important;
+  align-items: baseline !important;
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+  margin: 0 !important;
+}
+
+.kv-product-card .s-product-card-price,
+.kv-product-card .s-product-card-sale-price h4 {
+  margin: 0 !important;
+  font: 800 12px/1.2 "Montserrat", Arial, sans-serif !important;
+  color: var(--kv-black) !important;
+}
+
+.kv-price-vat {
+  font: 600 7px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(35,31,32,.42);
+}
+
+.kv-card-extra {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  margin-top: 16px !important;
+}
+
+.kv-concern {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 11px;
+  border: 1px solid rgba(0,93,186,.28);
+  border-radius: 999px;
+  color: var(--kv-blue);
+  background: transparent;
+  font: 700 8px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.kv-discover {
+  flex: 0 0 auto;
+  color: var(--kv-blue) !important;
+  text-decoration: none !important;
+  font: 700 8px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.kv-product-card .s-product-card-content-footer {
+  margin-top: 15px !important;
+  padding: 0 !important;
+}
+
+.kv-product-card salla-add-product-button {
+  width: 100% !important;
+  --color-primary: #231F20;
+}
+
+#kv-empty-filter {
+  width: min(1210px, calc(100% - 80px));
+  margin: -65px auto 80px;
+  padding: 50px 24px;
+  text-align: center;
+  background: #fff;
+  color: var(--kv-muted);
+  font: 500 14px/1.5 "Montserrat", Arial, sans-serif;
+}
+
+/* =========================================================
+   PDP — KOTIVA EDITORIAL LAYOUT
+   ========================================================= */
+
+html.kv-pdp #kv-shop-hero,
+html.kv-pdp #kv-shop-controls,
+html.kv-pdp #kv-empty-filter {
+  display: none !important;
+}
+
+html.kv-pdp .kv-pdp-main-row {
+  overflow: visible !important;
+}
+
+@media (min-width: 768px) {
+  html.kv-pdp .kv-pdp-main-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 0 !important;
+    align-items: start !important;
+    max-width: none !important;
+  }
+
+  html.kv-pdp .kv-pdp-gallery,
+  html.kv-pdp .kv-pdp-info {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  html.kv-pdp .kv-pdp-gallery {
+    position: sticky !important;
+    top: var(--kotiva-nav-height) !important;
+    align-self: start !important;
+    min-height: calc(100vh - var(--kotiva-nav-height)) !important;
+    height: calc(100vh - var(--kotiva-nav-height)) !important;
+    background: var(--kv-black) !important;
+    overflow: hidden !important;
+    z-index: 2 !important;
+  }
+
+  html.kv-pdp .kv-pdp-gallery [data-testid="store-product-image-slider"],
+  html.kv-pdp .kv-pdp-gallery .details-slider,
+  html.kv-pdp .kv-pdp-gallery .swiper,
+  html.kv-pdp .kv-pdp-gallery .swiper-wrapper,
+  html.kv-pdp .kv-pdp-gallery .swiper-slide,
+  html.kv-pdp .kv-pdp-gallery .magnify-wrapper {
+    min-height: 100% !important;
+    height: 100% !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--kv-black) !important;
+  }
+
+  html.kv-pdp .kv-pdp-gallery img {
+    width: 68% !important;
+    height: 76% !important;
+    margin: auto !important;
+    object-fit: contain !important;
+  }
+
+  html.kv-pdp .kv-pdp-info {
+    padding: 70px clamp(44px, 6vw, 92px) 80px !important;
+    background: #fff !important;
+  }
+}
+
+html.kv-pdp .kv-pdp-info [data-testid="store-product-title"] {
+  margin: 10px 0 6px !important;
+  color: var(--kv-black) !important;
+  font: 900 clamp(36px, 4.2vw, 64px)/.95 "Montserrat", Arial, sans-serif !important;
+  letter-spacing: -.035em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-pdp-meta-head {
+  margin-bottom: 12px;
+}
+
+.kv-pdp-breadcrumb-lite {
+  margin-bottom: 19px;
+  color: rgba(35,31,32,.56);
+  font: 700 9px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.kv-pdp-skin {
+  color: var(--kv-blue);
+  font: 700 10px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+html.kv-pdp .kv-pdp-info [data-testid="store-product-price"] {
+  margin-top: 20px !important;
+  gap: 7px !important;
+}
+
+html.kv-pdp .kv-pdp-info [data-testid="store-product-price"] p,
+html.kv-pdp .kv-pdp-info [data-testid="store-product-price"] span {
+  color: var(--kv-black) !important;
+  font-family: "Montserrat", Arial, sans-serif !important;
+}
+
+.kv-pdp-price-note {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 5px;
+  color: rgba(35,31,32,.5);
+}
+
+.kv-pdp-price-note > span {
+  font: 700 8px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .16em;
+}
+
+.kv-pdp-price-note small {
+  font: 400 12px/1.4 "Montserrat", Arial, sans-serif;
+}
+
+.kv-pdp-stock-concern {
+  margin: 28px 0 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.kv-pdp-stock {
+  color: #0B6B55;
+  font: 700 9px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .16em;
+}
+
+.kv-pdp-concern {
+  color: var(--kv-red);
+  font: 700 22px/1.1 Georgia, serif;
+  font-style: italic;
+}
+
+html.kv-pdp .kv-pdp-description,
+html.kv-pdp .kv-pdp-description article {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.kv-pdp-editorial {
+  margin: 0 0 34px;
+  padding: 30px 0 0;
+  border-top: 1px solid var(--kv-border);
+}
+
+html.kv-pdp .kv-pdp-description {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: rgba(35,31,32,.78) !important;
+  font: 400 14px/1.8 "Montserrat", Arial, sans-serif !important;
+}
+
+html.kv-pdp .kv-pdp-description p {
+  margin: 0 0 12px !important;
+}
+
+html.kv-pdp .kv-pdp-description h2,
+html.kv-pdp .kv-pdp-description h3,
+html.kv-pdp .kv-pdp-description h4,
+html.kv-pdp .kv-pdp-description strong {
+  color: var(--kv-black) !important;
+}
+
+html.kv-pdp .kv-pdp-description h2,
+html.kv-pdp .kv-pdp-description h3,
+html.kv-pdp .kv-pdp-description h4 {
+  margin: 24px 0 10px !important;
+  font: 700 10px/1 "Montserrat", Arial, sans-serif !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+}
+
+html.kv-pdp .kv-pdp-description ul {
+  margin: 8px 0 20px 18px !important;
+}
+
+html.kv-pdp .kv-pdp-description li {
+  margin: 6px 0 !important;
+}
+
+.kv-pdp-old-description-wrapper {
+  display: none !important;
+}
+
+.kv-pdp-hide,
+.kv-pdp-trust-strip {
+  display: none !important;
+}
+
+html.kv-pdp .kv-pdp-info [data-testid="store-product-form"] {
+  margin-top: 22px !important;
+  padding-top: 25px !important;
+  border-top: 1px solid var(--kv-border) !important;
+}
+
+html.kv-pdp .kv-pdp-info [data-testid="store-product-form"] > section {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.kv-build-routine {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 16px;
+  padding: 11px 28px;
+  border: 1px solid rgba(35,31,32,.55);
+  border-radius: 999px;
+  color: var(--kv-black) !important;
+  text-decoration: none !important;
+  font: 700 10px/1 "Montserrat", Arial, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.kv-cod-note {
+  margin-top: 16px;
+  color: rgba(35,31,32,.6);
+  font: 400 11px/1.5 "Montserrat", Arial, sans-serif;
+}
+
+.kv-doctor-standard {
+  margin-top: 24px;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 14px;
+  row-gap: 4px;
+  border: 1px solid var(--kv-border);
+}
+
+.kv-doctor-standard > span {
+  grid-row: 1 / 3;
+  align-self: center;
+}
+
+.kv-doctor-standard b,
+.kv-doctor-standard small {
+  font-family: "Montserrat", Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.kv-doctor-standard b {
+  font-size: 8px;
+  letter-spacing: .14em;
+}
+
+.kv-doctor-standard small {
+  font-size: 7px;
+  letter-spacing: .1em;
+  color: rgba(35,31,32,.55);
+}
+
+/* Related products */
+html.kv-pdp .kv-related-slider {
+  display: block;
+  margin: 70px 0 90px !important;
+}
+
+html.kv-pdp .kv-related-slider .s-block__title h2,
+html.kv-pdp .kv-related-slider [slot="title"] {
+  font: 800 28px/1.05 "Montserrat", Arial, sans-serif !important;
+  text-transform: uppercase !important;
+  color: var(--kv-black) !important;
+}
+
+html.kv-pdp .kv-related-slider .s-product-card-entry {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html.kv-pdp .kv-related-slider .s-product-card-image {
+  background: #fff !important;
+  border-radius: 0 !important;
+}
+
+html.kv-pdp .kv-related-slider .s-product-card-content {
+  background: var(--kv-card) !important;
+  border-radius: 0 !important;
+}
+
+html.kv-pdp .kv-related-slider .s-product-card-wishlist-btn {
+  display: none !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .kv-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #kv-shop-hero {
+    min-height: 340px;
+  }
+
+  .kv-shop-hero-inner,
+  .kv-product-grid,
+  #kv-empty-filter {
+    width: calc(100% - 28px) !important;
+  }
+
+  .kv-shop-title {
+    font-size: 42px;
+  }
+
+  .kv-filter-row,
+  .kv-sort-row {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .kv-filter,
+  .kv-sort,
+  .kv-sort-label {
+    flex: 0 0 auto;
+  }
+
+  .kv-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    margin-top: 28px !important;
+  }
+
+  .kv-product-card .s-product-card-content {
+    padding: 14px 12px !important;
+  }
+
+  .kv-product-card .s-product-card-content-title {
+    font-size: 10px !important;
+  }
+
+  .kv-card-subtitle,
+  .kv-card-extra {
+    display: none !important;
+  }
+
+  html.kv-pdp .kv-pdp-gallery {
+    background: var(--kv-black) !important;
+  }
+
+  html.kv-pdp .kv-pdp-info {
+    padding: 34px 20px 55px !important;
+  }
+
+  html.kv-pdp .kv-pdp-info [data-testid="store-product-title"] {
+    font-size: 36px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .kv-product-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* =========================================================
+   KOTIVA V3 — LISTING FINAL FIXES
+   ========================================================= */
+
+/* Keep Salla pagination / Load more visible until all 25 exist. */
+.kv-load-more {
+  display: flex !important;
+  width: max-content !important;
+  min-width: 150px !important;
+  min-height: 44px !important;
+  margin: 30px auto 75px !important;
+  padding: 10px 26px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(35,31,32,.35) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #231F20 !important;
+  font: 700 10px/1 'Montserrat', Arial, sans-serif !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+#kv-shop-controls.is-loading {
+  opacity: .55;
+  pointer-events: none;
+}
+
+/* Same hover motion as current Laravel product-card. */
+.kv-product-grid {
+  overflow: visible !important;
+  align-items: stretch !important;
+}
+
+.kv-product-grid > .kv-product-card,
+.kv-product-grid .kv-product-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-self: stretch !important;
+  height: 100% !important;
+  background: #fff !important;
+  border: 1px solid rgba(35,31,32,.12) !important;
+  cursor: pointer !important;
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease,
+    border-color .3s ease !important;
+}
+
+.kv-product-grid > .kv-product-card:hover,
+.kv-product-grid .kv-product-card:hover {
+  z-index: 5 !important;
+  transform: translateY(-3px) !important;
+  border-color: rgba(35,31,32,.30) !important;
+  box-shadow: 0 16px 48px rgba(35,31,32,.14) !important;
+}
+
+.kv-product-card .s-product-card-entry {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+}
+
+.kv-product-card .s-product-card-image img,
+.kv-product-card .s-product-card-image-full img {
+  transition: transform .5s cubic-bezier(.23,1,.32,1) !important;
+}
+
+.kv-product-card:hover .s-product-card-image img,
+.kv-product-card:hover .s-product-card-image-full img {
+  transform: scale(1.04) !important;
+}
+
+/* Equal card bodies; button stays at the bottom of every row. */
+.kv-product-card .s-product-card-content {
+  flex: 1 1 auto !important;
+  min-height: 205px !important;
+  height: 100% !important;
+}
+
+.kv-product-card .s-product-card-content-main {
+  flex: 0 0 auto !important;
+}
+
+.kv-product-card .s-product-card-content-title {
+  min-height: 34px !important;
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: .10em !important;
+  line-height: 1.2 !important;
+}
+
+.kv-card-subtitle {
+  font-family: 'MyriadPro', 'Myriad Pro', Arial, sans-serif !important;
+  font-size: 13px !important;
+}
+
+.kv-product-card .s-product-card-price,
+.kv-product-card .s-product-card-sale-price h4 {
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', sans-serif !important;
+  font-size: 13px !important;
+}
+
+.kv-card-extra {
+  margin-top: 12px !important;
+}
+
+.kv-product-card .s-product-card-content-footer {
+  margin-top: auto !important;
+  padding-top: 16px !important;
+}
+
+/* hidden must always win over our flex card rules */
+.kv-product-card[hidden] {
+  display: none !important;
+}
+
+/* =========================================================
+   KOTIVA V3 — PDP MATCH CURRENT SITE
+   ========================================================= */
+
+/* Salla breadcrumb is hidden; our small KOTIVA breadcrumb is used. */
+html.kv-pdp .container--breadcrumbs,
+html.kv-pdp .breadcrumbs,
+html.kv-pdp salla-breadcrumb {
+  display: none !important;
+}
+
+html.kv-pdp .s-before-product-info {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Remove Salla container padding/borders so the gallery is a true half-screen panel. */
+html.kv-pdp .container--product-details {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: visible !important;
+}
+
+html.kv-pdp .kv-pdp-main-row {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+@media (min-width: 768px) {
+  html.kv-pdp .kv-pdp-main-row {
+    grid-template-columns: 50% 50% !important;
+  }
+
+  html.kv-pdp .kv-pdp-gallery {
+    width: 50vw !important;
+    max-width: 50vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+  }
+
+  html.kv-pdp .kv-pdp-gallery [data-testid='store-product-image-slider'],
+  html.kv-pdp .kv-pdp-gallery .details-slider,
+  html.kv-pdp .kv-pdp-gallery .swiper,
+  html.kv-pdp .kv-pdp-gallery .swiper-wrapper,
+  html.kv-pdp .kv-pdp-gallery .swiper-slide,
+  html.kv-pdp .kv-pdp-gallery .magnify-wrapper,
+  html.kv-pdp .kv-pdp-gallery a {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    background: #231F20 !important;
+  }
+
+  html.kv-pdp .kv-pdp-info {
+    width: 50vw !important;
+    max-width: 50vw !important;
+    padding: clamp(48px, 6vw, 80px) clamp(36px, 5vw, 72px) !important;
+    border-left: 1px solid rgba(35,31,32,.12) !important;
+  }
+}
+
+/* Exact typography roles from Laravel design system. */
+html.kv-pdp .kv-pdp-breadcrumb-lite,
+html.kv-pdp .kv-pdp-skin,
+html.kv-pdp .kv-pdp-category-line,
+html.kv-pdp .kv-pdp-stock,
+html.kv-pdp .kv-pdp-info [data-testid='store-product-title'] {
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', sans-serif !important;
+}
+
+html.kv-pdp .kv-pdp-breadcrumb-lite {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 0 28px !important;
+  color: rgba(35,31,32,.62) !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: .22em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+}
+
+.kv-pdp-breadcrumb-sep {
+  color: rgba(35,31,32,.12) !important;
+}
+
+html.kv-pdp .kv-pdp-skin {
+  margin-bottom: 16px !important;
+  color: #005DBA !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: .22em !important;
+  text-transform: uppercase !important;
+}
+
+html.kv-pdp .kv-pdp-info [data-testid='store-product-title'] {
+  margin: 0 0 8px !important;
+  color: #231F20 !important;
+  font-size: clamp(28px, 3vw, 48px) !important;
+  font-weight: 900 !important;
+  letter-spacing: .03em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+}
+
+html.kv-pdp .kv-pdp-category-line {
+  margin-bottom: 16px !important;
+  color: rgba(35,31,32,.62) !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: .20em !important;
+  text-transform: uppercase !important;
+}
+
+html.kv-pdp .kv-pdp-description,
+html.kv-pdp .kv-pdp-description p,
+html.kv-pdp .kv-pdp-description li,
+.kv-cod-note {
+  font-family: 'MyriadPro', 'Myriad Pro', Georgia, serif !important;
+}
+
+html.kv-pdp .kv-pdp-description {
+  font-size: 15px !important;
+  line-height: 1.8 !important;
+}
+
+.kv-pdp-concern {
+  font-family: 'Manus', cursive !important;
+  font-size: clamp(18px,1.8vw,28px) !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+}
+
+.kv-pdp-stock {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: .20em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-pdp-stock i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #004539;
+}
+
+/* Related products only; Complete Your Routine is removed. */
+.kv-remove-complete-routine {
+  display: none !important;
+}
+
+html.kv-pdp .kv-related-slider {
+  margin: 80px auto 105px !important;
+}
+
+html.kv-pdp .kv-related-slider .s-block__title h2,
+html.kv-pdp .kv-related-slider [slot='title'] {
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  text-transform: none !important;
+}
+
+/* =========================================================
+   KOTIVA V4 — STABLE LISTING MEDIA + PDP RECOMMENDATIONS
+   ========================================================= */
+
+/* V4 renders its own stable product image using the same KOTIVA
+   product asset as the Laravel shop. This avoids Salla lazy-image
+   opacity/cache state from leaving blank listing cards. */
+.kv-product-card .kv-native-card-media {
+  display: none !important;
+}
+
+.kv-product-card .kv-card-media {
+  position: relative !important;
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  text-decoration: none !important;
+}
+
+.kv-product-card .kv-card-media img {
+  display: block !important;
+  width: calc(100% - 56px) !important;
+  height: calc(100% - 56px) !important;
+  margin: 28px !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: scale(1) !important;
+  transition: transform .5s cubic-bezier(.23,1,.32,1) !important;
+}
+
+.kv-product-card:hover .kv-card-media img {
+  transform: scale(1.04) !important;
+}
+
+/* Do not let the body expand into the missing-image space. */
+.kv-product-grid {
+  grid-auto-rows: auto !important;
+  align-items: stretch !important;
+}
+
+.kv-product-grid > .kv-product-card,
+.kv-product-grid .kv-product-card {
+  height: 100% !important;
+  align-self: stretch !important;
+}
+
+.kv-product-card .s-product-card-entry {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.kv-product-card .s-product-card-content {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: 190px !important;
+  padding: 20px 20px 22px !important;
+}
+
+.kv-product-card .s-product-card-content-footer {
+  margin-top: auto !important;
+  padding-top: 16px !important;
+}
+
+.kv-product-card .s-product-card-content-title a {
+  position: relative !important;
+  z-index: 2 !important;
+  display: inline !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.kv-product-card[hidden] {
+  display: none !important;
+}
+
+/* Our own visible Load More button. Salla's native button is still
+   the button that actually performs pagination in the background. */
+#kv-load-more-proxy {
+  display: flex !important;
+  width: max-content !important;
+  min-width: 150px !important;
+  min-height: 44px !important;
+  margin: -65px auto 78px !important;
+  padding: 10px 28px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(35,31,32,.32) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #231F20 !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: .25s ease !important;
+}
+
+#kv-load-more-proxy:hover {
+  background: #231F20 !important;
+  color: #fff !important;
+}
+
+#kv-load-more-proxy:disabled {
+  opacity: .55 !important;
+  cursor: wait !important;
+}
+
+/* =========================================================
+   PDP — exactly one same-category recommendations section
+   ========================================================= */
+
+/* Hide every Enaya/native recommendation rail. V4 creates one fresh
+   category-based slider, so the old Related + Complete Routine rails
+   can never be duplicated or renamed into two Similar Products rows. */
+html.kv-pdp .kv-native-pdp-slider-hidden {
+  display: none !important;
+}
+
+#kv-similar-products {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 80px 0 105px !important;
+  background: #fff !important;
+  border-top: 1px solid rgba(35,31,32,.12) !important;
+}
+
+#kv-similar-products.kv-similar-empty {
+  display: none !important;
+}
+
+#kv-similar-products .kv-similar-inner {
+  width: min(1380px, calc(100% - 80px)) !important;
+  margin: 0 auto !important;
+}
+
+#kv-similar-products salla-products-slider {
+  display: block !important;
+  width: 100% !important;
+}
+
+#kv-similar-products .s-block__title h2,
+#kv-similar-products [slot='title'] {
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  color: #231F20 !important;
+}
+
+/* Keep recommendation cards compact and clean. */
+#kv-similar-products .s-product-card-entry {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#kv-similar-products .s-product-card-image {
+  background: #fff !important;
+  border-radius: 0 !important;
+}
+
+#kv-similar-products .s-product-card-content {
+  background: rgba(138,183,233,.18) !important;
+  border-radius: 0 !important;
+}
+
+@media (max-width: 767px) {
+  .kv-product-card .kv-card-media img {
+    width: calc(100% - 28px) !important;
+    height: calc(100% - 28px) !important;
+    margin: 14px !important;
+  }
+
+  .kv-product-card .s-product-card-content {
+    min-height: 150px !important;
+    padding: 14px 12px 16px !important;
+  }
+
+  #kv-load-more-proxy {
+    margin-top: -40px !important;
+  }
+
+  #kv-similar-products {
+    padding: 55px 0 70px !important;
+  }
+
+  #kv-similar-products .kv-similar-inner {
+    width: calc(100% - 28px) !important;
+  }
+}
+
+/* =========================================================
+   KOTIVA V5 — CRITICAL STABILITY OVERRIDES
+   ========================================================= */
+
+/* The V5 listing never depends on Salla pagination. We force the
+   single homepage products-list to fetch all 25, then paginate it
+   client-side (15 + 10). Hide partial rendering while that one list
+   is being prepared so customers never see 6/9/15-product flashes. */
+body.kv-catalog-loading .kv-master-products-section salla-products-list {
+  visibility: hidden !important;
+}
+
+body.kv-catalog-loading .kv-master-products-section {
+  min-height: 520px !important;
+}
+
+.kv-master-products-section {
+  overflow: visible !important;
+}
+
+.kv-master-products-section salla-products-list {
+  display: block !important;
+  width: 100% !important;
+  visibility: visible !important;
+}
+
+/* V5 owns pagination entirely. */
+.kv-native-pagination-hidden {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+#kv-load-more-v5 {
+  display: flex !important;
+  width: max-content !important;
+  min-width: 154px !important;
+  min-height: 44px !important;
+  margin: -65px auto 78px !important;
+  padding: 10px 28px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(35,31,32,.34) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #231F20 !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: background .25s ease,color .25s ease,border-color .25s ease !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+#kv-load-more-v5:hover {
+  background: #231F20 !important;
+  border-color: #231F20 !important;
+  color: #fff !important;
+}
+
+/* Make sure each listing card is a real full-height grid item after
+   filtering/sorting and that hidden cards cannot reserve space. */
+.kv-product-grid > .kv-product-card,
+.kv-product-grid .kv-product-card {
+  min-height: 0 !important;
+  height: 100% !important;
+  align-self: stretch !important;
+}
+
+.kv-product-card[hidden] {
+  display: none !important;
+}
+
+.kv-product-card .kv-card-media,
+.kv-product-card .s-product-card-content-title a,
+.kv-product-card .kv-discover {
+  pointer-events: auto !important;
+}
+
+/* =========================================================
+   PDP V5 — NO EMPTY / DUPLICATE RECOMMENDATION SPACE
+   ========================================================= */
+
+/* Every Enaya/Salla recommendation rail is removed as a whole.
+   V5 creates only #kv-similar-products when a valid same-category
+   result actually exists. */
+html.kv-pdp .kv-native-pdp-slider-hidden,
+html.kv-pdp .kv-native-pdp-slider-hidden * {
+  display: none !important;
+}
+
+html.kv-pdp .kv-native-pdp-slider-hidden {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  height: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+}
+
+html.kv-pdp .s-before-related:empty,
+html.kv-pdp .s-after-related:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+#kv-similar-products[hidden],
+#kv-similar-products.kv-similar-pending,
+#kv-similar-products:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Remove any leftover V3/V4 proxy button if browser/theme cache briefly
+   leaves it in the DOM during a publish refresh. */
+#kv-load-more-proxy {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  body.kv-catalog-loading .kv-master-products-section {
+    min-height: 360px !important;
+  }
+
+  #kv-load-more-v5 {
+    margin-top: -40px !important;
+    margin-bottom: 58px !important;
+  }
+}
+
+/* =========================================================
+   KOTIVA SALLA V6 — STABLE CUSTOM CATALOG
+   The live listing is now rendered from salla.product.fetch()
+   and no longer depends on Enaya's products-list pagination DOM.
+   ========================================================= */
+
+/* Never allow the old V5/native listing to compete with V6. */
+#kv-load-more-v5,
+#kv-empty-filter,
+.kv-v6-native-list-hidden,
+.kv-v6-native-list-hidden * {
+  display: none !important;
+}
+
+#kv-v6-catalog-shell {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#kv-v6-catalog {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 58px 0 96px !important;
+  background: #f8fafc !important;
+}
+
+.kv-v6-grid {
+  width: min(1210px, calc(100% - 80px)) !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  align-items: stretch !important;
+  background: rgba(35,31,32,.15) !important;
+}
+
+.kv-v6-card {
+  position: relative !important;
+  z-index: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  background: #fff !important;
+  cursor: pointer !important;
+  transition: transform .3s ease, box-shadow .3s ease !important;
+}
+
+.kv-v6-card:hover {
+  z-index: 5 !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 16px 48px rgba(35,31,32,.14) !important;
+}
+
+.kv-v6-card-media {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  height: 390px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  text-decoration: none !important;
+}
+
+.kv-v6-card-media img {
+  display: block !important;
+  width: 72% !important;
+  height: 82% !important;
+  max-width: 320px !important;
+  object-fit: contain !important;
+  transform: scale(1) !important;
+  transition: transform .5s cubic-bezier(.23,1,.32,1) !important;
+}
+
+.kv-v6-card:hover .kv-v6-card-media img {
+  transform: scale(1.04) !important;
+}
+
+.kv-v6-card-info {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  min-height: 218px !important;
+  padding: 20px 20px 18px !important;
+  background: #eaf4ff !important;
+}
+
+.kv-v6-card-title {
+  display: block !important;
+  color: #231F20 !important;
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', Arial, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.22 !important;
+  letter-spacing: .08em !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+}
+
+.kv-v6-card-subtitle {
+  margin-top: 7px !important;
+  color: rgba(35,31,32,.66) !important;
+  font-family: 'MyriadPro', Arial, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+}
+
+.kv-v6-card-price {
+  margin-top: 17px !important;
+  color: #231F20 !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+.kv-v6-card-price span {
+  margin-left: 5px !important;
+  color: rgba(35,31,32,.50) !important;
+  font-size: 8px !important;
+  font-weight: 500 !important;
+  letter-spacing: .12em !important;
+}
+
+.kv-v6-card-meta {
+  display: flex !important;
+  margin-top: 13px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+.kv-v6-pill {
+  display: inline-flex !important;
+  min-height: 25px !important;
+  padding: 5px 11px !important;
+  align-items: center !important;
+  border: 1px solid rgba(8,103,190,.32) !important;
+  border-radius: 999px !important;
+  color: #0867be !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-v6-discover {
+  flex: 0 0 auto !important;
+  color: #0867be !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .10em !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+}
+
+.kv-v6-add {
+  display: block !important;
+  width: 100% !important;
+  margin-top: auto !important;
+  padding-top: 18px !important;
+}
+
+#kv-v6-load-more {
+  display: flex !important;
+  min-width: 170px !important;
+  min-height: 46px !important;
+  margin: 42px auto 0 !important;
+  padding: 12px 28px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #231F20 !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #231F20 !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .10em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+}
+
+#kv-v6-load-more:hover {
+  background: #231F20 !important;
+  color: #fff !important;
+}
+
+#kv-v6-load-more[hidden],
+.kv-v6-empty[hidden] {
+  display: none !important;
+}
+
+.kv-v6-empty {
+  width: min(1210px, calc(100% - 80px)) !important;
+  margin: 30px auto 0 !important;
+  padding: 35px !important;
+  text-align: center !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+
+/* =========================================================
+   PDP V6 — ONE RELATED-CATEGORY SECTION, NO SALLA TOAST CALLS
+   ========================================================= */
+
+html.kv-pdp .kv-native-pdp-slider-hidden,
+html.kv-pdp .kv-native-pdp-slider-hidden * {
+  display: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+}
+
+#kv-similar-products,
+#kv-similar-products:empty {
+  display: none !important;
+}
+
+#kv-similar-products-v6 {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 75px 0 95px !important;
+  background: #fff !important;
+}
+
+.kv-v6-similar-inner {
+  width: min(1210px, calc(100% - 80px)) !important;
+  margin: 0 auto !important;
+}
+
+.kv-v6-similar-inner > h2 {
+  margin: 0 0 28px !important;
+  color: #231F20 !important;
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', Arial, sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+}
+
+.kv-v6-similar-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.kv-v6-card-compact .kv-v6-card-media {
+  height: 245px !important;
+  background: #f4f6f8 !important;
+}
+
+.kv-v6-card-compact .kv-v6-card-media img {
+  width: 68% !important;
+  height: 78% !important;
+}
+
+.kv-v6-card-compact .kv-v6-card-info {
+  min-height: 182px !important;
+  padding: 15px !important;
+}
+
+.kv-v6-card-compact .kv-v6-card-title {
+  font-size: 12px !important;
+}
+
+.kv-v6-card-compact .kv-v6-card-subtitle,
+.kv-v6-card-compact .kv-v6-card-meta {
+  display: none !important;
+}
+
+.kv-v6-card-compact .kv-v6-card-price {
+  margin-top: 10px !important;
+  font-size: 12px !important;
+}
+
+@media (max-width: 900px) {
+  .kv-v6-grid {
+    width: min(100% - 32px, 760px) !important;
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  }
+  .kv-v6-card-media { height: 310px !important; }
+  .kv-v6-similar-inner { width: min(100% - 32px, 760px) !important; }
+  .kv-v6-similar-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+}
+
+@media (max-width: 560px) {
+  #kv-v6-catalog { padding-top: 30px !important; }
+  .kv-v6-grid {
+    width: calc(100% - 24px) !important;
+    grid-template-columns: 1fr !important;
+  }
+  .kv-v6-card-media { height: 350px !important; }
+  .kv-v6-similar-inner { width: calc(100% - 24px) !important; }
+  .kv-v6-similar-grid { grid-template-columns: 1fr !important; }
+}
+
+/* =========================================================
+   KOTIVA SALLA V7 — MATCH LARAVEL LISTING + PDP
+   Fixes: faint add-to-cart (light-DOM button), grey catalog bg,
+   off-brand blue, empty PDP bands, flat description, duplicate
+   price / Buy now / Apple Pay, related-products section.
+   ========================================================= */
+
+/* ---------- Add-to-cart: Salla renders the button in the light DOM,
+   so shadowRoot injection never applied. Style it directly. ---------- */
+.kv-add-btn,
+.kv-add-btn .s-button-element,
+.kv-add-btn button,
+.kv-add-btn .s-add-product-button-main-btn,
+.kv-v6-add .s-button-element,
+.kv-v6-add button {
+  display: flex !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+  transition: background .25s ease, color .25s ease, border-color .25s ease !important;
+}
+
+/* outline (listing cards) */
+.kv-add-btn-outline .s-button-element,
+.kv-add-btn-outline button,
+.kv-v6-add .s-button-element,
+.kv-v6-add button {
+  border: 1px solid rgba(35,31,32,.32) !important;
+  background: #fff !important;
+  color: #231F20 !important;
+}
+
+.kv-add-btn-outline .s-button-element:hover,
+.kv-add-btn-outline button:hover,
+.kv-v6-add .s-button-element:hover,
+.kv-v6-add button:hover {
+  background: #231F20 !important;
+  border-color: #231F20 !important;
+  color: #fff !important;
+}
+
+/* solid (PDP) */
+.kv-add-btn-solid .s-button-element,
+.kv-add-btn-solid button {
+  min-height: 52px !important;
+  border: 1px solid #231F20 !important;
+  background: #231F20 !important;
+  color: #fff !important;
+  font-size: 11px !important;
+}
+
+.kv-add-btn-solid .s-button-element:hover,
+.kv-add-btn-solid button:hover {
+  background: #005DBA !important;
+  border-color: #005DBA !important;
+  color: #fff !important;
+}
+
+.kv-add-btn .s-button-element svg,
+.kv-add-btn button svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.kv-add-btn .s-button-loader,
+.kv-add-btn .s-button-element[disabled] {
+  opacity: .55 !important;
+}
+
+/* ---------- Listing: white catalog, brand blue, Laravel card tint ---------- */
+#kv-v6-catalog {
+  background: #fff !important;
+}
+
+.kv-v6-card-info {
+  background: rgba(138,183,233,.18) !important;
+}
+
+.kv-v6-pill {
+  border-color: rgba(0,93,186,.30) !important;
+  color: #005DBA !important;
+}
+
+.kv-v6-discover {
+  color: #005DBA !important;
+}
+
+.kv-v6-card-price {
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', Arial, sans-serif !important;
+}
+
+/* ---------- PDP: remove the two empty bands ---------- */
+html.kv-pdp .kv-pdp-description-origin-hidden,
+html.kv-pdp .kv-pdp-old-description-wrapper,
+html.kv-pdp .product-tabs,
+html.kv-pdp [data-testid="store-product-tabs"],
+html.kv-pdp .s-tabs-wrapper:has(> .kv-pdp-hide),
+html.kv-pdp salla-tabs:not(:has(.kv-pdp-editorial)) {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  height: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Any grey/empty Enaya section between the product row and our related
+   section collapses to nothing. */
+html.kv-pdp .kv-pdp-main-row ~ section:empty,
+html.kv-pdp .kv-pdp-main-row ~ .container:empty,
+html.kv-pdp main > section:not(:has(*:not(script):not(style))) {
+  display: none !important;
+}
+
+html.kv-pdp main,
+html.kv-pdp .main-content,
+html.kv-pdp #app > main {
+  background: #fff !important;
+}
+
+/* ---------- PDP: price block like Laravel ---------- */
+html.kv-pdp .kv-pdp-price {
+  margin-top: 18px !important;
+  color: #231F20 !important;
+  font-family: 'FuturaNow', 'Futura', 'Century Gothic', Arial, sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em !important;
+  line-height: 1 !important;
+}
+
+html.kv-pdp .kv-pdp-info .kv-pdp-price-native {
+  display: none !important;
+}
+
+.kv-pdp-price-note {
+  margin-top: 8px !important;
+  gap: 6px !important;
+}
+
+.kv-pdp-price-note > span {
+  color: rgba(35,31,32,.5) !important;
+  font-size: 8px !important;
+  letter-spacing: .18em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-pdp-price-note small {
+  color: rgba(35,31,32,.62) !important;
+  font: 400 12px/1.4 'MyriadPro', 'Myriad Pro', Arial, sans-serif !important;
+}
+
+/* ---------- PDP: structured editorial (intro / spec grid / benefits /
+   ingredients / how-to-use) ---------- */
+.kv-pdp-editorial {
+  margin: 0 0 30px !important;
+  padding: 28px 0 0 !important;
+  border-top: 1px solid rgba(35,31,32,.12) !important;
+}
+
+.kv-pdp-intro {
+  margin: 0 0 24px !important;
+  color: rgba(35,31,32,.78) !important;
+  font: 400 15px/1.8 'MyriadPro', 'Myriad Pro', Georgia, serif !important;
+}
+
+.kv-pdp-spec {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 1px !important;
+  margin: 0 0 28px !important;
+  background: rgba(35,31,32,.12) !important;
+  border: 1px solid rgba(35,31,32,.12) !important;
+}
+
+.kv-pdp-spec-cell {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  padding: 14px 16px !important;
+  background: rgba(138,183,233,.14) !important;
+}
+
+.kv-pdp-spec-cell:last-child:nth-child(odd) {
+  grid-column: 1 / -1 !important;
+}
+
+.kv-pdp-spec-k {
+  color: rgba(35,31,32,.55) !important;
+  font: 700 8px/1 'FuturaNow', 'Futura', Arial, sans-serif !important;
+  letter-spacing: .2em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-pdp-spec-v {
+  color: #231F20 !important;
+  font: 400 13px/1.3 'MyriadPro', 'Myriad Pro', Arial, sans-serif !important;
+}
+
+.kv-pdp-block {
+  margin: 0 0 26px !important;
+}
+
+.kv-pdp-h {
+  margin: 0 0 12px !important;
+  color: rgba(35,31,32,.62) !important;
+  font: 700 9px/1 'FuturaNow', 'Futura', Arial, sans-serif !important;
+  letter-spacing: .22em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-pdp-benefits {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+.kv-pdp-benefits li {
+  position: relative !important;
+  margin: 0 0 9px !important;
+  padding-left: 18px !important;
+  color: rgba(35,31,32,.78) !important;
+  font: 400 14px/1.6 'MyriadPro', 'Myriad Pro', Arial, sans-serif !important;
+}
+
+.kv-pdp-benefits li::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 9px !important;
+  width: 5px !important;
+  height: 5px !important;
+  border-radius: 50% !important;
+  background: #005DBA !important;
+}
+
+.kv-pdp-ingredients {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.kv-pdp-ingredients span {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 28px !important;
+  padding: 6px 12px !important;
+  border: 1px solid rgba(0,93,186,.35) !important;
+  color: #005DBA !important;
+  font: 700 8px/1 'Montserrat', Arial, sans-serif !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-pdp-howto {
+  margin: 0 0 6px !important;
+  padding: 20px 22px !important;
+  border: 1px solid rgba(138,183,233,.6) !important;
+  background: rgba(138,183,233,.14) !important;
+}
+
+.kv-pdp-howto .kv-pdp-h {
+  color: #005DBA !important;
+}
+
+.kv-pdp-howto p {
+  margin: 0 !important;
+  color: rgba(35,31,32,.78) !important;
+  font: 400 14px/1.7 'MyriadPro', 'Myriad Pro', Arial, sans-serif !important;
+}
+
+/* ---------- PDP: concern in script, stock line ---------- */
+.kv-pdp-stock-concern {
+  margin: 24px 0 0 !important;
+  gap: 14px !important;
+}
+
+/* ---------- PDP: purchase area = stepper + one black pill ---------- */
+html.kv-pdp .kv-pdp-form {
+  margin-top: 26px !important;
+  padding-top: 24px !important;
+  border-top: 1px solid rgba(35,31,32,.12) !important;
+}
+
+html.kv-pdp .kv-pdp-form > section,
+html.kv-pdp .kv-pdp-form .s-product-options,
+html.kv-pdp .kv-pdp-form .s-product-form-section {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+html.kv-pdp .kv-pdp-form-label,
+html.kv-pdp .kv-pdp-form .s-product-price,
+html.kv-pdp .kv-pdp-form .product-price-wrapper,
+html.kv-pdp .kv-pdp-form salla-quick-order,
+html.kv-pdp .kv-pdp-form salla-apple-pay,
+html.kv-pdp .kv-pdp-form apple-pay-button,
+html.kv-pdp .kv-pdp-form .s-apple-pay,
+html.kv-pdp .kv-pdp-form [data-testid="store-product-quick-buy"],
+html.kv-pdp .kv-pdp-form .s-add-product-button-quick-buy,
+html.kv-pdp .kv-pdp-form .kv-pdp-hide {
+  display: none !important;
+}
+
+/* quantity stepper + add button on one row, like Laravel */
+html.kv-pdp .kv-pdp-form .s-add-product-button-wrapper,
+html.kv-pdp .kv-pdp-form .s-product-actions,
+html.kv-pdp .kv-pdp-form .s-add-product-button-main-container {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+html.kv-pdp .kv-pdp-form salla-quantity-input,
+html.kv-pdp .kv-pdp-form .s-quantity-input,
+html.kv-pdp .kv-pdp-form [data-testid="store-product-quantity"] {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-width: 56px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  border: 1px solid rgba(35,31,32,.35) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+
+html.kv-pdp .kv-pdp-form .s-quantity-input input,
+html.kv-pdp .kv-pdp-form .s-quantity-input-input {
+  width: 44px !important;
+  border: 0 !important;
+  background: transparent !important;
+  text-align: center !important;
+  color: #231F20 !important;
+  font: 700 13px/1 'Montserrat', Arial, sans-serif !important;
+}
+
+html.kv-pdp .kv-pdp-form .s-quantity-input button,
+html.kv-pdp .kv-pdp-form .s-quantity-input-button {
+  width: 32px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #231F20 !important;
+}
+
+html.kv-pdp .kv-pdp-form [data-testid="store-product-add-to-cart"] {
+  flex: 1 1 auto !important;
+  display: block !important;
+  width: auto !important;
+}
+
+html.kv-pdp .kv-build-routine {
+  margin-top: 18px !important;
+}
+
+html.kv-pdp .kv-doctor-standard {
+  margin-top: 22px !important;
+  border-color: rgba(35,31,32,.12) !important;
+}
+
+/* ---------- PDP: related = "Complete your routine", 4 full cards ---------- */
+#kv-similar-products-v6 {
+  padding: 80px 0 100px !important;
+  border-top: 1px solid rgba(35,31,32,.12) !important;
+}
+
+.kv-v6-similar-head {
+  margin: 0 0 36px !important;
+}
+
+.kv-v6-similar-eyebrow {
+  margin: 0 0 12px !important;
+  color: #005DBA !important;
+  font: 700 9px/1 'FuturaNow', 'Futura', Arial, sans-serif !important;
+  letter-spacing: .22em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-v6-similar-inner > .kv-v6-similar-head > h2 {
+  margin: 0 0 14px !important;
+  color: #231F20 !important;
+  font: 700 clamp(22px, 2.4vw, 30px)/1.05 'FuturaNow', 'Futura', 'Century Gothic', Arial, sans-serif !important;
+  letter-spacing: .02em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-v6-similar-all {
+  color: #231F20 !important;
+  text-decoration: none !important;
+  font: 400 13px/1 'MyriadPro', 'Myriad Pro', Arial, sans-serif !important;
+}
+
+.kv-v6-similar-all:hover {
+  color: #005DBA !important;
+}
+
+.kv-v6-similar-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  background: rgba(35,31,32,.12) !important;
+}
+
+#kv-similar-products-v6 .kv-v6-card-media {
+  height: 300px !important;
+  background: #fff !important;
+}
+
+#kv-similar-products-v6 .kv-v6-card-info {
+  min-height: 0 !important;
+  padding: 18px 18px 16px !important;
+}
+
+#kv-similar-products-v6 .kv-v6-card-title {
+  font-size: 13px !important;
+}
+
+#kv-similar-products-v6 .kv-v6-add {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .kv-v6-similar-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  #kv-similar-products-v6 .kv-v6-card-media { height: 240px !important; }
+}
+
+@media (max-width: 560px) {
+  .kv-v6-similar-grid { grid-template-columns: 1fr !important; }
+  .kv-pdp-spec { grid-template-columns: 1fr !important; }
+  .kv-pdp-spec-cell:last-child:nth-child(odd) { grid-column: auto !important; }
+  html.kv-pdp .kv-pdp-form .s-add-product-button-wrapper,
+  html.kv-pdp .kv-pdp-form .s-product-actions { flex-wrap: wrap !important; }
+}
+
+/* =========================================================
+   KOTIVA SALLA V7.1 — PDP fixes (price block, buy row,
+   grey bands, Tabby spacing)
+   ========================================================= */
+
+/* 1. Tabby / installment widget gets breathing room */
+html.kv-pdp .kv-pdp-info salla-installment,
+html.kv-pdp .kv-pdp-info [class*="tabby"],
+html.kv-pdp .kv-pdp-info [id*="tabby"],
+html.kv-pdp .kv-pdp-info [class*="tamara"],
+html.kv-pdp .kv-pdp-info .s-installment {
+  display: block !important;
+  margin: 22px 0 0 !important;
+}
+
+/* 2. Empty Enaya sections between product row and related section */
+html.kv-pdp .kv-pdp-empty-section {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+html.kv-pdp .kv-pdp-main-row {
+  margin-bottom: 0 !important;
+}
+
+/* 3. Price block (replaces every native price display) */
+.kv-pdp-price-block {
+  margin: 18px 0 0 !important;
+}
+
+.kv-pdp-price-block .kv-pdp-price {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  color: #231F20 !important;
+  font: 700 20px/1 'FuturaNow', 'Futura', 'Century Gothic', Arial, sans-serif !important;
+  letter-spacing: .04em !important;
+}
+
+.kv-pdp-price-block .kv-pdp-price span {
+  color: rgba(35,31,32,.5) !important;
+  font: 700 8px/1 'Montserrat', Arial, sans-serif !important;
+  letter-spacing: .18em !important;
+  text-transform: uppercase !important;
+}
+
+.kv-pdp-price-block small {
+  display: block !important;
+  margin-top: 8px !important;
+  color: rgba(35,31,32,.62) !important;
+  font: 400 12px/1.4 'MyriadPro', 'Myriad Pro', Arial, sans-serif !important;
+}
+
+/* the old note element is superseded by the block */
+html.kv-pdp .kv-pdp-price-note { display: none !important; }
+
+/* native price displays anywhere in the info column */
+html.kv-pdp .kv-pdp-info [data-testid="store-product-price"],
+html.kv-pdp .kv-pdp-info .s-product-price,
+html.kv-pdp .kv-pdp-info salla-product-price,
+html.kv-pdp .kv-pdp-info .product-price,
+html.kv-pdp .kv-pdp-info .kv-pdp-hide {
+  display: none !important;
+}
+
+/* 4. Buy row: stepper + one black pill, full width */
+html.kv-pdp .kv-pdp-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+
+html.kv-pdp .kv-pdp-form > *:not(.kv-pdp-buy-row):not(.s-product-options):not(salla-product-options):not([data-testid="store-product-options"]) {
+  display: none !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row > salla-quantity-input,
+html.kv-pdp .kv-pdp-buy-row > [data-testid="store-product-quantity"],
+html.kv-pdp .kv-pdp-buy-row > .s-quantity-input {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  border: 1px solid rgba(35,31,32,.35) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row .s-quantity-input,
+html.kv-pdp .kv-pdp-buy-row .s-quantity-input-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row .s-quantity-input input,
+html.kv-pdp .kv-pdp-buy-row input[type="number"],
+html.kv-pdp .kv-pdp-buy-row input[type="text"] {
+  width: 40px !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: center !important;
+  color: #231F20 !important;
+  font: 700 13px/1 'Montserrat', Arial, sans-serif !important;
+  -moz-appearance: textfield;
+}
+
+html.kv-pdp .kv-pdp-buy-row input::-webkit-outer-spin-button,
+html.kv-pdp .kv-pdp-buy-row input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row .s-quantity-input button,
+html.kv-pdp .kv-pdp-buy-row button[class*="quantity"],
+html.kv-pdp .kv-pdp-buy-row .s-quantity-input-button {
+  width: 34px !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #231F20 !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row > [data-testid="store-product-add-to-cart"],
+html.kv-pdp .kv-pdp-buy-row > salla-add-product-button {
+  flex: 1 1 auto !important;
+  display: block !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+/* inside the host, only the main button survives */
+html.kv-pdp .kv-pdp-buy-row salla-add-product-button > *:not(.s-add-product-button-main-btn):not(button):not(.s-button-element):not(.s-add-product-button-main):not(.s-add-product-button-wrapper) {
+  display: none !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row .s-add-product-button-wrapper,
+html.kv-pdp .kv-pdp-buy-row .s-add-product-button-main {
+  display: block !important;
+  width: 100% !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row .s-button-element,
+html.kv-pdp .kv-pdp-buy-row button:not([class*="quantity"]) {
+  width: 100% !important;
+  min-height: 52px !important;
+  border: 1px solid #231F20 !important;
+  border-radius: 999px !important;
+  background: #231F20 !important;
+  color: #fff !important;
+  font: 700 11px/1 'Montserrat', Arial, sans-serif !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.kv-pdp .kv-pdp-buy-row .s-button-element:hover,
+html.kv-pdp .kv-pdp-buy-row button:not([class*="quantity"]):hover {
+  background: #005DBA !important;
+  border-color: #005DBA !important;
+}
+
+@media (max-width: 560px) {
+  html.kv-pdp .kv-pdp-buy-row { flex-wrap: wrap !important; }
+  html.kv-pdp .kv-pdp-buy-row > [data-testid="store-product-add-to-cart"],
+  html.kv-pdp .kv-pdp-buy-row > salla-add-product-button { flex-basis: 100% !important; }
+}
