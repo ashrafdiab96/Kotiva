@@ -264,7 +264,7 @@ final class SyncSallaLinks extends Command
 
             // Another origin is refused, never re-homed onto ours: the "Buy"
             // button would land on a store this site does not use.
-            return [Salla::pathFromStoreUrl($url), $url, 'url not on '.Salla::storeUrl()];
+            return [Salla::pathFromStoreUrl($url), $url, 'url not on '.Salla::storeUrl(withReferral: false)];
         }
 
         return [null, '', 'no salla_path'];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Models\Product;
+use Illuminate\Http\Request;
 
 /**
  * Every link from this site into the Salla storefront.
@@ -17,6 +18,13 @@ use App\Models\Product;
  *
  * Nothing here talks to the Salla API or reads the access token — that is the
  * kotiva:salla-links command's job, and only its.
+ *
+ * Doctor referrals (D-38): every public URL method passes its result through
+ * Referral::applyTo(), so a visitor who arrived via /dr/<code> carries the
+ * doctor's Salla affiliate query into the store. Pass withReferral: false
+ * where a URL must be the same for everyone (crawl files, the dashboard).
+ * Internally the bare origin is storeOrigin(), never storeUrl(), so a
+ * referral query is never concatenated into the middle of another URL.
  */
 final class Salla
 {
@@ -44,14 +52,50 @@ final class Salla
         'sunscreen' => 'spf',
     ];
 
-    public static function storeUrl(): string
+    public static function storeUrl(bool $withReferral = true): string
+    {
+        return self::referred(self::storeOrigin(), $withReferral);
+    }
+
+    public static function cartUrl(bool $withReferral = true): string
+    {
+        return self::referred((string) config('kotiva.salla.cart_url'), $withReferral);
+    }
+
+    /**
+     * The current visitor's affiliate query, encoded ("ref=XXXX"), or "" when
+     * there is none. For the one client-side builder that appends to a bare
+     * store URL (the Routine Finder handoff); everything else gets the query
+     * merged by the URL methods above.
+     */
+    public static function referralQuery(): string
+    {
+        $marker = self::storeOrigin().'/';
+        $referred = self::referred($marker, true);
+
+        return $referred === $marker ? '' : (string) parse_url($referred, PHP_URL_QUERY);
+    }
+
+    /**
+     * The configured store URL with nothing added: the base every other URL
+     * here is built on.
+     */
+    private static function storeOrigin(): string
     {
         return (string) config('kotiva.salla.store_url');
     }
 
-    public static function cartUrl(): string
+    /**
+     * $url with the current visitor's referral, when there is a request and
+     * the caller wants it.
+     */
+    private static function referred(string $url, bool $withReferral): string
     {
-        return (string) config('kotiva.salla.cart_url');
+        if (! $withReferral || ! app()->bound('request')) {
+            return $url;
+        }
+
+        return Referral::applyTo($url, Referral::current(app(Request::class)));
     }
 
     public static function redirectStatus(): int
@@ -71,7 +115,7 @@ final class Salla
      *
      * @param  iterable<mixed>  $routineSkus
      */
-    public static function listingUrl(?string $filter = null, iterable $routineSkus = []): string
+    public static function listingUrl(?string $filter = null, iterable $routineSkus = [], bool $withReferral = true): string
     {
         $query = [];
 
@@ -89,9 +133,9 @@ final class Salla
             $query[] = 'routine='.implode(',', $skus);
         }
 
-        return $query === []
-            ? self::storeUrl()
-            : self::storeUrl().'/?'.implode('&', $query);
+        return self::referred($query === []
+            ? self::storeOrigin()
+            : self::storeOrigin().'/?'.implode('&', $query), $withReferral);
     }
 
     /**
@@ -101,13 +145,13 @@ final class Salla
      * comes from config. This is the only place the two are joined, so moving
      * the store is an .env change and nothing else.
      */
-    public static function productUrl(Product $product): string
+    public static function productUrl(Product $product, bool $withReferral = true): string
     {
         $path = $product->salla_path;
 
-        return self::isStorePath($path)
-            ? rtrim(self::storeUrl(), '/').$path
-            : self::storeUrl();
+        return self::referred(self::isStorePath($path)
+            ? rtrim(self::storeOrigin(), '/').$path
+            : self::storeOrigin(), $withReferral);
     }
 
     /**
@@ -134,7 +178,7 @@ final class Salla
             return null;
         }
 
-        $prefix = rtrim((string) parse_url(self::storeUrl(), PHP_URL_PATH), '/');
+        $prefix = rtrim((string) parse_url(self::storeOrigin(), PHP_URL_PATH), '/');
         $path = (string) parse_url($url, PHP_URL_PATH);
         $query = parse_url($url, PHP_URL_QUERY);
 
@@ -198,7 +242,7 @@ final class Salla
     public static function isStoreUrl(string $url): bool
     {
         $candidate = parse_url($url);
-        $store = parse_url(self::storeUrl());
+        $store = parse_url(self::storeOrigin());
 
         if (! is_array($candidate) || ! is_array($store)) {
             return false;

@@ -38,14 +38,14 @@ final class LlmsTxt
             return sprintf(
                 '  - [%s](%s)%s',
                 $p->name,
-                Salla::productUrl($p),
+                Salla::productUrl($p, withReferral: false),
                 $tags === [] ? '' : ' — '.implode(', ', $tags)
             );
         });
 
         $text = strtr((string) file_get_contents(resource_path('llms/llms.txt.stub')), [
             '{{MAIN}}' => $main,
-            '{{STORE}}' => Salla::storeUrl(),
+            '{{STORE}}' => Salla::storeUrl(withReferral: false),
             '{{COUNT}}' => (string) $products->count(),
             '{{PRODUCTS}}' => $lines->implode("\n"),
         ]);

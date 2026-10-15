@@ -436,7 +436,7 @@ final class ProductResource extends Resource
                     Forms\Components\Placeholder::make('salla_link')
                         ->label('Salla URL')
                         ->content(fn (?Product $record): HtmlString|string => $record instanceof Product && Salla::isStorePath($record->salla_path)
-                            ? new HtmlString('<a href="'.e(Salla::productUrl($record)).'" target="_blank" rel="noopener" class="text-primary-600 underline dark:text-primary-400">'.e(Salla::productUrl($record)).'</a>')
+                            ? new HtmlString('<a href="'.e(Salla::productUrl($record, withReferral: false)).'" target="_blank" rel="noopener" class="text-primary-600 underline dark:text-primary-400">'.e(Salla::productUrl($record, withReferral: false)).'</a>')
                             : 'Not linked — the site links this product to the store root'),
 
                     Forms\Components\Placeholder::make('salla_synced_at')

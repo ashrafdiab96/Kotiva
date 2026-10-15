@@ -32,7 +32,7 @@ final class SallaNotice extends Widget
     protected function getViewData(): array
     {
         $dashboard = (string) config('kotiva.salla.dashboard_url');
-        $store = Salla::storeUrl();
+        $store = Salla::storeUrl(withReferral: false);
 
         return [
             'storeUrl' => $store,
