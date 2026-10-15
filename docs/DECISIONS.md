@@ -781,3 +781,70 @@ copy once the product exists there.
 because it pins pricing rules that only apply in that mode.
 
 **Pinned by** `tests/Feature/ProductImportSallaModeTest.php`.
+
+## D-38 — Doctor referral links: a cookie here, the affiliate query on Salla
+
+**Choice.** Doctors are enrolled in Salla's built-in Affiliate marketing, and each gets a Salla
+affiliate link. They share a short link on this site instead: `klyvosystems.com/dr/<code>`.
+`ReferralController` records a `referral_visits` row, sets the `kotiva_ref` cookie and redirects to
+the partner's landing page (or, with `?to=shop`, straight to the Salla store). While the cookie
+names an active partner, every URL that `App\Support\Salla` returns (`storeUrl`, `listingUrl`,
+`productUrl`, `cartUrl`) goes through `Referral::applyTo()`, which merges in the query string of
+that partner's Salla affiliate link. Salla sees the visitor arrive with its own affiliate query and
+credits the order. The parameter name and value are whatever Salla generated. This site never
+interprets them.
+
+**Why not match orders here.** Salla owns orders, refunds and commission, and its affiliate
+dashboard is the source of truth for them. Matching orders on this side would mean a second,
+drifting copy of Salla's numbers, an API token on the public site, and a reconciliation problem
+whenever Salla's own rules (refund windows, commission rates) changed. This site counts only what
+it can see: visits to `/dr/<code>`. The dashboard says so on the widget.
+
+**Cookie.** `kotiva_ref=<code>`, 90 days, `HttpOnly`, `SameSite=Lax`, `Path=/`, `Secure` when the
+request is https. It stays encrypted by `EncryptCookies` (not in its `except` list) and is read
+only on the server. The value is the code, not the affiliate URL, so retiring a partner (inactive
+or soft-deleted) ends attribution at once, even for cookies already handed out.
+
+**Small choices.**
+
+- **Last doctor wins.** A visit to a second doctor's link overwrites the cookie, and the redirect in
+  that same request already carries the new doctor (`Referral::remember()`). The most recent
+  recommendation is the one the patient acted on, and it matches how Salla treats a fresh affiliate
+  click.
+- **Unknown or inactive code goes home silently.** It returns a 302 to `/` with no cookie and no
+  visit row. It does not 404, because a mistyped code on a printed card should still land the
+  patient on the brand. The route has no pattern on `{code}`, so a malformed code reaches the
+  controller and goes home too.
+- **Opt-out for clean URLs.** Every Salla method takes `withReferral: false`. robots.txt, llms.txt,
+  the admin dashboard's Salla links and `kotiva:salla-links` messages use it, so a crawl file or a
+  screenshot never carries one visitor's referral.
+- **The Routine Finder.** Its handoff appends a path to `window.SALLA_STORE_URL` in JS. That global
+  stays the bare origin (pinned by `SallaHandoffTest`), and the affiliate query is appended last
+  from `window.SALLA_REF_QUERY` (`Salla::referralQuery()`). Product links come from
+  `/api/products`, which carries the referral because the same-origin fetch sends the cookie. The
+  engine (`public/js/routine-engine.js`) and the model are untouched.
+- **Existing parameters are kept byte for byte.** `applyTo()` splits the query on `&` instead of
+  rebuilding it, so `routine=KOT001,KOT005` keeps its literal commas. Only a parameter with the
+  same name as an affiliate key is replaced. URLs on another host pass through unchanged. If a
+  partner's stored link stops validating (for example, the store host changed in `.env`), the URL
+  also comes back unchanged instead of failing.
+- **Visits.** `ip_hash` is `sha256(ip . APP_KEY)`, never the raw IP. `is_unique_day` is true for the
+  first visit from that hash for that partner on that calendar day. The insert happens inline,
+  because a queue would add a moving part for one row. `ip_hash` and `user_agent` never appear in
+  the dashboard.
+- **Rate limit.** The `referral` limiter allows 60/min per IP and 600/min per code. The per-code cap
+  bounds a flood spread over many IPs. It sits far above a clinic's real traffic.
+- **Deletion.** Soft delete only. A hard delete would cascade away the visit history.
+
+**Rejected alternatives.**
+
+- **Redirect `/dr/<code>` straight to the Salla affiliate link.** This is simpler, but the patient
+  never sees the brand site, the Routine Finder or the science pages. Attribution would also rely on
+  Salla's own cookie, so a patient who came back to this site and then clicked Shop would arrive at
+  Salla without the affiliate query.
+- **Set or read the cookie in JS and rewrite links client-side.** That needs the cookie out of
+  `EncryptCookies` and readable by any script on the page, and it leaves server-rendered links,
+  redirects (`/shop`, `/product/*`) and no-JS visitors unattributed. Server-side covers all of them.
+
+**Pinned by** `tests/Feature/ReferralLinkTest.php`, `tests/Feature/ReferralSallaUrlsTest.php`,
+`tests/Feature/ReferralPartnerAdminTest.php` and `tests/Unit/ReferralTest.php`.

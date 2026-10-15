@@ -130,6 +130,45 @@ any active product has no Salla link (such a product's links fall back to the st
 role; the dashboard shows where to manage them in Salla. On a product, prices, stock and the
 low-stock threshold are read-only ("Managed in Salla") and the Salla tab shows the link.
 
+## Doctor referral links
+
+Doctors share `klyvosystems.com/dr/<code>`. The patient lands on this site, and every link to the
+Salla store then carries the doctor's Salla affiliate query, so Salla credits the order to them.
+Design and trade-offs: `docs/DECISIONS.md` D-38.
+
+**Adding a doctor**
+
+1. In Salla: **Marketing → Affiliate marketing**. Create the affiliate and copy their link (for
+   example `https://<store host>/?ref=XXXX`).
+2. In this dashboard: **Marketing → Doctor referrals → New**. Enter the name, accept or edit the
+   suggested code (e.g. `dr-ahmed`), paste the Salla link and pick a landing page. The form refuses
+   a link that is not on the Salla store or has no query string.
+3. Copy the **Share link** from the table (`https://klyvosystems.com/dr/dr-ahmed`) and send it to
+   the doctor. `…/dr/dr-ahmed?to=shop` skips the landing page and opens the Salla store directly.
+
+**Where to see what**
+
+- Here: visits per doctor (total, unique in the last 30 days, last visit), a 30-day chart and the
+  last 100 visits on each doctor's page, and the "Doctor referrals — last 30 days" card on the
+  dashboard.
+- In Salla's Affiliate marketing dashboard: orders, revenue and commission per affiliate. Salla is
+  the source of truth for those. This site never counts orders.
+
+**Behaviour.** The `kotiva_ref` cookie lasts 90 days. It is encrypted, HttpOnly and SameSite=Lax.
+The most recent doctor's link wins. An unknown or deactivated code quietly redirects to the home
+page and sets no cookie. To stop a doctor's attribution, deactivate them (a bulk action is
+available). Their existing cookies stop working at once.
+
+**Testing it**
+
+```bash
+php artisan test --filter=Referral
+```
+
+Manual check: create a partner with a test affiliate link, open `/dr/<code>`, then click **Shop**.
+The Salla URL must end with the affiliate query, e.g. `?filter=cleanser&ref=XXXX`. Place a test
+order and confirm it appears under that affiliate in Salla.
+
 ## Running the shop day to day (retired)
 
 Kept for reference until the commerce code is deleted; none of this runs while
