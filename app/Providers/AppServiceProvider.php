@@ -6,8 +6,11 @@ use App\Models\Setting;
 use App\Services\Payments\CashOnDeliveryGateway;
 use App\Services\Payments\PaymentGateways;
 use App\Support\Salla;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\ServiceProvider;
 
@@ -34,6 +37,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // /dr/{code} (D-38): 60 a minute per IP, and a ceiling per code so a
+        // flood spread over many addresses cannot fill referral_visits for one
+        // doctor. The per-code ceiling sits far above a clinic's real traffic
+        // so a patient never meets it.
+        RateLimiter::for('referral', fn (Request $request): array => [
+            Limit::perMinute(60)->by('referral-ip:'.$request->ip()),
+            Limit::perMinute(600)->by('referral-code:'.strtolower((string) $request->route('code'))),
+        ]);
+
         // The announcement bar (§7.6). Shared through a composer rather than
         // read inside the layout, so the view stays free of data access and
         // every page gets the same answer from one place. Setting caches its

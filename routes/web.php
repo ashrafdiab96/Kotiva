@@ -7,6 +7,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CrawlFilesController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\SallaRedirectController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -88,6 +89,23 @@ Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/cart/items/{item?}', [
 Route::match(['POST', 'PUT', 'PATCH', 'DELETE'], '/checkout/{step?}', [SallaRedirectController::class, 'gone'])
     ->where('step', '.*');
 Route::get('/api/shipping/cities', [SallaRedirectController::class, 'gone']);
+
+/*
+|--------------------------------------------------------------------------
+| Doctor referral links (D-38)
+|--------------------------------------------------------------------------
+|
+| /dr/<code> records a visit, sets the kotiva_ref cookie and redirects; every
+| Salla URL the visitor then sees carries the doctor's affiliate query. The
+| "referral" limiter (AppServiceProvider) caps it per IP and per code.
+|
+*/
+
+// No pattern on {code}: a malformed code must reach the controller and go
+// home quietly rather than 404.
+Route::get('/dr/{code}', [ReferralController::class, 'enter'])
+    ->middleware('throttle:referral')
+    ->name('referral.enter');
 
 /*
 |--------------------------------------------------------------------------
