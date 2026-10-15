@@ -375,8 +375,12 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
 @push('pre_scripts')
 {{-- The Salla store root, injected once. Every product link the quiz builds
      comes from /api/products (each row carries its own Salla URL); this is
-     only the fallback and the base for the "Shop These Products" handoff. --}}
-<script>window.SALLA_STORE_URL = @json(Salla::storeUrl());</script>
+     only the fallback and the base for the "Shop These Products" handoff.
+     D-38: SALLA_STORE_URL stays the bare origin because the handoff appends
+     a path to it; a referred visitor's affiliate query comes separately from
+     Salla::referralQuery() and is appended last, and SALLA_STORE_HOME is the
+     store root with that query already on it. --}}
+<script>window.SALLA_STORE_URL = @json(Salla::storeUrl(withReferral: false)); window.SALLA_STORE_HOME = @json(Salla::storeUrl()); window.SALLA_REF_QUERY = @json(Salla::referralQuery());</script>
 @endpush
 
 @push('pre_scripts')
@@ -822,7 +826,7 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
       '<div class="result-time-icon">' + icon + '</div>' + esc(title) + '</div>' +
       '<div class="result-steps">' + list.map(function (s, i) {
         var product = productOf(s.id);
-        var href = (product && product.url) || SALLA_STORE_URL;
+        var href = (product && product.url) || window.SALLA_STORE_HOME || SALLA_STORE_URL;
         return '<a class="result-step" href="' + esc(href) + '">' +
           '<div class="result-step-num">' + ('0' + (i + 1)).slice(-2) + '</div><div>' +
           '<div class="result-step-label">' + esc(STEP_LABEL[s.step] || s.step) + '</div>' +
@@ -899,7 +903,7 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
       });
     });
     var cta = document.getElementById('shop-routine-cta');
-    if (cta && skus.length) cta.setAttribute('href', SALLA_STORE_URL + '/?routine=' + skus.map(function (s) { return encodeURIComponent(s); }).join(','));
+    if (cta && skus.length) cta.setAttribute('href', SALLA_STORE_URL + '/?routine=' + skus.map(function (s) { return encodeURIComponent(s); }).join(',') + (window.SALLA_REF_QUERY ? '&' + window.SALLA_REF_QUERY : ''));
 
     document.getElementById('quiz-section').style.display = 'none';
     var sec = document.getElementById('result-section');

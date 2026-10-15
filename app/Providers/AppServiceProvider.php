@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Setting;
 use App\Services\Payments\CashOnDeliveryGateway;
 use App\Services\Payments\PaymentGateways;
+use App\Support\Referral;
 use App\Support\Salla;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\View\View;
@@ -52,6 +53,9 @@ class AppServiceProvider extends ServiceProvider
         // map, so this costs no query per request.
         ViewFacade::composer('layouts.app', function (View $view): void {
             $view->with('announcementText', self::announcementText());
+            // D-38: the referring doctor's code, for analytics only. Read
+            // server-side from the encrypted cookie; null for most visitors.
+            $view->with('referralCode', Referral::current(request())?->code);
         });
     }
 

@@ -24,6 +24,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
+  @if (! empty($referralCode ?? null))
+  <meta name="kotiva-ref" content="{{ $referralCode }}" />
+  @endif
   @yield('meta')
   <link rel="icon" type="image/svg+xml" href="{{ asset('assets/favicon.svg') }}?v={{ $v }}">
   <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('assets/favicon-48.png') }}?v={{ $v }}">
