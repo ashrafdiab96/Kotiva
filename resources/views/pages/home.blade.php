@@ -253,7 +253,7 @@
 
     <a class="category-card" href="{{ Salla::listingUrl('face') }}" aria-label="Shop Face Care">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
-        <img src="{{ asset('assets/categories/cat-face-v3.webp') }}" alt="A woman with olive skin resting in warm sunlight, her skin clear and glowing." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+        <img src="{{ asset('assets/categories/cat-face-v4.webp') }}" alt="A smiling woman with dark hair pulled back, her skin clear and glowing." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="category-card-overlay"></div>
       <div class="category-card-info">
@@ -265,7 +265,7 @@
 
     <a class="category-card" href="{{ Salla::listingUrl('body') }}" aria-label="Shop Body Care">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
-        <img src="{{ asset('assets/categories/cat-body-v3.webp') }}" alt="A woman smoothing body cream along her arm in soft morning light." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+        <img src="{{ asset('assets/categories/cat-body-v4.webp') }}" alt="A woman resting her hand on her bare shoulder, skin smooth and soft." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="category-card-overlay"></div>
       <div class="category-card-info">
@@ -277,7 +277,7 @@
 
     <a class="category-card" href="{{ Salla::listingUrl('serums') }}" aria-label="Shop Serums">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
-        <img src="{{ asset('assets/categories/cat-serums-v3.webp') }}" alt="A golden droplet of serum falling from a glass dropper." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+        <img src="{{ asset('assets/categories/cat-serums-v4.webp') }}" alt="Golden serum droplets falling from a glass dropper." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="category-card-overlay"></div>
       <div class="category-card-info">
@@ -289,7 +289,7 @@
 
     <a class="category-card" href="{{ Salla::listingUrl('treatment') }}" aria-label="Shop Treatments">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
-        <img src="{{ asset('assets/categories/cat-treatments-v4.webp') }}" alt="A woman pressing treatment cream into her cheek with her fingertips." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+        <img src="{{ asset('assets/categories/cat-treatments-v5.webp') }}" alt="Hands rubbing a dollop of treatment cream into the skin." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="category-card-overlay"></div>
       <div class="category-card-info">
@@ -301,7 +301,7 @@
 
     <a class="category-card" href="{{ Salla::listingUrl('spf') }}" aria-label="Shop Sunscreen">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
-        <img src="{{ asset('assets/categories/cat-spf-v3.webp') }}" alt="A woman turning her face toward warm sunlight, skin protected and even." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+        <img src="{{ asset('assets/categories/cat-spf-v4.webp') }}" alt="A woman smoothing sunscreen across her cheek." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="category-card-overlay"></div>
       <div class="category-card-info">
@@ -313,7 +313,7 @@
 
     <a class="category-card" href="{{ Salla::listingUrl('hair') }}" aria-label="Shop Hair Care">
       <div class="category-card-bg" style="background:linear-gradient(145deg,var(--bg-alt),var(--bg-alt));">
-        <img src="{{ asset('assets/categories/cat-hair-v3.webp') }}" alt="Long healthy hair backlit by sunlight, seen from behind." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
+        <img src="{{ asset('assets/categories/cat-hair-v4.webp') }}" alt="A woman running her fingers through long, glossy wavy hair." loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="category-card-overlay"></div>
       <div class="category-card-info">
@@ -347,7 +347,7 @@
     <a class="btn btn-gold" href="{{ route('science') }}">Our Science →</a>
   </div>
   <div class="doctor-image" style="position:relative;overflow:hidden;">
-    <img src="{{ asset('assets/home-doctor-approved-v5.webp') }}" alt="A dermatologist in a white coat holding the real KOTIVA Micellar Water bottle, label clearly visible" loading="lazy" data-parallax="0.10" style="position:absolute;top:-7%;left:0;width:100%;height:114%;object-fit:cover;object-position:center 22%;" />
+    <img src="{{ asset('assets/home-doctor-approved-v6.webp') }}" alt="The KOTIVA range on a clinic counter beside a prescription pad and pen" loading="lazy" data-parallax="0.10" style="position:absolute;top:-7%;left:0;width:100%;height:114%;object-fit:cover;object-position:center 60%;" />
   </div>
 </section>
 
@@ -586,12 +586,12 @@
        3-product shelf (the K30-B fallback) is retired; its routine-finder CTA is kept. -->
   <div class="container">
     <div class="ritual-grid reveal" role="list" data-stagger="70">
-      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-01-v2.webp') }}" alt="A Kotiva Glow Up Water Essence Toner bottle on warm stone in late-afternoon light" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
-      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-02-v2.webp') }}" alt="Two unmarked skincare vessels beside a glass prism casting a band of refracted light" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
-      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-03-v2.webp') }}" alt="A group of unmarked skincare vessels resting on rumpled linen" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
-      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-04-v2.webp') }}" alt="Water droplets beaded on warm stone, backlit to a golden glow" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
-      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-05-v2.webp') }}" alt="An unmarked skincare bottle beside plain glass labware on pale stone" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
-      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-06-v2.webp') }}" alt="A single dried rosehip and its leaves on sunlit stone" loading="lazy" width="1200" height="1200" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-01-v3.webp') }}" alt="Kotiva shampoo and hair ampoules on a lavender backdrop" loading="lazy" width="1200" height="1600" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-02-v3.webp') }}" alt="A Kotiva night cream bottle floating between two hands on a soft lilac background" loading="lazy" width="1200" height="1600" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-03-v3.webp') }}" alt="A hand holding a swirl of Kotiva cream against a bright blue background" loading="lazy" width="1200" height="1600" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-04-v3.webp') }}" alt="A woman with curly hair holding a Kotiva bottle beside her face" loading="lazy" width="1200" height="1600" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-05-v3.webp') }}" alt="A group of Kotiva bottles and tubes on a pink backdrop" loading="lazy" width="1200" height="1600" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="ritual-tile" role="listitem"><img src="{{ asset('assets/ritual/ritual-06-v3.webp') }}" alt="A line-up of blue Kotiva skincare products" loading="lazy" width="1200" height="1600" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>
     </div>
     <p class="ritual-foot"><a href="{{ route('routine-finder') }}">Build your routine →</a></p>
   </div>

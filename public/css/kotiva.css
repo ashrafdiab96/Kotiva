@@ -1766,6 +1766,24 @@ html[data-mode="dark"] .footer-brand-logo { filter: brightness(0) invert(1); opa
 html[data-mode="dark"] .nav-theme-btn .icon-moon { display: none; }
 html[data-mode="dark"] .nav-theme-btn .icon-sun  { display: block; }
 
+/* Match the cart control beside it (shop.css .nav-cart): same 38px circle,
+   1px hairline, colours and hover, so the right-hand cluster reads as one set.
+   padding:0 drops the UA button padding; the SVG is block so it centres exactly
+   instead of sitting on the text baseline. */
+.nav-theme-btn {
+  width: 38px; height: 38px;
+  padding: 0;
+  border-width: 1px;
+  color: rgba(255,255,255,0.78);
+  flex-shrink: 0;
+}
+.nav-theme-btn svg { display: block; }
+.nav-theme-btn:hover { border-color: #FFFFFF; color: #FFFFFF; }
+.nav.scrolled .nav-theme-btn { border-color: var(--border); color: var(--fg-mid); }
+.nav.scrolled .nav-theme-btn:hover { border-color: var(--border-strong); color: var(--fg); }
+html[data-mode="dark"] .nav.scrolled .nav-theme-btn { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.78); }
+html[data-mode="dark"] .nav.scrolled .nav-theme-btn:hover { border-color: rgba(255,255,255,0.40); color: #FFFFFF; }
+
 /* ============================================================
    CREDENTIAL BADGE — checkmark prefix
    ============================================================ */
@@ -2261,7 +2279,8 @@ html[data-mode="dark"] .scroll-progress-bar { background: linear-gradient(90deg,
 .trust-item {
   flex-direction: column !important;
   align-items: flex-start !important;
-  padding: 40px 36px 32px !important;
+  justify-content: center !important;
+  padding: 36px !important;
   gap: 4px !important;
   min-height: 156px !important;
 }
