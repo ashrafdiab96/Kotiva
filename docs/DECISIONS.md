@@ -781,3 +781,27 @@ copy once the product exists there.
 because it pins pricing rules that only apply in that mode.
 
 **Pinned by** `tests/Feature/ProductImportSallaModeTest.php`.
+
+## D-39 — The routine SKU comes from the model id, not the database id
+
+**Choice.** The Routine Finder derives each recommended product's SKU on the client from its
+routine-model id: id N ⇔ `KOT{N:03}` (`7` → `KOT007`). `public/js/routine-cta.js` turns a
+`build()` result into the "Shop These Products" href with the same rule as
+`Salla::listingUrl(null, $skus)`, using unique SKUs in am → pm → anytime order. The href is set
+every time a result renders. With no SKUs it is the store root and the page logs a `console.warn`.
+`/api/products` is only used to give each result step its own Salla page, matched **by SKU**
+(`KOTIVA.getBySku`). A step with no matching row links to the listing for that one SKU, never the
+bare store root. The database id is never used as a cross-system key.
+
+**Why.** The page used to look each model id up in `/api/products` rows keyed by database id. The
+two matched only because of auto-increment order. `ProductSeeder` upserts by SKU, so a reseed or
+delete moves the ids. When they drifted, or the fetch was slow or failed, the SKU list came back
+empty and the CTA quietly stayed on the store root with no `?routine=`.
+
+**Rejected alternative: keep the id lookup and reseed with fixed ids.** That is fragile, because
+any delete, import or manual insert breaks it again. It also hides the failure, because a wrong
+or missing lookup still produces a working-looking link to the store.
+
+**Pinned by** `resources/routine/test-routine-cta.mjs` (part of `npm run test:routine`),
+`tests/Feature/RoutineSkuInvariantTest.php` (every API row has a `KOT\d{3}` SKU, and every model
+id names the seeded product with that SKU) and `SallaHandoffTest::the_routine_finder_hands_off_to_salla`.

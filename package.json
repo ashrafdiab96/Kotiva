@@ -4,7 +4,7 @@
   "description": "KOTIVA™ e-commerce — Laravel storefront + Filament admin.",
   "scripts": {
     "test": "npm run test:routine",
-    "test:routine": "node resources/routine/test-routine-engine.mjs",
+    "test:routine": "node resources/routine/test-routine-engine.mjs && node resources/routine/test-routine-cta.mjs",
     "gen:routine-model": "node resources/routine/generate-routine-model.js"
   },
   "repository": {

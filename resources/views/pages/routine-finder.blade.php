@@ -373,38 +373,42 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
 @endpush
 
 @push('pre_scripts')
-{{-- The Salla store root, injected once. Every product link the quiz builds
-     comes from /api/products (each row carries its own Salla URL); this is
-     only the fallback and the base for the "Shop These Products" handoff. --}}
+{{-- The Salla store root, injected once. It is the base for the "Shop These
+     Products" handoff and for any result step whose Salla page is unknown. --}}
 <script>window.SALLA_STORE_URL = @json(Salla::storeUrl());</script>
 @endpush
 
 @push('pre_scripts')
 @verbatim
 <script>
-/* The quiz engine and its model are untouched; only the product lookup moved.
-   This page used to load the whole legacy data-lite.js bundle for one thing:
-   resolving a recommended product id to its slug for the result links. It now
-   reads the catalog over /api/products instead, so a deactivated or renamed
-   product cannot linger here after it has left the shop.
+/* The quiz engine and its model are untouched. /api/products supplies each
+   recommended product's own Salla page for the result-step links, looked up
+   by SKU (D-39): the database id is not a cross-system key, so it is never
+   matched against the engine's routine-model ids. getById stays for any
+   older caller.
 
-   The fetch is async, and that is safe: KOTIVA.getById is only ever called
-   from build(), which cannot run until the visitor has answered seven
-   questions. productOf() misses fall back to the Salla store root, so a slow
-   or failed request degrades to the store rather than a dead link. */
+   The fetch is async and only ever improves the step links: the SKUs, and
+   so the "Shop These Products" handoff, come from the model ids alone. A slow
+   or failed request degrades each step to the Salla listing for that SKU. */
 (function () {
   'use strict';
-  var byId = {};
+  var byId = {}, bySku = {};
   window.KOTIVA = window.KOTIVA || {};
   window.KOTIVA.products = [];
   window.KOTIVA.getById = function (id) { return byId[id] || null; };
+  window.KOTIVA.getBySku = function (sku) {
+    return (typeof sku === 'string' && bySku[sku.toUpperCase()]) || null;
+  };
 
   fetch('/api/products', { headers: { 'Accept': 'application/json' } })
     .then(function (res) { return res.ok ? res.json() : { data: [] }; })
     .then(function (payload) {
       var rows = (payload && payload.data) || [];
       window.KOTIVA.products = rows;
-      rows.forEach(function (p) { byId[p.id] = p; });
+      rows.forEach(function (p) {
+        byId[p.id] = p;
+        if (p.sku) bySku[String(p.sku).toUpperCase()] = p;
+      });
     })
     .catch(function () { /* result links fall back to the Salla store */ });
 })();
@@ -418,6 +422,10 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
 
 @push('pre_scripts')
 <script src="{{ asset('js/routine-engine.js') }}?v={{ config('app.asset_version') }}"></script>
+@endpush
+
+@push('pre_scripts')
+<script src="{{ asset('js/routine-cta.js') }}?v={{ config('app.asset_version') }}"></script>
 @endpush
 
 @section('content')
@@ -805,8 +813,16 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
     });
   }
   var SALLA_STORE_URL = window.SALLA_STORE_URL;
-  function productOf(id) {
-    return (window.KOTIVA && KOTIVA.getById) ? KOTIVA.getById(id) : null;
+  var CTA = window.KOTIVA_ROUTINE_CTA;
+  /* routine-model id N -> SKU KOT{N:03} (D-39); null unless id is 1..999 */
+  function skuOf(id) { return CTA.skuOf(id); }
+  /* A step's own Salla page when /api/products has it under that SKU,
+     otherwise the Salla listing narrowed to that one SKU. */
+  function stepHref(id) {
+    var sku = skuOf(id);
+    var row = sku && window.KOTIVA && KOTIVA.getBySku ? KOTIVA.getBySku(sku) : null;
+    if (row && row.url && row.url !== SALLA_STORE_URL) return row.url;
+    return CTA.listingUrl(SALLA_STORE_URL, sku ? [sku] : []);
   }
   var STEP_LABEL = {
     'makeup-removal': 'Remove', 'cleanser': 'Cleanse', 'toner': 'Tone',
@@ -821,8 +837,7 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
     return '<div class="result-time-block"><div class="result-time-label">' +
       '<div class="result-time-icon">' + icon + '</div>' + esc(title) + '</div>' +
       '<div class="result-steps">' + list.map(function (s, i) {
-        var product = productOf(s.id);
-        var href = (product && product.url) || SALLA_STORE_URL;
+        var href = stepHref(s.id);
         return '<a class="result-step" href="' + esc(href) + '">' +
           '<div class="result-step-num">' + ('0' + (i + 1)).slice(-2) + '</div><div>' +
           '<div class="result-step-label">' + esc(STEP_LABEL[s.step] || s.step) + '</div>' +
@@ -887,19 +902,13 @@ html[data-mode="dark"] .result-summary-title{ color:var(--bronze); }
     document.getElementById('result-notes').innerHTML = notes.join('');
 
     /* carry the recommendation through to the Salla store (K25 / S2-4).
-       SKUs, not ids or slugs: they are the one key this site and Salla share,
-       so the store's listing can pick the routine out with no product data
-       from here. Same shape as App\Support\Salla::listingUrl(). */
-    var skus = [];
-    [r.am, r.pm, r.anytime].forEach(function (half) {
-      half.forEach(function (s) {
-        var product = productOf(s.id);
-        var sku = product && product.sku ? String(product.sku).toUpperCase() : null;
-        if (sku && skus.indexOf(sku) === -1) skus.push(sku);
-      });
-    });
+       SKUs, derived from the model ids (D-39): they are the one key this site
+       and Salla share, so the store's listing can pick the routine out with
+       no product data from here. Same shape as Salla::listingUrl(). */
+    var skus = CTA.skusOf(r);
+    if (!skus.length) console.warn('Routine Finder: no SKUs in this routine; Shop These Products opens the store root.');
     var cta = document.getElementById('shop-routine-cta');
-    if (cta && skus.length) cta.setAttribute('href', SALLA_STORE_URL + '/?routine=' + skus.map(function (s) { return encodeURIComponent(s); }).join(','));
+    if (cta) cta.setAttribute('href', CTA.listingUrl(SALLA_STORE_URL, skus));
 
     document.getElementById('quiz-section').style.display = 'none';
     var sec = document.getElementById('result-section');

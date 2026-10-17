@@ -358,10 +358,21 @@ final class SallaHandoffTest extends TestCase
         $html = (string) $this->get('/routine-finder')->assertOk()->getContent();
 
         $this->assertStringContainsString('window.SALLA_STORE_URL = '.json_encode($this->store()), $html);
-        $this->assertStringContainsString("SALLA_STORE_URL + '/?routine='", $html);
         $this->assertStringContainsString('id="shop-routine-cta"', $html);
         $this->assertStringNotContainsString("'/product/' + slug", $html);
         $this->assertStringNotContainsString("'/shop?routine='", $html);
+
+        // The handoff URL is built by public/js/routine-cta.js from the
+        // routine-model ids (id N => KOT{N:03}, D-39), never from the
+        // /api/products row the database id happens to match.
+        $cta = (string) file_get_contents(public_path('js/routine-cta.js'));
+        $this->assertStringContainsString('js/routine-cta.js', $html);
+        $this->assertStringContainsString("storeUrl + '/?routine='", $cta);
+        $this->assertStringContainsString('function skuOf(id)', $cta);
+        $this->assertStringContainsString('function skuOf(id)', $html);
+        $this->assertStringContainsString('CTA.listingUrl(SALLA_STORE_URL, skus)', $html);
+        $this->assertStringNotContainsString('product.sku', $html);
+        $this->assertStringNotContainsString('productOf(', $html);
     }
 
     #[Test]
