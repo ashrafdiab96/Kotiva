@@ -628,7 +628,7 @@ was only visible by looking.
 ## D-35 — Salla handoff: this site becomes content-only
 
 The storefront (listing, product pages, cart, checkout, orders, stock, payments) moved to Salla at
-`shop.klyvosystems.com`. This site keeps the content pages and the Routine Finder. Every commercial
+`shop.kotiva.store`. This site keeps the content pages and the Routine Finder. Every commercial
 link resolves through `App\Support\Salla`, which reads `config('kotiva.salla.*')`. No view contains
 the store hostname. Nothing was deleted: the commerce code is unrouted, switched off by
 `kotiva.commerce_enabled=false` and hidden from the dashboard, ready to be removed in its own PR.

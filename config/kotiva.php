@@ -31,8 +31,8 @@ return [
      | flips it to 301 once Salla is confirmed final.
      */
     'salla' => [
-        'store_url' => rtrim((string) env('KOTIVA_SALLA_STORE_URL', 'https://shop.klyvosystems.com'), '/'),
-        'cart_url' => rtrim((string) env('KOTIVA_SALLA_CART_URL', 'https://shop.klyvosystems.com/cart'), '/'),
+        'store_url' => rtrim((string) env('KOTIVA_SALLA_STORE_URL', 'https://shop.kotiva.store'), '/'),
+        'cart_url' => rtrim((string) env('KOTIVA_SALLA_CART_URL', 'https://shop.kotiva.store/cart'), '/'),
         'api_base' => rtrim((string) env('KOTIVA_SALLA_API_BASE', 'https://api.salla.dev/admin/v2'), '/'),
         'access_token' => (string) env('KOTIVA_SALLA_ACCESS_TOKEN', ''),
         'redirect_status' => (int) env('KOTIVA_SALLA_REDIRECT_STATUS', 302),

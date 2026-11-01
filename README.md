@@ -4,7 +4,7 @@ The KOTIVA brand and content website (`klyvosystems.com`) as a Laravel applicati
 pages served from Blade with their design unchanged, the Routine Finder, the ingredient glossary,
 and a Filament dashboard for the content.
 
-> **The shop is on Salla** (`shop.klyvosystems.com`). Listing, product pages, cart, checkout,
+> **The shop is on Salla** (`shop.kotiva.store`). Listing, product pages, cart, checkout,
 > orders, prices and stock all live there. Every "Shop", product and cart link on this site lands on
 > Salla, and the old `/shop`, `/product/*`, `/cart` and `/checkout` URLs redirect there. Laravel's
 > own cart/checkout code is still in the repository but switched off (`KOTIVA_COMMERCE_ENABLED=false`)
@@ -93,8 +93,8 @@ The store URLs come from `.env` and are read only through `App\Support\Salla`; n
 the store hostname.
 
 ```
-KOTIVA_SALLA_STORE_URL=https://shop.klyvosystems.com
-KOTIVA_SALLA_CART_URL=https://shop.klyvosystems.com/cart
+KOTIVA_SALLA_STORE_URL=https://shop.kotiva.store
+KOTIVA_SALLA_CART_URL=https://shop.kotiva.store/cart
 KOTIVA_SALLA_API_BASE=https://api.salla.dev/admin/v2
 KOTIVA_SALLA_ACCESS_TOKEN=            # only for API mode below; never commit it
 KOTIVA_SALLA_REDIRECT_STATUS=302      # flip to 301 once the Salla store is confirmed final

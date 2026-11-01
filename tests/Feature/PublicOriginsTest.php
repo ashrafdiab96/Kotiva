@@ -28,7 +28,7 @@ final class PublicOriginsTest extends TestCase
     private const STORE = 'https://store.origin-test.example';
 
     /** Domains this project has used; none may appear once config points elsewhere. */
-    private const KNOWN_HOSTS_PATTERN = '#(?:[a-z0-9-]+\.)*(?:klyvosystems\.com|kotiva\.co(?![a-z])|ashater\.com)#i';
+    private const KNOWN_HOSTS_PATTERN = '#(?:[a-z0-9-]+\.)*(?:klyvosystems\.com|kotiva\.store|kotiva\.co(?![a-z])|ashater\.com)#i';
 
     protected function setUp(): void
     {
