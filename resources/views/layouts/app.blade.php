@@ -135,7 +135,7 @@
       </div>
       <div><div class="footer-col-title">Support</div>
         <nav class="footer-links" aria-label="Support links">
-          <a href="{{ route('privacy-policy') }}">Privacy Policy</a><a href="{{ route('terms') }}">Terms of Use</a><a href="{{ route('contact') }}#faq">FAQ</a>
+          <a href="{{ route('privacy-policy') }}">Privacy Policy</a><a href="{{ route('terms') }}">Terms of Use</a><a href="{{ route('returns') }}">Returns &amp; Refunds</a><a href="{{ route('contact') }}#faq">FAQ</a>
         </nav>
       </div>
     </div>

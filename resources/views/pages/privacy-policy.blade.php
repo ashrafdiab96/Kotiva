@@ -90,77 +90,71 @@
   <section class="legal-content">
     <div class="container">
       <div class="legal-content-inner reveal">
-        <p class="legal-meta">Last updated: 5 July 2026 (draft)</p>
+        <p class="legal-meta">Last updated: October 2026 (draft)</p>
 
-        <h2>1. Who We Are</h2>
-        <p>This website ({{ parse_url(config('app.url'), PHP_URL_HOST) }}, the "Site") is operated by <strong>Vitakode
-        LLC</strong>, a company registered in Muscat, Sultanate of Oman ("kotiva™", "we", "us", or "our").
-        We are the data controller responsible for your personal data collected through this Site.</p>
+        <p>This Privacy Policy explains how kotiva™, a brand of Vitakode LLC ("kotiva", "we", "us"),
+        collects, uses and protects your personal data when you visit our website, take our Routine
+        Finder quiz, subscribe to our newsletter, contact us, or buy our products. We want you to know
+        what we do with your information, and we collect only what we need to look after you and run
+        the brand.</p>
 
-        <h2>2. Information We Collect</h2>
-        <p>We collect information you provide directly to us, including:</p>
-        <ul>
-          <li>Contact details submitted through our contact form (name, email address, enquiry type, message)</li>
-          <li>Email address submitted through our newsletter sign-up</li>
-          <li>Any information you provide when contacting us by email or phone</li>
-        </ul>
-        <p>We do not currently operate online ordering, so we do not collect payment or shipping
-        information through this Site. If and when online ordering launches, this policy will be
-        updated to describe the additional data collected (e.g. delivery address, order history).</p>
+        <h2>What We Collect</h2>
+        <p>When you contact us or fill in a form, we collect the details you give us, such as your name,
+        email address, phone number and message. When you subscribe to the Journal newsletter, we collect
+        your email address. When you use the Routine Finder, we collect the answers you choose about your
+        skin type, main concern and experience level. If you order from us online, we also collect your
+        delivery address, order details and payment confirmation. Payments are handled by our payment
+        provider, and we do not store your full card details. Like most websites, we also collect basic
+        technical information, such as your device, browser, pages visited and approximate location,
+        through cookies and similar tools.</p>
 
-        <h2>3. How We Use Your Information</h2>
-        <p>We use the information we collect to:</p>
-        <ul>
-          <li>Respond to your enquiries and provide customer support</li>
-          <li>Send you newsletter updates, if you have opted in, about new products, routines, and offers</li>
-          <li>Improve our Site and product offering</li>
-          <li>Comply with our legal obligations</li>
-        </ul>
+        <h2>Why We Use It</h2>
+        <p>We use your information to answer your questions, process and deliver orders, handle faulty or
+        damaged product reports, send the newsletter you asked for, and give you routine suggestions that
+        match your answers. We also use it to understand how the website is used so we can improve it,
+        and to meet our legal obligations. We use your Routine Finder answers only to build your suggested
+        routine and to improve the quiz. The quiz offers product guidance and does not diagnose any skin
+        condition. We only send you marketing messages if you have agreed to receive them, and you can
+        unsubscribe at any time using the link in every email.</p>
 
-        <h2>4. Legal Basis for Processing</h2>
-        <p>We process your personal data on the basis of your consent (for newsletter sign-ups and
-        voluntary enquiries) and our legitimate interest in responding to enquiries and operating our
-        business.</p>
+        <h2>Who We Share It With</h2>
+        <p>We share personal data only with people who help us run kotiva, such as delivery companies, our
+        payment provider, website hosting and analytics services, and email service providers, and only
+        for the purpose they were engaged for. If you buy from a pharmacy or retailer and contact us about
+        the purchase, we may speak to that retailer to resolve it. We may also share information where the
+        law requires it. We do not sell your personal data.</p>
 
-        <h2>5. Sharing Your Information</h2>
-        <p>We do not sell your personal data. We may share it with trusted service providers who help
-        us operate the Site (for example, email delivery and website hosting providers), who are
-        obligated to keep your data confidential and use it only to provide services to us. We do not
-        currently share data with a CRM or marketing platform; if this changes, we will update this
-        policy accordingly.</p>
+        <h2>Where It Is Processed and How Long We Keep It</h2>
+        <p>kotiva is founded in Oman, our products are manufactured in Poland, and our service providers
+        may be located in other countries, so your data may be processed outside the country where you
+        live. When this happens, we take steps to protect it in line with applicable law. We keep personal
+        data only as long as we need it for the purposes above or as the law requires: 24 months after
+        your last interaction for enquiries and quiz answers, and the period required by law for order
+        records.</p>
 
-        <h2>6. Data Retention</h2>
-        <p>We retain contact form submissions and newsletter sign-up data for as long as necessary to
-        respond to your enquiry or for as long as you remain subscribed, unless a longer retention
-        period is required by law.</p>
+        <h2>How We Protect It</h2>
+        <p>We use reasonable technical and organisational measures to keep your data secure, including
+        access controls and encrypted connections. No online service can promise perfect security, so
+        please use a strong password if you create an account and contact us straight away if you suspect
+        your account has been misused.</p>
 
-        <h2>7. Your Rights</h2>
-        <p>Depending on your location, you may have the right to access, correct, delete, or object to
-        our processing of your personal data, and to withdraw consent at any time (for example, by
-        unsubscribing from our newsletter). To exercise any of these rights, contact us using the
-        details below.</p>
+        <h2>Your Rights</h2>
+        <p>Under the Saudi Personal Data Protection Law and other data protection laws that apply to you,
+        you have the right to know how your data is used, to ask for a copy of it, to ask us to correct it
+        or delete it, and to withdraw your consent at any time. To use any of these rights, contact us
+        using the details below. We will respond within the time the law requires and may need to confirm
+        your identity first. If you are not satisfied with our response, you can complain to your local
+        data protection authority.</p>
 
-        <h2>8. Cookies</h2>
-        <p>This Site may use essential cookies required for basic functionality. We do not currently use
-        third-party advertising or analytics cookies. If this changes, we will update this policy and,
-        where required, request your consent.</p>
+        <h2>Cookies</h2>
+        <p>We use cookies that are necessary to make the website work, and, with your consent where the law
+        requires it, cookies that measure how the site is used. You can change your cookie choices at any
+        time in your browser settings.</p>
 
-        <h2>9. Children's Privacy</h2>
-        <p>This Site is not directed at children under 16, and we do not knowingly collect personal data
-        from children.</p>
-
-        <h2>10. Changes to This Policy</h2>
-        <p>We may update this Privacy Policy from time to time. The "Last updated" date at the top of
-        this page reflects the most recent revision.</p>
-
-        <h2>11. Contact Us</h2>
-        <p>If you have questions about this Privacy Policy or how we handle your data, contact us at:</p>
-        <p>
-          Vitakode LLC<br>
-          North Al Ghubra, Bousher, Muscat Governorate, Sultanate of Oman<br>
-          Email: <a href="mailto:info@vitakode.com">info@vitakode.com</a><br>
-          Phone: <a href="tel:+96895990420">+968 9599 0420</a>
-        </p>
+        <h2>Changes and Contact</h2>
+        <p>We may update this policy from time to time and will show the date of the latest version at the
+        top of this page. If you have any question about it, contact our customer care team at
+        <a href="mailto:care@vitakode.com">care@vitakode.com</a>.</p>
       </div>
     </div>
   </section>

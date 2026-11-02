@@ -32,6 +32,7 @@ Route::get('/ingredients', [PageController::class, 'ingredients'])->name('ingred
 Route::get('/routine-finder', [PageController::class, 'routineFinder'])->name('routine-finder');
 Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name('privacy-policy');
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
+Route::get('/returns', [PageController::class, 'returns'])->name('returns');
 
 /*
 |--------------------------------------------------------------------------

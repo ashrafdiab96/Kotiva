@@ -66,6 +66,7 @@ final class StorefrontRoutesTest extends TestCase
             ['/routine-finder'],
             ['/privacy-policy'],
             ['/terms'],
+            ['/returns'],
         ];
     }
 
@@ -205,7 +206,7 @@ final class StorefrontRoutesTest extends TestCase
 
         $body = $response->getContent() ?: '';
 
-        $this->assertSame(9, substr_count($body, '<url>'), '9 content pages; the shop and products are on Salla');
+        $this->assertSame(10, substr_count($body, '<url>'), '10 content pages; the shop and products are on Salla');
         $this->assertStringNotContainsString('/product/', $body);
         $this->assertStringNotContainsString('/shop', $body);
         $this->assertStringContainsString('/routine-finder</loc>', $body);

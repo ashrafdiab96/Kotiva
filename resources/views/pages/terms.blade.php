@@ -1,20 +1,20 @@
 @extends('layouts.app')
 
 @section('meta')
-  <title>Terms & Conditions (Draft) — kotiva™</title>
-  <meta name="description" content="The terms and conditions governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
+  <title>Terms of Use (Draft) — kotiva™</title>
+  <meta name="description" content="The terms governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
   <meta name="robots" content="noindex, follow">
   <link rel="canonical" href="{{ config('app.url') }}/terms">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KOTIVA">
   <meta property="og:locale" content="en_US">
-  <meta property="og:title" content="Terms & Conditions (Draft) — kotiva™">
-  <meta property="og:description" content="The terms and conditions governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
+  <meta property="og:title" content="Terms of Use (Draft) — kotiva™">
+  <meta property="og:description" content="The terms governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
   <meta property="og:url" content="{{ config('app.url') }}/terms">
   <meta property="og:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Terms & Conditions (Draft) — kotiva™">
-  <meta name="twitter:description" content="The terms and conditions governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
+  <meta name="twitter:title" content="Terms of Use (Draft) — kotiva™">
+  <meta name="twitter:description" content="The terms governing your use of the kotiva™ (Vitakode LLC) website. Draft template pending legal review.">
   <meta name="twitter:image" content="{{ config('app.url') }}/assets/hero-warm-skincare.webp">
 @endsection
 
@@ -78,10 +78,10 @@
   <header class="legal-hero">
     <div class="container">
       <p class="t-eyebrow reveal" style="margin-bottom:16px;">Legal</p>
-      <h1 class="t-display reveal reveal-delay-1" style="margin-bottom:0;">TERMS &<br>CONDITIONS</h1>
+      <h1 class="t-display reveal reveal-delay-1" style="margin-bottom:0;">TERMS<br>OF USE</h1>
       <div class="draft-banner reveal reveal-delay-2">
         <strong>Draft — pending legal review.</strong> This page is a template prepared for internal
-        review and has not yet been approved as kotiva™'s final Terms & Conditions. Do not treat this
+        review and has not yet been approved as kotiva™'s final Terms of Use. Do not treat this
         as legally binding until it is reviewed and confirmed.
       </div>
     </div>
@@ -90,65 +90,60 @@
   <section class="legal-content">
     <div class="container">
       <div class="legal-content-inner reveal">
-        <p class="legal-meta">Last updated: 5 July 2026 (draft)</p>
+        <p class="legal-meta">Last updated: October 2026 (draft)</p>
 
-        <h2>1. Acceptance of Terms</h2>
-        <p>These Terms & Conditions ("Terms") govern your use of this website
-        ({{ parse_url(config('app.url'), PHP_URL_HOST) }}, the "Site"), operated by <strong>Vitakode LLC</strong>,
-        a company registered in Muscat, Sultanate of Oman ("kotiva™", "we", "us", or "our"). By
-        accessing or using the Site, you agree to be bound by these Terms.</p>
+        <p>These Terms of Use apply to your use of the kotiva website and to orders you place through it.
+        By using the website you agree to them, so please read them carefully. The website is operated by
+        kotiva™, a brand of Vitakode LLC. If you do not agree with these terms, please do not use the
+        website.</p>
 
-        <h2>2. About Our Products</h2>
-        <p>kotiva™ products are doctor-reviewed skincare formulations. Product descriptions,
-        ingredient information, and usage instructions on this Site are provided for informational
-        purposes and do not constitute medical advice. Always patch-test a new product and consult a
-        dermatologist or physician if you have a skin condition, are pregnant or nursing, or are
-        uncertain whether a product is suitable for you.</p>
+        <h2>Information on This Website</h2>
+        <p>The content on this website, including product descriptions, ingredient information, articles in
+        the Journal and the results of the Routine Finder, is general information about skincare and
+        haircare. It is not medical advice, and it does not replace a consultation with a doctor,
+        dermatologist or pharmacist. If you have a skin condition, are pregnant or breastfeeding, or take
+        prescription medication, please speak to a healthcare professional before using a new product. We
+        work to keep the information accurate and up to date, but we cannot guarantee that it is free of
+        errors, and results vary from person to person.</p>
 
-        <h2>3. Online Ordering</h2>
-        <p>Online ordering is not yet available on this Site. Where the Site indicates a "coming soon"
-        or waitlist feature for online ordering, no purchase can currently be made through the Site.
-        Once online ordering launches, these Terms will be updated to include order acceptance,
-        payment, shipping, and cancellation terms.</p>
+        <h2>Buying From Us and From Retailers</h2>
+        <p>kotiva products are available through selected pharmacies and retailers and through our website.
+        Where a product is sold on our website, the price shown is in Saudi Riyals (SAR) and may change
+        without notice. We accept an order when we confirm that it has been dispatched, and we may decline
+        or cancel an order if a product is unavailable, if there is an error in the price or description,
+        or if we suspect misuse. Delivery times shown at checkout are estimates, and delivery is available
+        only to the countries listed at checkout. Products bought from a pharmacy or retailer are sold
+        under that retailer's terms, together with our
+        <a href="{{ route('returns') }}">Returns and Refunds</a> policy.</p>
 
-        <h2>4. Purchases Through Stockists</h2>
-        <p>kotiva™ products may currently be purchased through select third-party stockists. Purchases
-        made through a stockist are subject to that stockist's own terms of sale, return policy, and
-        payment terms, not these Terms.</p>
+        <h2>Using the Website Properly</h2>
+        <p>You agree to use the website lawfully and not to interfere with it or its security, copy it
+        automatically in bulk, upload harmful code, or give false details when you contact us or order. We
+        may suspend access if these terms are broken.</p>
 
-        <h2>5. Intellectual Property</h2>
-        <p>All content on this Site — including text, graphics, logos, product photography, and
-        the kotiva™ name and marks — is the property of Vitakode LLC or its licensors and is
-        protected by applicable intellectual property laws. You may not reproduce, distribute, or
-        create derivative works from this content without our prior written consent.</p>
+        <h2>Our Content and Brand</h2>
+        <p>The kotiva name, logo, photography, text, designs and other content on this website belong to
+        kotiva or its licensors and are protected by intellectual property laws. You may view and share
+        the pages for personal, non-commercial use, but you may not copy, change or reuse our content or
+        brand for any other purpose without our written permission.</p>
 
-        <h2>6. Acceptable Use</h2>
-        <p>You agree not to use the Site in any way that is unlawful, or to attempt to gain
-        unauthorized access to any part of the Site or its underlying systems.</p>
+        <h2>Links to Other Websites</h2>
+        <p>The website may link to other websites, such as retailers' pages. We do not control those sites
+        and are not responsible for their content or policies.</p>
 
-        <h2>7. Limitation of Liability</h2>
-        <p>To the fullest extent permitted by applicable law, Vitakode LLC shall not be liable for any
-        indirect, incidental, or consequential damages arising from your use of the Site or reliance
-        on any information published on it.</p>
+        <h2>Our Responsibility</h2>
+        <p>We take care to provide the website and our products to a high standard, and nothing in these
+        terms limits any right you have under the law that cannot be limited. Subject to that, we are not
+        responsible for losses that were not reasonably foreseeable, for interruptions to the website
+        beyond our control, or for loss caused by using the website or its information contrary to these
+        terms or to a product's directions.</p>
 
-        <h2>8. Governing Law</h2>
-        <p>These Terms are governed by the laws of the Sultanate of Oman, without regard to its
-        conflict-of-law principles. Any disputes arising under these Terms shall be subject to the
-        exclusive jurisdiction of the courts of Muscat, Oman.</p>
-
-        <h2>9. Changes to These Terms</h2>
-        <p>We may revise these Terms from time to time. The "Last updated" date at the top of this
-        page reflects the most recent revision. Continued use of the Site after changes are posted
-        constitutes acceptance of the revised Terms.</p>
-
-        <h2>10. Contact Us</h2>
-        <p>Questions about these Terms can be directed to:</p>
-        <p>
-          Vitakode LLC<br>
-          North Al Ghubra, Bousher, Muscat Governorate, Sultanate of Oman<br>
-          Email: <a href="mailto:info@vitakode.com">info@vitakode.com</a><br>
-          Phone: <a href="tel:+96895990420">+968 9599 0420</a>
-        </p>
+        <h2>Changes, Law and Contact</h2>
+        <p>We may update these terms from time to time. The version published on this website at the time
+        you use it is the one that applies. These terms are governed by the laws of the Kingdom of Saudi
+        Arabia, and any dispute will be handled by the competent courts of the Kingdom of Saudi Arabia,
+        unless the law gives you the right to bring a claim elsewhere. If you have any question about these
+        terms, please get in touch through our <a href="{{ route('contact') }}">Contact page</a>.</p>
       </div>
     </div>
   </section>

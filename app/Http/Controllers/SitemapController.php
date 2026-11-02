@@ -34,6 +34,7 @@ final class SitemapController extends Controller
         'contact' => 0.5,
         'privacy-policy' => 0.3,
         'terms' => 0.3,
+        'returns' => 0.3,
     ];
 
     public function __invoke(): Response

@@ -78,4 +78,9 @@ final class PageController extends Controller
     {
         return view('pages.terms');
     }
+
+    public function returns(): View
+    {
+        return view('pages.returns');
+    }
 }

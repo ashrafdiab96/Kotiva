@@ -61,7 +61,7 @@
 
             <label class="checkout-check">
               <input type="checkbox" name="terms" value="1" @checked(old('terms')) @error('terms') aria-invalid="true" aria-describedby="terms-error" @enderror>
-              <span>I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener">Terms &amp; Conditions</a>.</span>
+              <span>I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener">Terms of Use</a>.</span>
             </label>
             {{-- role="alert": this is usually the only error on the step, and
                  without it a failed Place Order is silent to a screen reader. --}}
